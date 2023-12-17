@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "gpt-server"
+version = "0.0.1"
+description = ""
+authors = ["liuyu <506610466@qq.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langchain = "^0.0.350"
+sentence-transformers = "^2.2.2"
+fschat = {extras = ["model-worker", "webui"], version = "^0.2.34"}
+
+[[tool.poetry.source]]
+name = "ustc"
+url = "https://mirrors.ustc.edu.cn/pypi/web/simple"
+priority = "primary"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
