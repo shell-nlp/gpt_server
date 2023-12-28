@@ -1,5 +1,4 @@
 import json
-import socket
 from typing import Dict, List, Optional
 from fastchat.serve.base_model_worker import BaseModelWorker, app
 import os
@@ -24,6 +23,7 @@ from fastchat.utils import (
 
 import torch
 from fastchat_adapter.model_handler.chatglm3 import conv2messages
+from fastchat_adapter.utils import get_free_tcp_port
 
 
 class InvalidScoreLogitsProcessor(LogitsProcessor):
@@ -148,15 +148,6 @@ class ChatGLM3Worker(BaseModelWorker):
         return json.loads(x[:-1].decode())
 
 
-def get_free_tcp_port():
-    """获取可用的端口"""
-    tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    tcp.bind(("", 0))
-    _, port = tcp.getsockname()
-    tcp.close()
-    return port
-
-
 def get_worker(
     model_path: str = "/home/dev/model/chatglm3-6b/",
     controller_addr: str = "http://localhost:21001",
@@ -176,9 +167,6 @@ def get_worker(
         conv_template=conv_template,
     )
     return worker
-
-
-master_port = None
 
 
 def main():

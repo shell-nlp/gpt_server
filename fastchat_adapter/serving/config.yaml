@@ -12,11 +12,11 @@ models:
 
     workers:
     - gpus:
-      # - 1
+      - 1
       - 2
       # - 3
-    - gpus:
-      - 1
+    # - gpus:
+    #   - 1
 
 
 
