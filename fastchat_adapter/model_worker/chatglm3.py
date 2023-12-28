@@ -15,7 +15,6 @@ from fastchat.model.model_adapter import (
     add_model_args,
 )
 import uuid
-import numpy as np
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from transformers.generation.logits_process import LogitsProcessor
 from transformers.generation.utils import LogitsProcessorList
@@ -179,15 +178,34 @@ def get_worker(
     return worker
 
 
-def main():
-    import uvicorn
+master_port = None
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
+
+def main():
+    global master_port
+    import uvicorn
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--gpus", type=str, default="gpus")
+    # 必传
+    parser.add_argument("--local_rank", type=str, default="local-rank")
+    parser.add_argument("--master_port", type=str, default="master_port")
+    args = parser.parse_args()
+    gpus = args.gpus
+    master_port = args.master_port
+    print("local-rank", args.local_rank)
+    print("master_port", args.master_port)
+
+    os.environ["MASTER_PORT"] = str(master_port)
+    os.environ["CUDA_VISIBLE_DEVICES"] = gpus
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
     host = "localhost"
     port = get_free_tcp_port()
     worker_addr = f"http://{host}:{port}"
     worker = get_worker(worker_addr=worker_addr)
     uvicorn.run(app, host=host, port=port)
+    # deepspeed --num_gpus 2 chatglm3.py --gpus 1,2
 
 
 if __name__ == "__main__":
