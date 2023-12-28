@@ -15,7 +15,7 @@ class EmbeddingWorker(BaseModelWorker):
         model_path: str,
         model_names: List[str],
         limit_worker_concurrency: int,
-        conv_template: str = None,
+        conv_template: str = None,  # type: ignore
     ):
         super().__init__(
             controller_addr,
@@ -41,9 +41,9 @@ class EmbeddingWorker(BaseModelWorker):
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]
         outputs = self.embedding.client.tokenize(texts)
-        token_num = outputs['input_ids'].size(0)*outputs['input_ids'].size(1)
+        token_num = outputs["input_ids"].size(0) * outputs["input_ids"].size(1)
         embedding = self.embedding.embed_documents(texts=texts)
-        ret['token_num'] = token_num
+        ret["token_num"] = token_num
         ret["embedding"] = embedding
         return ret
 
@@ -55,7 +55,7 @@ def get_worker(
     worker_id: str = str(uuid.uuid4())[:8],
     model_names: List[str] = ["piccolo-base-zh"],
     limit_worker_concurrency: int = 6,
-    conv_template: str = None,
+    conv_template: str = None,  # type: ignore
 ):
     worker = EmbeddingWorker(
         controller_addr,
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="localhost")
-    parser.add_argument("--port", type=int, default=21002)
+    parser.add_argument("--port", type=int, default=21003)
     parser.add_argument(
         "--controller-address", type=str, default="http://localhost:21001"
     )
@@ -91,6 +91,7 @@ if __name__ == "__main__":
         help="Limit the model concurrency to prevent OOM.",
     )
     parser.add_argument("--embed-in-truncate", action="store_true")
-
-    worker = get_worker()
-    uvicorn.run(app, host="localhost", port=21002, log_level="info")
+    args = parser.parse_args()
+    worker_addr = f"http://{args.host}:{args.port}"
+    worker = get_worker(worker_addr=worker_addr)
+    uvicorn.run(app, host=args.host, port=args.port, log_level="info")

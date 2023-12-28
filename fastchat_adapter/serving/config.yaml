@@ -1,0 +1,24 @@
+serve_args:
+  host: 0.0.0.0
+  port: 8081
+
+models:
+  chatglm3-6b:  #自定义的模型名称
+    alias: null
+    enable: true  # false true
+    model_name_or_path: /home/dev/model/chatglm3-6b/
+    model_type: chatglm3
+    work_mode: deepspeed
+
+    workers:
+    - gpus:
+      # - 1
+      - 2
+      # - 3
+
+
+
+
+
+
+
