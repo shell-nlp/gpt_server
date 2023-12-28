@@ -1,1 +1,1 @@
-# gpt_server
+# fastchat_adapter
