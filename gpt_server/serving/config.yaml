@@ -5,7 +5,7 @@ serve_args:
 models:
   chatglm3-6b-2:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: true  # false true
+    enable: false  # false true
     model_name_or_path: /home/dev/model/chatglm3-6b/
     model_type: chatglm3
     work_mode: deepspeed
@@ -17,6 +17,18 @@ models:
       # - 3
     # - gpus:
     #   - 1
+  # Embedding 模型
+  piccolo-base-zh:
+    alias: null # 别名   
+    enable: true  # false true
+    model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
+    model_type: embedding
+    work_mode: deepspeed
+
+    workers:
+    - gpus:
+      - 0
+
 
 
 

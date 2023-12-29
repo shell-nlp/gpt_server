@@ -29,7 +29,11 @@ for model_name, model_config in config["models"].items():
         model_type = model_config["model_type"]
         # model type 校验
         py_path = f"{root_dir}/model_worker/{model_type}.py"
-        model_names = model_name + "," + model_config["alias"]
+        
+        model_names = model_name
+        if model_config["alias"]:
+            model_names = model_name + "," + model_config["alias"]
+
         # 获取 worker 数目 并获取每个 worker 的资源
         workers = model_config["workers"]
         if model_config["work_mode"] == "deepspeed":

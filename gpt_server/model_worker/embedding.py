@@ -1,9 +1,10 @@
+import uuid
+import os
 from typing import List
 from fastchat.serve.base_model_worker import BaseModelWorker, app
 from langchain.embeddings import HuggingFaceEmbeddings
-from fastchat.model.model_adapter import add_model_args
-import uuid
-import argparse
+
+from gpt_server.utils import get_free_tcp_port
 
 
 class EmbeddingWorker(BaseModelWorker):
@@ -37,6 +38,8 @@ class EmbeddingWorker(BaseModelWorker):
         self.init_heart_beat()
 
     def get_embeddings(self, params):
+        print("params", params)
+        print("worker_id:", self.worker_id)
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]
@@ -49,7 +52,7 @@ class EmbeddingWorker(BaseModelWorker):
 
 
 def get_worker(
-    model_path: str = "/home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/",
+    model_path: str,
     controller_addr: str = "http://localhost:21001",
     worker_addr: str = "http://localhost:21002",
     worker_id: str = str(uuid.uuid4())[:8],
@@ -69,29 +72,41 @@ def get_worker(
     return worker
 
 
-if __name__ == "__main__":
+def main():
     import uvicorn
+    import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", type=str, default="localhost")
-    parser.add_argument("--port", type=int, default=21003)
+    parser.add_argument("--gpus", type=str, default="gpus")
+
+    parser.add_argument("--local_rank", type=str, default="local-rank")  # 必传
+    parser.add_argument("--master_port", type=str, default="master_port")
+    parser.add_argument("--model_name_or_path", type=str, default="model_name_or_path")
     parser.add_argument(
-        "--controller-address", type=str, default="http://localhost:21001"
+        "--model_names", type=lambda s: s.split(","), default="model_names"
     )
-    add_model_args(parser)
-    parser.add_argument(
-        "--model-names",
-        type=lambda s: s.split(","),
-        help="Optional display comma separated names",
-    )
-    parser.add_argument(
-        "--limit-worker-concurrency",
-        type=int,
-        default=5,
-        help="Limit the model concurrency to prevent OOM.",
-    )
-    parser.add_argument("--embed-in-truncate", action="store_true")
+
     args = parser.parse_args()
-    worker_addr = f"http://{args.host}:{args.port}"
-    worker = get_worker(worker_addr=worker_addr)
-    uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+
+    print("local-rank", args.local_rank)
+    print("master_port", args.master_port)
+
+    os.environ["MASTER_PORT"] = args.master_port
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
+    host = "localhost"
+    port = get_free_tcp_port()
+    worker_addr = f"http://{host}:{port}"
+    worker = get_worker(
+        worker_addr=worker_addr,
+        model_path=args.model_name_or_path,
+        model_names=args.model_names,
+    )
+    if args.local_rank == "0":
+        print("=======================================")
+        print(f"{args.model_names[0]} 启动成功!")
+        print("=======================================")
+    uvicorn.run(app, host=host, port=port)
+
+
+if __name__ == "__main__":
+    main()

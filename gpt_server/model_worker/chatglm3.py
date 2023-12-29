@@ -145,7 +145,7 @@ class ChatGLM3Worker(BaseModelWorker):
 
 
 def get_worker(
-    model_path: str = "/home/dev/model/chatglm3-6b/",
+    model_path: str,
     controller_addr: str = "http://localhost:21001",
     worker_addr: str = "http://localhost:21002",
     worker_id: str = str(uuid.uuid4())[:8],
@@ -166,7 +166,6 @@ def get_worker(
 
 
 def main():
-    global master_port
     import uvicorn
     import argparse
 
@@ -187,7 +186,6 @@ def main():
 
     os.environ["MASTER_PORT"] = args.master_port
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
     host = "localhost"
     port = get_free_tcp_port()
     worker_addr = f"http://{host}:{port}"
@@ -196,6 +194,10 @@ def main():
         model_path=args.model_name_or_path,
         model_names=args.model_names,
     )
+    if args.local_rank == "0":
+        print("=======================================")
+        print(f"{args.model_names[0]} 启动成功!")
+        print("=======================================")
     uvicorn.run(app, host=host, port=port)
 
 
