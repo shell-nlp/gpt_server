@@ -22,8 +22,8 @@ from fastchat.utils import (
 )
 
 import torch
-from fastchat_adapter.model_handler.chatglm3 import conv2messages
-from fastchat_adapter.utils import get_free_tcp_port
+from gpt_server.model_handler.chatglm3 import conv2messages
+from gpt_server.utils import get_free_tcp_port
 
 
 class InvalidScoreLogitsProcessor(LogitsProcessor):

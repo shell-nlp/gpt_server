@@ -9,7 +9,7 @@ import subprocess
 root_dir = os.path.join(os.path.dirname(__file__), "..")
 root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)
-from fastchat_adapter.utils import get_free_tcp_port
+from gpt_server.utils import get_free_tcp_port
 
 with open("./config.yaml", "r") as f:
     config = yaml.safe_load(f)

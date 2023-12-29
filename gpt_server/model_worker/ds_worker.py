@@ -7,7 +7,7 @@ from transformers import AutoModel, AutoConfig, AutoTokenizer
 from accelerate import init_empty_weights, load_checkpoint_and_dispatch
 from accelerate.utils import get_balanced_memory, infer_auto_device_map
 from acc_worker import get_acc_model
-from fastchat_adapter.utils import get_free_tcp_port
+from gpt_server.utils import get_free_tcp_port
 
 # mp.set_start_method("spawn")
 # 创建进程对象
