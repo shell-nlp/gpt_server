@@ -3,8 +3,8 @@ serve_args:
   port: 8081
 
 models:
-  chatglm3-6b:  #自定义的模型名称
-    alias: null
+  chatglm3-6b-2:  #自定义的模型名称
+    alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
     enable: true  # false true
     model_name_or_path: /home/dev/model/chatglm3-6b/
     model_type: chatglm3

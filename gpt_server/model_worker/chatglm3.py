@@ -1,18 +1,14 @@
-import json
-from typing import Dict, List, Optional
-from fastchat.serve.base_model_worker import BaseModelWorker, app
 import os
-
-
+import json
+from typing import List
+from fastchat.serve.base_model_worker import BaseModelWorker, app
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 from loguru import logger
 from fastchat.modules.awq import AWQConfig
 from fastchat.modules.exllama import ExllamaConfig
 from fastchat.modules.xfastertransformer import XftConfig
 from fastchat.modules.gptq import GptqConfig
-from fastchat.model.model_adapter import (
-    add_model_args,
-)
+
 import uuid
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from transformers.generation.logits_process import LogitsProcessor
@@ -80,13 +76,13 @@ class ChatGLM3Worker(BaseModelWorker):
         # TODO -----------------------------hf 模型加载------------------------
         # TODO -----------------------------DeepSpeed 模型加载------------------------
         if use_deepspeed:
-            from ds_worker import get_ds_model
+            from gpt_server.model_backend.ds_worker import get_ds_model
 
             logger.info("使用deepspeed")
             ds_model = get_ds_model(model_path=model_path)
             self.model = ds_model
         if use_accelerate:
-            from acc_worker import get_acc_model
+            from gpt_server.model_backend.acc_worker import get_acc_model
 
             logger.info("使用accelerate")
             acc_model = get_acc_model(model_path=model_path)
@@ -176,24 +172,31 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--gpus", type=str, default="gpus")
-    # 必传
-    parser.add_argument("--local_rank", type=str, default="local-rank")
+
+    parser.add_argument("--local_rank", type=str, default="local-rank")  # 必传
     parser.add_argument("--master_port", type=str, default="master_port")
+    parser.add_argument("--model_name_or_path", type=str, default="model_name_or_path")
+    parser.add_argument(
+        "--model_names", type=lambda s: s.split(","), default="model_names"
+    )
+
     args = parser.parse_args()
-    gpus = args.gpus
-    master_port = args.master_port
+
     print("local-rank", args.local_rank)
     print("master_port", args.master_port)
 
-    os.environ["MASTER_PORT"] = str(master_port)
-    os.environ["CUDA_VISIBLE_DEVICES"] = gpus
+    os.environ["MASTER_PORT"] = args.master_port
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
     # os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
     host = "localhost"
     port = get_free_tcp_port()
     worker_addr = f"http://{host}:{port}"
-    worker = get_worker(worker_addr=worker_addr)
+    worker = get_worker(
+        worker_addr=worker_addr,
+        model_path=args.model_name_or_path,
+        model_names=args.model_names,
+    )
     uvicorn.run(app, host=host, port=port)
-    # deepspeed --num_gpus 2 chatglm3.py --gpus 1,2
 
 
 if __name__ == "__main__":

@@ -17,11 +17,15 @@ with open("./config.yaml", "r") as f:
 for model_name, model_config in config["models"].items():
     pprint(model_config)
     print()
+    # 启用的模型
     if model_config["enable"]:
+        # 模型地址
+        model_name_or_path = model_config["model_name_or_path"]
+        # 模型类型
         model_type = model_config["model_type"]
         # model type 校验
         py_path = f"{root_dir}/model_worker/{model_type}.py"
-
+        model_names = model_name + "," + model_config["alias"]
         # 获取 worker 数目 并获取每个 worker 的资源
         workers = model_config["workers"]
         if model_config["work_mode"] == "deepspeed":
@@ -38,6 +42,8 @@ for model_name, model_config in config["models"].items():
                     + py_path
                     + f" --gpus {gpus_str}"
                     + f" --master_port {get_free_tcp_port()}"
+                    + f" --model_name_or_path {model_name_or_path}"
+                    + f" --model_names {model_names}"
                 )
 
                 def run_cmd(cmd):
