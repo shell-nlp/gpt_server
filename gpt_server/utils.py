@@ -21,6 +21,7 @@ def start_controller():
 
 def start_openai_server(host, port):
     """启动openai api 服务"""
+    os.environ["FASTCHAT_WORKER_API_EMBEDDING_BATCH_SIZE"] = "100000"
     cmd = f"python -m fastchat.serve.openai_api_server --host {host} --port {port}"
     openai_server_process = Process(target=run_cmd, args=(cmd,))
     openai_server_process.start()
