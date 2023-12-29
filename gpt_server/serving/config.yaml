@@ -1,6 +1,6 @@
 serve_args:
   host: 0.0.0.0
-  port: 8081
+  port: 8082
 
 models:
   chatglm3-6b-2:  #自定义的模型名称

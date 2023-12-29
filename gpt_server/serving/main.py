@@ -9,11 +9,15 @@ import subprocess
 root_dir = os.path.join(os.path.dirname(__file__), "..")
 root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)
-from gpt_server.utils import get_free_tcp_port
+from gpt_server.utils import get_free_tcp_port, start_server, run_cmd
 
 with open("./config.yaml", "r") as f:
     config = yaml.safe_load(f)
-
+# ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
+host = config["serve_args"]["host"]
+port = config["serve_args"]["port"]
+start_server(host, port)
+# ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
 for model_name, model_config in config["models"].items():
     pprint(model_config)
     print()
@@ -45,12 +49,6 @@ for model_name, model_config in config["models"].items():
                     + f" --model_name_or_path {model_name_or_path}"
                     + f" --model_names {model_names}"
                 )
-
-                def run_cmd(cmd):
-                    print("执行命令命令如下：")
-                    print(cmd)  # 执行
-                    print()
-                    subprocess.run(cmd, shell=True)
 
                 p = Process(target=run_cmd, args=(cmd,))
                 p.start()
