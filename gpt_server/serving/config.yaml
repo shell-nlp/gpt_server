@@ -16,7 +16,7 @@ models:
       - 0
       # - 3
     # - gpus:
-    #   - 1
+    #   - 0
   # Embedding 模型
   piccolo-base-zh:
     alias: null # 别名   

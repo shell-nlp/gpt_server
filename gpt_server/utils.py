@@ -35,7 +35,14 @@ def start_server(host, port):
 
 def stop_server():
     """停止服务"""
-    pass
+    stop_fastchat = (
+        "ps -ef | grep fastchat.serve | awk '{print $2}' |xargs -I{} kill -9 {}"
+    )
+    stop_gpt_server = (
+        "ps -ef | grep gpt_server | awk '{print $2}' |xargs -I{} kill -9 {}"
+    )
+    run_cmd(stop_fastchat)
+    run_cmd(stop_gpt_server)
 
 
 def get_free_tcp_port():

@@ -72,7 +72,7 @@ models:
 [main.py](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/serving/main.py "服务主文件")
 
 ```bash
-python main.py
+sh start.sh
 ```
 
 ## 致谢

@@ -11,6 +11,7 @@ root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)
 from gpt_server.utils import get_free_tcp_port, start_server, run_cmd
 
+
 with open("./config.yaml", "r") as f:
     config = yaml.safe_load(f)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
