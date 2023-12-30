@@ -27,6 +27,9 @@ class EmbeddingWorker(BaseModelWorker):
             limit_worker_concurrency,
             conv_template,
         )
+        use_deepspeed = os.getenv("USE_DS", 0)
+        if use_deepspeed:
+            print("使用deepspeed")
         model_name = model_path
         model_kwargs = {"device": "cuda"}
         encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}

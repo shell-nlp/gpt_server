@@ -62,11 +62,13 @@ class ChatGLM3Worker(BaseModelWorker):
             trust_remote_code=True,
             encode_special_tokens=True,
         )
-        use_deepspeed = True
-        use_accelerate = False
+        use_deepspeed = os.getenv("USE_DS", 0)
+        use_accelerate = os.getenv("USE_ACC",0)
+      
         if use_accelerate and use_deepspeed:
             assert 0, "ds 和 acc 不能同时设置为 True"
         if not use_deepspeed and not use_accelerate:
+            logger.info("使用hf")
             self.model = AutoModel.from_pretrained(
                 model_path,
                 trust_remote_code=True,
@@ -180,12 +182,14 @@ def main():
     )
 
     args = parser.parse_args()
+    use_deepspeed = os.getenv("USE_DS", 0)
+    if use_deepspeed:
+        print("local-rank", args.local_rank)
+        print("master_port", args.master_port)
+        os.environ["MASTER_PORT"] = args.master_port
+        # DS 只能在内部生效
+        os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
-    print("local-rank", args.local_rank)
-    print("master_port", args.master_port)
-
-    os.environ["MASTER_PORT"] = args.master_port
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
     host = "localhost"
     port = get_free_tcp_port()
     worker_addr = f"http://{host}:{port}"

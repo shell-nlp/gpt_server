@@ -4,7 +4,6 @@
 
 （仓库初步构建中，欢迎提出改进或者适配模型的建议。）
 
-
 ## 更新信息
 
 ```plaintext
@@ -18,13 +17,13 @@
 
 | 模型          | 16bit | 4bit | ptv2 | deepspeed | accelerate | hf |
 | ------------- | ----- | ---- | ---- | --------- | ---------- | -- |
-| chatglm-6b    | √    | ×   | ×   | √        | ×         | × |
-| all-embedding | √    | ×   | ×   | √        | ×         | × |
+| chatglm-6b    | √    | ×   | ×   | √        | √         | √ |
+| All-embedding | √    | ×   | ×   | ×        | ×         | √ |
 | Qwen-14B      |       |      |      |           |            |    |
 
 ## 使用方式
 
-### 1. 修改配置文件 
+### 1. 修改配置文件
 
 [config.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/serving/config.yaml "配置文件")
 
