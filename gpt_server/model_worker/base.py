@@ -7,7 +7,7 @@ from fastchat.utils import (
 )
 from loguru import logger
 import os
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer, AutoModelForCausalLM
 import uuid
 from gpt_server.utils import get_free_tcp_port
 
@@ -63,11 +63,18 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             assert 0, "ds 和 acc 不能同时设置为 True"
         if not self.use_deepspeed and not self.use_accelerate:
             logger.info("使用hf")
-            self.model = AutoModel.from_pretrained(
-                model_path,
-                trust_remote_code=True,
-                device_map=None if self.use_deepspeed else "auto",
-            ).half()
+            try:
+                self.model = AutoModel.from_pretrained(
+                    model_path,
+                    trust_remote_code=True,
+                    device_map=None if self.use_deepspeed else "auto",
+                ).half()
+            except ValueError as e:
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    trust_remote_code=True,
+                    device_map=None if self.use_deepspeed else "auto",
+                ).half()
             self.model = self.model.eval()
         if self.use_deepspeed:
             from gpt_server.model_backend.ds_worker import get_ds_model
@@ -150,6 +157,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             worker_addr=worker_addr,
             model_path=args.model_name_or_path,
             model_names=args.model_names,
+            conv_template="chatglm3",  # TODO 默认是chatglm3用于统一处理
         )
         if args.local_rank == "0":
             print("=======================================")

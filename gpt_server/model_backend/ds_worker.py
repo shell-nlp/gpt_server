@@ -2,7 +2,7 @@ import deepspeed
 from deepspeed.inference.config import DeepSpeedTPConfig
 import torch
 import torch.distributed as dist
-from transformers import AutoModel
+from transformers import AutoModel, AutoModelForCausalLM
 
 
 def get_ds_model(model_path):
@@ -12,8 +12,10 @@ def get_ds_model(model_path):
     )
 
     # model = get_acc_model(model_path=model_path)
-
-    model = AutoModel.from_pretrained(model_path, trust_remote_code=True)
+    try:
+        model = AutoModel.from_pretrained(model_path, trust_remote_code=True)
+    except ValueError as e:
+        model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True)
 
     world_size = dist.get_world_size()
     print(f"world size {world_size}")

@@ -2,8 +2,10 @@ import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 from transformers.generation.logits_process import LogitsProcessor
+from transformers import GenerationConfig
 import torch
-from gpt_server.model_handler.chatglm3 import conv2messages
+from gpt_server.model_handler.qwen import conv2messages
+
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
@@ -20,7 +22,7 @@ class InvalidScoreLogitsProcessor(LogitsProcessor):
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
-class ChatGLM3Worker(ModelWorkerBase):
+class QwenWorker(ModelWorkerBase):
     def __init__(
         self,
         controller_addr: str,
@@ -53,24 +55,33 @@ class ChatGLM3Worker(ModelWorkerBase):
             temperature = float(params.get("temperature", 0.8))
             top_p = float(params.get("top_p", 0.8))
             max_new_tokens = int(params.get("max_new_tokens", 512))
-
             query, messages = conv2messages(prompt=prompt)
-
-            for response, new_history in self.model.stream_chat(
+            print(1, query)
+            print(2, messages)
+            stream_generator = self.model.chat_stream(
                 tokenizer=self.tokenizer,
                 query=query,
                 history=messages if messages else None,
-                role= "user",
-                past_key_values=None,
-                max_length=max_new_tokens,
-                do_sample=True,
-                top_p=top_p,
-                temperature=temperature,
-                logits_processor=[invalid_score_processor],
-                return_past_key_values=False,
-            ):
+                system="You are a helpful assistant.",
+                # stop_words_ids=None,
+                # logits_processor=None,
+                generation_config=GenerationConfig(
+                    # temperature=temperature,
+                    chat_format="chatml",
+                    eos_token_id = 151643,
+                    pad_token_id=151643,
+                    max_window_size=6144,
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    top_k = 0,
+                    top_p=top_p,
+                    repetition_penalty = 1.1,
+                    transformers_version="4.31.0"
+                ),
+            )
+            for text in stream_generator:
                 ret = {
-                    "text": response,
+                    "text": text,
                     "error_code": 0,
                 }
 
@@ -95,4 +106,4 @@ class ChatGLM3Worker(ModelWorkerBase):
 
 
 if __name__ == "__main__":
-    ChatGLM3Worker.run()
+    QwenWorker.run()

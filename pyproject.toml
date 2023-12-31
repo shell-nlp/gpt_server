@@ -15,6 +15,8 @@ loguru = "^0.7.2"
 deepspeed = "^0.12.6"
 mpi4py = "^3.1.5"
 distribute = "^0.7.3"
+wheel = "^0.42.0"
+transformers-stream-generator = "^0.0.4"
 
 [[tool.poetry.source]]
 name = "ustc"

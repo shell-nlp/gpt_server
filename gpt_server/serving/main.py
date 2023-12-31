@@ -14,6 +14,7 @@ from gpt_server.utils import get_free_tcp_port, start_server, run_cmd
 
 with open("./config.yaml", "r") as f:
     config = yaml.safe_load(f)
+print(config)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
 host = config["serve_args"]["host"]
 port = config["serve_args"]["port"]
