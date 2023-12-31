@@ -4,13 +4,21 @@ import os
 import sys
 from multiprocessing import Process
 import subprocess
+import signal
 
 # 配置根目录
 root_dir = os.path.join(os.path.dirname(__file__), "..")
 root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)
-from gpt_server.utils import get_free_tcp_port, start_server, run_cmd
+from gpt_server.utils import get_free_tcp_port, start_server, run_cmd, stop_server
 
+
+def signal_handler(signum, frame):
+    stop_server()
+    raise KeyboardInterrupt
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 with open("./config.yaml", "r") as f:
     config = yaml.safe_load(f)

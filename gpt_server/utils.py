@@ -43,6 +43,7 @@ def stop_server():
     )
     run_cmd(stop_fastchat)
     run_cmd(stop_gpt_server)
+    print("停止服务成功！")
 
 
 def get_free_tcp_port():
