@@ -1,5 +1,4 @@
 import socket
-import uvicorn
 import os
 from multiprocessing import Process
 import subprocess
@@ -45,6 +44,17 @@ def stop_server():
     run_cmd(stop_gpt_server)
     print("停止服务成功！")
 
+
+def delete_log(root_path):
+    datanames = os.listdir(os.path.join(root_path,"serving"))  # 查找本目录下所有文件
+    for dataname in datanames:
+        if (
+            dataname.startswith("model_worker")
+            or dataname.startswith("openai_api_server")
+            or dataname.startswith("controller.log")
+        ):
+            # print(os.path.join(root_path,f"serving/{dataname}"))
+            os.remove(os.path.join(root_path,f"serving/{dataname}"))
 
 def get_free_tcp_port():
     """获取可用的端口"""
