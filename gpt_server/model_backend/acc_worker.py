@@ -5,6 +5,19 @@ import torch
 
 
 def get_acc_model(model_path: str, model_class):
+    
+    model = model_class.from_pretrained(
+        model_path,
+        torch_dtype=torch.bfloat16,
+        trust_remote_code=True,
+        device_map = "auto"
+    ).eval()
+    dispatch_model(model=model,)
+    print("device_map: ", "auto")
+    print(model)
+    return model
+
+def get_acc_model2(model_path: str, model_class):
     with init_empty_weights():
         config = AutoConfig.from_pretrained(
             model_path,
@@ -15,7 +28,6 @@ def get_acc_model(model_path: str, model_class):
             torch_dtype=torch.bfloat16,
             trust_remote_code=True,
         ).eval()
-
     no_split_module_classes = getattr(model, "_no_split_modules", None)
     max_memory = get_balanced_memory(
         model,
@@ -23,7 +35,6 @@ def get_acc_model(model_path: str, model_class):
         low_zero=False,
         no_split_module_classes=no_split_module_classes,
     )
-
     device_map = infer_auto_device_map(
         model,
         dtype=torch.bfloat16,

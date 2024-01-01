@@ -28,7 +28,7 @@ class YiWorker(ModelWorkerBase):
             model_names,
             limit_worker_concurrency,
             conv_template,
-            model_type="LlamaForCausalLM",
+            model_type="AutoModelForCausalLM",
         )
 
     def load_model_tokenizer(self, model_path):
