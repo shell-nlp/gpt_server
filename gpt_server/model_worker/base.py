@@ -7,7 +7,13 @@ from fastchat.utils import (
 )
 from loguru import logger
 import os
-from transformers import AutoModel, AutoTokenizer, AutoModelForCausalLM
+from transformers import (
+    AutoModel,
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    LlamaForCausalLM,
+)
+import torch
 import uuid
 from gpt_server.utils import get_free_tcp_port
 
@@ -22,6 +28,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         model_names: List[str],
         limit_worker_concurrency: int,
         conv_template: str = None,  # type: ignore
+        model_type: str = "AutoModel",
     ):
         super().__init__(
             controller_addr,
@@ -34,7 +41,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         )
         self.use_deepspeed = os.getenv("USE_DS", 0)
         self.use_accelerate = os.getenv("USE_ACC", 0)
-
+        self.model_type = model_type
         self.model = None
         self.tokenizer = None
         self.load_model_tokenizer(model_path)
@@ -50,6 +57,21 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             return 512
         return get_context_length(self.model.config)
 
+    def get_model_class(self):
+        MODEL_CLASS = AutoModel
+        if self.model_type == "LlamaForCausalLM":
+            MODEL_CLASS = LlamaForCausalLM
+            register = AutoModelForCausalLM._model_mapping.register
+            register(LlamaForCausalLM.config_class,LlamaForCausalLM,exist_ok=True)
+            MODEL_CLASS = AutoModelForCausalLM
+            
+        elif self.model_type == "AutoModel":
+            MODEL_CLASS = AutoModel
+        elif self.model_type == "AutoModelForCausalLM":
+            MODEL_CLASS = AutoModelForCausalLM
+
+        return MODEL_CLASS
+
     @abstractmethod
     def load_model_tokenizer(self, model_path):
         """加载 模型 和 分词器 直接对 self.model 和 self.tokenizer 进行赋值"""
@@ -61,32 +83,30 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
         if self.use_accelerate and self.use_deepspeed:
             assert 0, "ds 和 acc 不能同时设置为 True"
+
+        MODEL_CLASS = self.get_model_class()
         if not self.use_deepspeed and not self.use_accelerate:
             logger.info("使用hf")
-            try:
-                self.model = AutoModel.from_pretrained(
-                    model_path,
-                    trust_remote_code=True,
-                    device_map=None if self.use_deepspeed else "auto",
-                ).half()
-            except ValueError as e:
-                self.model = AutoModelForCausalLM.from_pretrained(
-                    model_path,
-                    trust_remote_code=True,
-                    device_map=None if self.use_deepspeed else "auto",
-                ).half()
+            self.model = MODEL_CLASS.from_pretrained(
+                model_path,
+                trust_remote_code=True,
+                torch_dtype=torch.bfloat16,
+                device_map=None if self.use_deepspeed else "auto",
+            ).half()
+
             self.model = self.model.eval()
+
         if self.use_deepspeed:
             from gpt_server.model_backend.ds_worker import get_ds_model
 
             logger.info("使用deepspeed")
-            ds_model = get_ds_model(model_path=model_path)
+            ds_model = get_ds_model(model_path=model_path,model_class = MODEL_CLASS)
             self.model = ds_model
         if self.use_accelerate:
             from gpt_server.model_backend.acc_worker import get_acc_model
 
             logger.info("使用accelerate")
-            acc_model = get_acc_model(model_path=model_path)
+            acc_model = get_acc_model(model_path=model_path,model_class = MODEL_CLASS)
             self.model = acc_model
 
     @abstractmethod
@@ -146,6 +166,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         if use_deepspeed:
             print("local-rank", args.local_rank)
             print("master_port", args.master_port)
+            os.environ["Local_RANK"] = args.local_rank
             os.environ["MASTER_PORT"] = args.master_port
             # DS 只能在内部生效
             os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus

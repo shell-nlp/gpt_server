@@ -1,28 +1,15 @@
 import json
+from threading import Thread
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
-from transformers.generation.logits_process import LogitsProcessor
-from transformers import GenerationConfig
+from transformers import GenerationConfig, TextIteratorStreamer
 import torch
-from gpt_server.model_handler.qwen import conv2messages
+from gpt_server.model_handler.yi import conv2messages
 
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
-class InvalidScoreLogitsProcessor(LogitsProcessor):
-    def __call__(
-        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
-    ) -> torch.FloatTensor:
-        if torch.isnan(scores).any() or torch.isinf(scores).any():
-            scores.zero_()
-            scores[..., 5] = 5e4
-        return scores
-
-
-invalid_score_processor = InvalidScoreLogitsProcessor()
-
-
-class QwenWorker(ModelWorkerBase):
+class YiWorker(ModelWorkerBase):
     def __init__(
         self,
         controller_addr: str,
@@ -41,7 +28,7 @@ class QwenWorker(ModelWorkerBase):
             model_names,
             limit_worker_concurrency,
             conv_template,
-            model_type = "AutoModelForCausalLM",
+            model_type="LlamaForCausalLM",
         )
 
     def load_model_tokenizer(self, model_path):
@@ -53,36 +40,50 @@ class QwenWorker(ModelWorkerBase):
         print("worker_id:", self.worker_id)
         try:
             prompt = params["prompt"]
-            temperature = float(params.get("temperature", 0.8))
+            temperature = float(params.get("temperature", 0.6))
             top_p = float(params.get("top_p", 0.8))
             max_new_tokens = int(params.get("max_new_tokens", 512))
-            query, messages = conv2messages(prompt=prompt)
-            print(1, query)
-            print(2, messages)
-            stream_generator = self.model.chat_stream(
-                tokenizer=self.tokenizer,
-                query=query,
-                history=messages if messages else None,
-                system="You are a helpful assistant.",
-                # stop_words_ids=None,
-                # logits_processor=None,
-                generation_config=GenerationConfig(
-                    # temperature=temperature,
-                    chat_format="chatml",
-                    eos_token_id = 151643,
-                    pad_token_id=151643,
-                    max_window_size=6144,
-                    max_new_tokens=max_new_tokens,
-                    do_sample=True,
-                    top_k = 0,
-                    top_p=top_p,
-                    repetition_penalty = 1.1,
-                    transformers_version="4.31.0"
-                ),
+            messages = conv2messages(prompt=prompt)
+            print(1, messages)
+            input_ids = self.tokenizer.apply_chat_template(
+                conversation=messages,
+                tokenize=True,
+                add_generation_prompt=True,
+                return_tensors="pt",
+            ).to(self.model.device)
+            print(self.model.device)
+            streamer = TextIteratorStreamer(
+                self.tokenizer,
+                skip_prompt=True,
+                decode_kwargsl={"skip_special_tokens": True},
             )
-            for text in stream_generator:
+            generation_kwargs = dict(
+                input_ids=input_ids,
+                streamer=streamer,
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=temperature,
+                top_p=top_p,
+                eos_token_id=7,
+                bos_token_id=6,
+                pad_token_id=0,
+            )
+            thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
+            thread.start()
+            generated_text = ""
+            special_tokens = self.tokenizer.special_tokens_map[
+                "additional_special_tokens"
+            ]
+            for new_text in streamer:
+                # 针对 yi模型 特别处理
+                if "<|im_end|>" in new_text:
+                    idx = new_text.rfind("<|im_end|>")
+                    new_text = new_text[:idx]
+
+                generated_text += new_text
+
                 ret = {
-                    "text": text,
+                    "text": generated_text,
                     "error_code": 0,
                 }
 
@@ -107,4 +108,4 @@ class QwenWorker(ModelWorkerBase):
 
 
 if __name__ == "__main__":
-    QwenWorker.run()
+    YiWorker.run()

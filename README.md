@@ -7,6 +7,7 @@
 ## 更新信息
 
 ```plaintext
+1-1   支持了 Yi-34B(hf)
 12-31 支持了 qwen-14b
 12-29 支持了 all-embedding(所有的词嵌入模型)
 12-28 支持了 chatglm3-6b 
@@ -16,11 +17,12 @@
 
 支持且不限于以下模型 ，原则上支持transformer 全系列
 
-| 模型          | 16bit | 4bit | ptv2 | deepspeed | accelerate | hf |
-| ------------- | ----- | ---- | ---- | --------- | ---------- | -- |
-| All-embedding | √    | ×   | ×   | ×        | ×         | √ |
-| chatglm-6b    | √    | ×   | ×   | √        | √         | √ |
-| Qwen-14B      | √    | ×   | ×   | √        | √         | √ |
+| 模型          | 16bit | 4bit | deepspeed | accelerate | hf |
+| ------------- | ----- | ---- | --------- | ---------- | -- |
+| All-embedding | √    | ×   | ×        | ×         | √ |
+| chatglm-6b    | √    | ×   | √        | √         | √ |
+| Qwen-14B      | √    | ×   | √        | √         | √ |
+| Yi-34B        | ×    | ×   | ×        | ×         | √ |
 
 ## 使用方式
 
