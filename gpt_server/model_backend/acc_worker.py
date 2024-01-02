@@ -12,7 +12,7 @@ def get_acc_model(model_path: str, model_class):
         trust_remote_code=True,
         device_map = "auto"
     ).eval()
-    dispatch_model(model=model,)
+    # dispatch_model(model=model,)
     print("device_map: ", "auto")
     print(model)
     return model
