@@ -17,12 +17,14 @@
 
 支持且不限于以下模型 ，原则上支持transformer 全系列， 4bit模型 未进行测试。
 
+（因为 deepspeed inference  官方的bug的问题 可能不太稳定）
+
 | 模型          | 16bit | 4bit | deepspeed | accelerate | hf |
 | ------------- | ----- | ---- | --------- | ---------- | -- |
 | All-embedding | √    | ×   | ×        | ×         | √ |
 | chatglm-6b    | √    | ×   | √        | √         | √ |
 | Qwen-14B      | √    | ×   | √        | √         | √ |
-| Yi-34B        | √    | ×   | ×        | √         | √ |
+| Yi-34B        | √    | ×   | √        | √         | √ |
 
 ## 使用方式
 

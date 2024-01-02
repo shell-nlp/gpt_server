@@ -1,4 +1,5 @@
 import json
+import os
 from threading import Thread
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
@@ -38,6 +39,7 @@ class YiWorker(ModelWorkerBase):
         self.call_ct += 1
         print("params", params)
         print("worker_id:", self.worker_id)
+        print("LOCAL_RANKL: ", int(os.environ["LOCAL_RANK"]))
         try:
             prompt = params["prompt"]
             temperature = float(params.get("temperature", 0.6))
@@ -51,7 +53,6 @@ class YiWorker(ModelWorkerBase):
                 add_generation_prompt=True,
                 return_tensors="pt",
             ).to(self.model.device)
-            print(self.model.device)
             streamer = TextIteratorStreamer(
                 self.tokenizer,
                 skip_prompt=True,
@@ -79,9 +80,7 @@ class YiWorker(ModelWorkerBase):
                 if "<|im_end|>" in new_text:
                     idx = new_text.rfind("<|im_end|>")
                     new_text = new_text[:idx]
-
                 generated_text += new_text
-
                 ret = {
                     "text": generated_text,
                     "error_code": 0,

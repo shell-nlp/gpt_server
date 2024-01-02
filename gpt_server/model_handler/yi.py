@@ -36,6 +36,29 @@ def conv2messages(prompt):
         raise Exception("conv2messages 解析错误")
 
 
+def deepspeed_tp():
+    """from https://github.com/01-ai/Yi/blob/main/demo/text_generation_tp.py"""
+    from deepspeed.module_inject import auto_tp
+    import torch.nn as nn
+
+    # module_inject for model Yi
+    def is_load_module(module):
+        load_layers = [nn.Linear, nn.Embedding, nn.LayerNorm]
+        load_layer_names = [
+            "LPLayerNorm",
+            "SharedEmbedding",
+            "OPTLearnedPositionalEmbedding",
+            "LlamaRMSNorm",
+            # "YiRMSNorm",
+        ]
+        return module.__class__ in load_layers or module._get_name() in load_layer_names
+
+    auto_tp.Loading.is_load_module = is_load_module
+
+    replace_with_kernel_inject = False
+    return replace_with_kernel_inject
+
+
 if __name__ == "__main__":
     from pprint import pprint
 

@@ -7,7 +7,6 @@ import subprocess
 def run_cmd(cmd):
     print("执行命令命令如下：")
     print(cmd)  # 执行
-    print()
     subprocess.run(cmd, shell=True)
 
 
@@ -46,7 +45,7 @@ def stop_server():
 
 
 def delete_log(root_path):
-    datanames = os.listdir(os.path.join(root_path,"serving"))  # 查找本目录下所有文件
+    datanames = os.listdir(os.path.join(root_path, "serving"))  # 查找本目录下所有文件
     for dataname in datanames:
         if (
             dataname.startswith("model_worker")
@@ -54,7 +53,8 @@ def delete_log(root_path):
             or dataname.startswith("controller.log")
         ):
             # print(os.path.join(root_path,f"serving/{dataname}"))
-            os.remove(os.path.join(root_path,f"serving/{dataname}"))
+            os.remove(os.path.join(root_path, f"serving/{dataname}"))
+
 
 def get_free_tcp_port():
     """获取可用的端口"""

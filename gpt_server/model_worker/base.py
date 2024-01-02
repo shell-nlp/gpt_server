@@ -39,6 +39,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             limit_worker_concurrency,
             conv_template,
         )
+        os.environ["WORKER_NAME"] = self.__class__.__name__
         self.use_deepspeed = os.getenv("USE_DS", 0)
         self.use_accelerate = os.getenv("USE_ACC", 0)
         self.model_type = model_type
@@ -62,9 +63,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         if self.model_type == "LlamaForCausalLM":
             MODEL_CLASS = LlamaForCausalLM
             register = AutoModelForCausalLM._model_mapping.register
-            register(LlamaForCausalLM.config_class,LlamaForCausalLM,exist_ok=True)
+            register(LlamaForCausalLM.config_class, LlamaForCausalLM, exist_ok=True)
             MODEL_CLASS = AutoModelForCausalLM
-            
+
         elif self.model_type == "AutoModel":
             MODEL_CLASS = AutoModel
         elif self.model_type == "AutoModelForCausalLM":
@@ -100,13 +101,13 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             from gpt_server.model_backend.ds_worker import get_ds_model
 
             logger.info("使用deepspeed")
-            ds_model = get_ds_model(model_path=model_path,model_class = MODEL_CLASS)
+            ds_model = get_ds_model(model_path=model_path, model_class=MODEL_CLASS)
             self.model = ds_model
         if self.use_accelerate:
             from gpt_server.model_backend.acc_worker import get_acc_model
 
             logger.info("使用accelerate")
-            acc_model = get_acc_model(model_path=model_path,model_class = MODEL_CLASS)
+            acc_model = get_acc_model(model_path=model_path, model_class=MODEL_CLASS)
             self.model = acc_model
 
     @abstractmethod
