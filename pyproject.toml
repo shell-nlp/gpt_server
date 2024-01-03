@@ -18,6 +18,8 @@ distribute = "^0.7.3"
 wheel = "^0.42.0"
 transformers-stream-generator = "^0.0.4"
 openai = "0.28.0"
+vllm = "^0.2.6"
+pyzmq = "^25.1.2"
 
 [[tool.poetry.source]]
 name = "ustc"
