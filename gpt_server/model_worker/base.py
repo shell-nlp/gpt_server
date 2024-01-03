@@ -98,13 +98,13 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             self.model = self.model.eval()
 
         if self.use_deepspeed:
-            from gpt_server.model_backend.ds_worker import get_ds_model
+            from gpt_server.model_backend.deepspeed import get_ds_model
 
             logger.info("使用deepspeed")
             ds_model = get_ds_model(model_path=model_path, model_class=MODEL_CLASS)
             self.model = ds_model
         if self.use_accelerate:
-            from gpt_server.model_backend.acc_worker import get_acc_model
+            from gpt_server.model_backend.accelerate import get_acc_model
 
             logger.info("使用accelerate")
             acc_model = get_acc_model(model_path=model_path, model_class=MODEL_CLASS)
