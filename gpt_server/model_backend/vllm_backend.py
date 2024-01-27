@@ -1,7 +1,9 @@
 from fastchat.conversation import get_conv_template
-from langchain.chat_models import ChatOpenAI
+from typing import Any, Dict, AsyncGenerator
 import asyncio
 import os
+
+from gpt_server.model_backend.base import ModelBackend
 
 os.system("clear")
 
@@ -11,16 +13,7 @@ prompt = conv.get_prompt() + "<|assistant|>"
 
 print(prompt)
 print("---------------------------")
-# llm = ChatOpenAI(
-#     model="chatglm3",
-#     openai_api_key="x",
-#     openai_api_base="http://192.168.102.19:8082/v1",
-#     max_tokens=5120,
-# )
-# for i in llm.stream("你是谁"):
-#     print(i.content, end="", flush=True)
-# print()
-# assert 0
+
 from vllm import LLM, SamplingParams, AsyncLLMEngine, AsyncEngineArgs
 from transformers import AutoTokenizer
 
@@ -43,45 +36,34 @@ inputs = tokenizer.encode_plus(prompt, return_tensors="pt", is_split_into_words=
 print("探索", inputs)
 print(tokenizer.decode(inputs))
 
-assert 0
-# input_ids = inputs
 
+class VllmBackend(ModelBackend):
+    def __init__(self) -> None:
+        model_path = "/home/dev/model/chatglm3-6b/"
 
-engine = AsyncLLMEngine.from_engine_args(engine_args)
+        engine_args = AsyncEngineArgs(
+            model_path, tensor_parallel_size=1, trust_remote_code=True
+        )
+        self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
+    async def stream_chat(self, query: str, params: Dict[str, Any]) -> AsyncGenerator:
+        request_id = params.get("request_id")
+        top_p = params.get("top_p")
+        temperature = params.get("temperature")
+        max_tokens = params.get("max_tokens")
+        prompt_token_ids = params.get("prompt_token_ids")
 
-# ps -ef |grep ray | awk '{print $2}' |xargs -I{} kill -9 {}
-# ray start --head
-# ray start --address='192.168.102.19:6379'
-async def main(request_id="0"):
-    sampling = SamplingParams(
-        use_beam_search=False, top_p=0.8, temperature=0, max_tokens=2048
-    )
-
-    results_generator = engine.generate(
-        "你是谁",
-        sampling_params=sampling,
-        request_id=request_id,
-        prompt_token_ids=input_ids,
-    )
-    # get the results
-    async for request_output in results_generator:
-        print(request_output.outputs[0].text)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
-
-# --------------------------------------
-# llm = LLM(
-#     "/home/dev/model/chatglm3-6b/", tensor_parallel_size=1, trust_remote_code=True
-# )
-# tokenizer = llm.llm_engine.tokenizer
-# input_ids = tokenizer.build_chat_input("你是谁？", history=[], role="user")[
-#     "input_ids"
-# ].tolist()
-# print(tokenizer.decode(input_ids[0]))
-# # print(input_ids)
-# output = llm.generate(sampling_params=sampling, prompt_token_ids=input_ids)
-
-# print(output)
+        sampling = SamplingParams(
+            use_beam_search=False,
+            top_p=top_p,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+        results_generator = self.engine.generate(
+            query,
+            sampling_params=sampling,
+            request_id=request_id,
+            prompt_token_ids=prompt_token_ids,  # 这个是不同之处
+        )
+        async for request_output in results_generator:
+            yield request_output.outputs[0].text

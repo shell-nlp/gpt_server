@@ -82,33 +82,16 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             encode_special_tokens=True,
         )
 
-        if self.use_accelerate and self.use_deepspeed:
-            assert 0, "ds 和 acc 不能同时设置为 True"
-
         MODEL_CLASS = self.get_model_class()
-        if not self.use_deepspeed and not self.use_accelerate:
-            logger.info("使用hf")
-            self.model = MODEL_CLASS.from_pretrained(
-                model_path,
-                trust_remote_code=True,
-                torch_dtype=torch.bfloat16,
-                device_map=None if self.use_deepspeed else "auto",
-            ).half()
+        logger.info("使用hf")
+        self.model = MODEL_CLASS.from_pretrained(
+            model_path,
+            trust_remote_code=True,
+            torch_dtype=torch.bfloat16,
+            device_map=None if self.use_deepspeed else "auto",
+        ).half()
 
-            self.model = self.model.eval()
-
-        if self.use_deepspeed:
-            from gpt_server.model_backend.deepspeed_backend import get_ds_model
-
-            logger.info("使用deepspeed")
-            ds_model = get_ds_model(model_path=model_path, model_class=MODEL_CLASS)
-            self.model = ds_model
-        if self.use_accelerate:
-            from gpt_server.model_backend.accelerate_backend import get_acc_model
-
-            logger.info("使用accelerate")
-            acc_model = get_acc_model(model_path=model_path, model_class=MODEL_CLASS)
-            self.model = acc_model
+        self.model = self.model.eval()
 
     @abstractmethod
     def generate_stream_gate(self, params):
@@ -153,8 +136,6 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser = argparse.ArgumentParser()
         parser.add_argument("--gpus", type=str, default="gpus")
 
-        parser.add_argument("--local_rank", type=str, default="local-rank")  # 必传
-        parser.add_argument("--master_port", type=str, default="master_port")
         parser.add_argument(
             "--model_name_or_path", type=str, default="model_name_or_path"
         )
@@ -163,14 +144,6 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         )
 
         args = parser.parse_args()
-        use_deepspeed = os.getenv("USE_DS", 0)
-        if use_deepspeed:
-            print("local-rank", args.local_rank)
-            print("master_port", args.master_port)
-            os.environ["Local_RANK"] = args.local_rank
-            os.environ["MASTER_PORT"] = args.master_port
-            # DS 只能在内部生效
-            os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
         host = "localhost"
         port = get_free_tcp_port()
@@ -181,8 +154,5 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             model_names=args.model_names,
             conv_template="chatglm3",  # TODO 默认是chatglm3用于统一处理
         )
-        if args.local_rank == "0":
-            print("=======================================")
-            print(f"{args.model_names[0]} 启动成功!")
-            print("=======================================")
+
         uvicorn.run(app, host=host, port=port)

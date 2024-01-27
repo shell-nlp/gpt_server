@@ -5,21 +5,21 @@ serve_args:
 models:
   chatglm3-6b-2:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: false  # false true
+    enable: true  # false true
     model_name_or_path: /home/dev/model/chatglm3-6b/
     model_type: chatglm3  # qwen  chatglm3
     work_mode: hf  # accelerate  deepspeed hf
 
     workers:
     - gpus:
-      - 1
+      # - 1
       - 2
       # - 3
     # - gpus:
     #   - 0
   yi:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: true  # false true
+    enable: false  # false true
     model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
     model_type: yi  # qwen  chatglm3
     work_mode: deepspeed  # accelerate  deepspeed hf
