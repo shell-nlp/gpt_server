@@ -64,10 +64,11 @@ for model_name, model_config in config["models"].items():
             gpus = [str(i) for i in gpus]
             gpus_str = ",".join(gpus)
             num_gpus = len(gpus)
+            run_mode = "python "
+            os.environ["CUDA_VISIBLE_DEVICES"] = gpus_str
 
-            if model_config["work_mode"] == "hf":
-                os.environ["CUDA_VISIBLE_DEVICES"] = gpus_str
-                run_mode = "python "
+            if model_config["work_mode"] == "vllm":
+                os.environ["USE_VLLM"] = "1"
 
             cmd = (
                 run_mode

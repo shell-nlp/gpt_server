@@ -40,8 +40,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             conv_template,
         )
         os.environ["WORKER_NAME"] = self.__class__.__name__
-        self.use_deepspeed = os.getenv("USE_DS", 0)
-        self.use_accelerate = os.getenv("USE_ACC", 0)
+        self.use_vllm = os.getenv("USE_VLLM", 0)
         self.model_type = model_type
         self.model = None
         self.tokenizer = None
@@ -88,7 +87,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             model_path,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
-            device_map=None if self.use_deepspeed else "auto",
+            device_map="auto",
         ).half()
 
         self.model = self.model.eval()
