@@ -6,16 +6,14 @@ from gpt_server.model_backend.base import ModelBackend
 
 
 class HFBackend(ModelBackend):
-    def __init__(self, model_path: str, model: nn.Module) -> None:
+    def __init__(self, tokenizer, model: nn.Module) -> None:
         self.model = model
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_path, trust_remote_code=True
-        )
+        self.tokenizer = tokenizer
 
-    def stream_chat(self, query: str, params: Dict[str, Any]):
-        top_p = params.get("top_p")
-        temperature = params.get("temperature")
-        max_tokens = params.get("max_tokens")
+    async def stream_chat(self, query: str, params: Dict[str, Any]):
+        temperature = float(params.get("temperature", 0.8))
+        top_p = float(params.get("top_p", 0.8))
+        max_tokens = int(params.get("max_new_tokens", 512))
         input_ids = params.get("input_ids")
         streamer = TextIteratorStreamer(
             self.tokenizer,

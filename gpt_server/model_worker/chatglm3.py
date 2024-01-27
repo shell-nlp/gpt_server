@@ -39,13 +39,39 @@ class ChatGLM3Worker(ModelWorkerBase):
             model_names,
             limit_worker_concurrency,
             conv_template,
-            model_type = "AutoModel",
+            model_type="AutoModel",
         )
 
-    def load_model_tokenizer(self, model_path):
-        return super().load_model_tokenizer(model_path)
+    async def generate_stream_gate(self, params):
+        self.call_ct += 1
+        print("params", params)
+        print("worker_id:", self.worker_id)
+        try:
+            prompt = params["prompt"]
+            query, messages = conv2messages(prompt=prompt)
+            async for response in self.backend.stream_chat(query=query, params=params):
+                ret = {
+                    "text": response,
+                    "error_code": 0,
+                }
 
-    def generate_stream_gate(self, params):
+                yield json.dumps(ret).encode() + b"\0"
+
+        except torch.cuda.OutOfMemoryError as e:
+            ret = {
+                "text": f"{SERVER_ERROR_MSG}\n\n({e})",
+                "error_code": ErrorCode.CUDA_OUT_OF_MEMORY,
+            }
+            yield json.dumps(ret).encode() + b"\0"
+        except (ValueError, RuntimeError) as e:
+            print(e)
+            ret = {
+                "text": f"{SERVER_ERROR_MSG}\n\n({e})",
+                "error_code": ErrorCode.INTERNAL_ERROR,
+            }
+            yield json.dumps(ret).encode() + b"\0"
+
+    def generate_stream_gate2(self, params):
         self.call_ct += 1
         print("params", params)
         print("worker_id:", self.worker_id)
@@ -61,7 +87,7 @@ class ChatGLM3Worker(ModelWorkerBase):
                 tokenizer=self.tokenizer,
                 query=query,
                 history=messages if messages else None,
-                role= "user",
+                role="user",
                 past_key_values=None,
                 max_length=max_new_tokens,
                 do_sample=True,

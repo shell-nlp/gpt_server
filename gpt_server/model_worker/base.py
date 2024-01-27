@@ -12,6 +12,7 @@ from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
     LlamaForCausalLM,
+    AutoConfig,
 )
 import torch
 import uuid
@@ -40,8 +41,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             conv_template,
         )
         os.environ["WORKER_NAME"] = self.__class__.__name__
-        self.use_vllm = os.getenv("USE_VLLM", 0)
+        self.USE_VLLM = os.getenv("USE_VLLM", 0)
         self.model_type = model_type
+        self.model_path = model_path
         self.model = None
         self.tokenizer = None
         self.load_model_tokenizer(model_path)
@@ -55,7 +57,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         """ "支持的最大 token 长度"""
         if self.model is None:
             return 512
-        return get_context_length(self.model.config)
+        config = AutoConfig.from_pretrained(self.model_path, trust_remote_code=True)
+        return get_context_length(config)
 
     def get_model_class(self):
         MODEL_CLASS = AutoModel
@@ -80,17 +83,25 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             trust_remote_code=True,
             encode_special_tokens=True,
         )
+        if self.USE_VLLM:
+            from gpt_server.model_backend.vllm_backend import VllmBackend
 
-        MODEL_CLASS = self.get_model_class()
-        logger.info("使用hf")
-        self.model = MODEL_CLASS.from_pretrained(
-            model_path,
-            trust_remote_code=True,
-            torch_dtype=torch.bfloat16,
-            device_map="auto",
-        ).half()
+            pass
+        else:
+            from gpt_server.model_backend.hf_backend import HFBackend
 
-        self.model = self.model.eval()
+            logger.info("使用hf 后端")
+            MODEL_CLASS = self.get_model_class()
+            self.model = MODEL_CLASS.from_pretrained(
+                model_path,
+                trust_remote_code=True,
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
+            ).half()
+
+            self.model = self.model.eval()
+            # 加载 HF 后端
+            self.backend = HFBackend(tokenizer=self.tokenizer, model=self.model)
 
     @abstractmethod
     def generate_stream_gate(self, params):

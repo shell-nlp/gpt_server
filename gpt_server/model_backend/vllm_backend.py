@@ -11,12 +11,12 @@ class VllmBackend(ModelBackend):
         self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
     async def stream_chat(self, query: str, params: Dict[str, Any]) -> AsyncGenerator:
-        request_id = params.get("request_id")
-        top_p = params.get("top_p")
-        temperature = params.get("temperature")
-        max_tokens = params.get("max_tokens")
-        prompt_token_ids = params.get("prompt_token_ids")
-
+        request_id = params.get("request_id", "0")
+        temperature = float(params.get("temperature", 0.8))
+        top_p = float(params.get("top_p", 0.8))
+        max_tokens = int(params.get("max_new_tokens", 512))
+        input_ids = params.get("input_ids")
+        prompt_token_ids = input_ids.tolist()[0]
         sampling = SamplingParams(
             use_beam_search=False,
             top_p=top_p,
