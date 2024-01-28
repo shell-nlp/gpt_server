@@ -1,14 +1,13 @@
 from typing import List
 import json
 from abc import ABC, abstractmethod
-from fastchat.serve.base_model_worker import BaseModelWorker
+from fastchat.serve.base_model_worker import BaseModelWorker, app
 from fastchat.utils import (
     get_context_length,
 )
 
 from loguru import logger
 import os
-from fastapi import FastAPI
 from transformers import (
     AutoModel,
     AutoTokenizer,
@@ -19,9 +18,6 @@ from transformers import (
 import torch
 import uuid
 from gpt_server.utils import get_free_tcp_port
-
-worker = None
-app = FastAPI()
 
 
 class ModelWorkerBase(BaseModelWorker, ABC):
