@@ -196,7 +196,9 @@ def create_background_tasks(request_id):
 
     background_tasks = BackgroundTasks()
     background_tasks.add_task(release_worker_semaphore)
-    background_tasks.add_task(abort_request)
+    #
+    if os.getenv("USE_VLLM", 0):
+        background_tasks.add_task(abort_request)
     return background_tasks
 
 
@@ -221,7 +223,8 @@ async def api_generate(request: Request):
     params["request"] = request
     output = await worker.generate_gate(params)
     release_worker_semaphore()
-    await worker.backend.engine.abort(request_id)
+    if os.getenv("USE_VLLM", 0):
+        await worker.backend.engine.abort(request_id)
     return JSONResponse(output)
 
 

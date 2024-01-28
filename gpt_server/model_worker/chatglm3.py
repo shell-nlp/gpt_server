@@ -53,11 +53,10 @@ class ChatGLM3Worker(ModelWorkerBase):
                 "input_ids"
             ]
             params["input_ids"] = input_ids
-            async for response in self.backend.stream_chat(query=query, params=params):
-                ret = {
-                    "text": response,
-                    "error_code": 0,
-                }
+            async for response, usage in self.backend.stream_chat(
+                query=query, params=params
+            ):
+                ret = {"text": response, "error_code": 0, "usage": usage}
 
                 yield json.dumps(ret).encode() + b"\0"
 
