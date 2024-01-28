@@ -1,13 +1,14 @@
+import asyncio
 from typing import List
 import json
 from abc import ABC, abstractmethod
-from fastchat.serve.base_model_worker import (
-    BaseModelWorker,
-    app,
-)
+from fastapi import BackgroundTasks, Request, FastAPI
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastchat.serve.base_model_worker import BaseModelWorker
 from fastchat.utils import (
     get_context_length,
 )
+from vllm.utils import random_uuid
 from loguru import logger
 import os
 from transformers import (
@@ -20,6 +21,9 @@ from transformers import (
 import torch
 import uuid
 from gpt_server.utils import get_free_tcp_port
+
+worker = None
+app = FastAPI()
 
 
 class ModelWorkerBase(BaseModelWorker, ABC):
@@ -53,6 +57,10 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         self.context_len = self.get_context_length()
         logger.info(f"Loading the model {self.model_names} on worker {worker_id} ...")
         self.init_heart_beat()
+        global worker
+        if worker is None:
+            worker = self
+            print("worker 已赋值")
 
     def get_context_length(
         self,
@@ -170,3 +178,69 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         )
 
         uvicorn.run(app, host=host, port=port)
+
+
+def release_worker_semaphore():
+    worker.semaphore.release()
+
+
+def acquire_worker_semaphore():
+    if worker.semaphore is None:
+        worker.semaphore = asyncio.Semaphore(worker.limit_worker_concurrency)
+    return worker.semaphore.acquire()
+
+
+def create_background_tasks(request_id):
+    async def abort_request() -> None:
+        await worker.backend.engine.abort(request_id)
+
+    background_tasks = BackgroundTasks()
+    background_tasks.add_task(release_worker_semaphore)
+    background_tasks.add_task(abort_request)
+    return background_tasks
+
+
+@app.post("/worker_generate_stream")
+async def api_generate_stream(request: Request):
+    params = await request.json()
+    await acquire_worker_semaphore()
+    request_id = random_uuid()
+    params["request_id"] = request_id
+    params["request"] = request
+    generator = worker.generate_stream_gate(params)
+    background_tasks = create_background_tasks(request_id)
+    return StreamingResponse(generator, background=background_tasks)
+
+
+@app.post("/worker_generate")
+async def api_generate(request: Request):
+    params = await request.json()
+    await acquire_worker_semaphore()
+    request_id = random_uuid()
+    params["request_id"] = request_id
+    params["request"] = request
+    output = await worker.generate_gate(params)
+    release_worker_semaphore()
+    await worker.backend.engine.abort(request_id)
+    return JSONResponse(output)
+
+
+@app.post("/worker_get_status")
+async def api_get_status(request: Request):
+    return worker.get_status()
+
+
+@app.post("/count_token")
+async def api_count_token(request: Request):
+    params = await request.json()
+    return worker.count_token(params)
+
+
+@app.post("/worker_get_conv_template")
+async def api_get_conv(request: Request):
+    return worker.get_conv_template()
+
+
+@app.post("/model_details")
+async def api_model_details(request: Request):
+    return {"context_length": worker.context_len}
