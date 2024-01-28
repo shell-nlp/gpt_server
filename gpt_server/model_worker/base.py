@@ -75,7 +75,6 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
         return MODEL_CLASS
 
-    @abstractmethod
     def load_model_tokenizer(self, model_path):
         """加载 模型 和 分词器 直接对 self.model 和 self.tokenizer 进行赋值"""
         self.tokenizer = AutoTokenizer.from_pretrained(

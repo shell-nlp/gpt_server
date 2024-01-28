@@ -49,6 +49,10 @@ class ChatGLM3Worker(ModelWorkerBase):
         try:
             prompt = params["prompt"]
             query, messages = conv2messages(prompt=prompt)
+            input_ids = self.tokenizer.build_chat_input(query, history=[], role="user")[
+                "input_ids"
+            ]
+            params["input_ids"] = input_ids
             async for response in self.backend.stream_chat(query=query, params=params):
                 ret = {
                     "text": response,

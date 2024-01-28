@@ -34,3 +34,4 @@ class HFBackend(ModelBackend):
         for new_text in streamer:
             generated_text += new_text
             yield generated_text
+        thread.join()
