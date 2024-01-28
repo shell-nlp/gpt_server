@@ -8,7 +8,7 @@ models:
     enable: true  # false true
     model_name_or_path: /home/dev/model/chatglm3-6b/
     model_type: chatglm3  # qwen  chatglm3
-    work_mode: hf  # accelerate  deepspeed hf
+    work_mode: vllm  # vllm hf
 
     workers:
     - gpus:

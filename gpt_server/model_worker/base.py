@@ -1,12 +1,14 @@
 from typing import List
 import json
 from abc import ABC, abstractmethod
-from fastchat.serve.base_model_worker import BaseModelWorker, app
+from fastchat.serve.base_model_worker import BaseModelWorker
 from fastchat.utils import (
     get_context_length,
 )
+
 from loguru import logger
 import os
+from fastapi import FastAPI
 from transformers import (
     AutoModel,
     AutoTokenizer,
@@ -17,6 +19,9 @@ from transformers import (
 import torch
 import uuid
 from gpt_server.utils import get_free_tcp_port
+
+worker = None
+app = FastAPI()
 
 
 class ModelWorkerBase(BaseModelWorker, ABC):
@@ -85,7 +90,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         if self.USE_VLLM:
             from gpt_server.model_backend.vllm_backend import VllmBackend
 
-            pass
+            logger.info("使用vllm 后端")
+            self.backend = VllmBackend(model_path=self.model_path)
         else:
             from gpt_server.model_backend.hf_backend import HFBackend
 
@@ -106,8 +112,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
     def generate_stream_gate(self, params):
         pass
 
-    def generate_gate(self, params):
-        for x in self.generate_stream_gate(params):
+    async def generate_gate(self, params):
+        async for x in self.generate_stream_gate(params):
             pass
         return json.loads(x[:-1].decode())
 
@@ -157,6 +163,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         host = "localhost"
         port = get_free_tcp_port()
         worker_addr = f"http://{host}:{port}"
+        global worker
+
         worker = cls.get_worker(
             worker_addr=worker_addr,
             model_path=args.model_name_or_path,
