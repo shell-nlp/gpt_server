@@ -1,11 +1,13 @@
 from typing import List
 import json
 from abc import ABC, abstractmethod
-from fastchat.serve.base_model_worker import BaseModelWorker, app
+from fastchat.serve.base_model_worker import (
+    BaseModelWorker,
+    app,
+)
 from fastchat.utils import (
     get_context_length,
 )
-
 from loguru import logger
 import os
 from transformers import (
@@ -159,7 +161,6 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         host = "localhost"
         port = get_free_tcp_port()
         worker_addr = f"http://{host}:{port}"
-        global worker
 
         worker = cls.get_worker(
             worker_addr=worker_addr,
