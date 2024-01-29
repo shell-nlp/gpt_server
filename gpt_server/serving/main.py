@@ -10,7 +10,6 @@ root_dir = os.path.join(os.path.dirname(__file__), "..")
 root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)
 from gpt_server.utils import (
-    get_free_tcp_port,
     start_server,
     run_cmd,
     stop_server,
