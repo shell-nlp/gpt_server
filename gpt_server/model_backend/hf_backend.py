@@ -1,12 +1,26 @@
 from typing import Any, Dict
-import torch.nn as nn
+import torch
 from transformers import TextIteratorStreamer
+from transformers.generation.logits_process import LogitsProcessor
 from threading import Thread
 from gpt_server.model_backend.base import ModelBackend
 
 
+class InvalidScoreLogitsProcessor(LogitsProcessor):
+    def __call__(
+        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
+    ) -> torch.FloatTensor:
+        if torch.isnan(scores).any() or torch.isinf(scores).any():
+            scores.zero_()
+            scores[..., 5] = 5e4
+        return scores
+
+
+invalid_score_processor = InvalidScoreLogitsProcessor()
+
+
 class HFBackend(ModelBackend):
-    def __init__(self, tokenizer, model: nn.Module) -> None:
+    def __init__(self, tokenizer, model: torch.nn.Module) -> None:
         self.model = model
         self.tokenizer = tokenizer
 

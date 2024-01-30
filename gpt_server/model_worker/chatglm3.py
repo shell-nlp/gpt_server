@@ -1,23 +1,9 @@
 import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
-from transformers.generation.logits_process import LogitsProcessor
 import torch
 from gpt_server.model_handler.chatglm3 import conv2messages
 from gpt_server.model_worker.base import ModelWorkerBase
-
-
-class InvalidScoreLogitsProcessor(LogitsProcessor):
-    def __call__(
-        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
-    ) -> torch.FloatTensor:
-        if torch.isnan(scores).any() or torch.isinf(scores).any():
-            scores.zero_()
-            scores[..., 5] = 5e4
-        return scores
-
-
-invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
 class ChatGLM3Worker(ModelWorkerBase):

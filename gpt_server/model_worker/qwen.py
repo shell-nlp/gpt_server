@@ -1,25 +1,11 @@
 import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
-from transformers.generation.logits_process import LogitsProcessor
 from transformers import GenerationConfig
 import torch
-from gpt_server.model_handler.qwen import conv2messages
+from gpt_server.model_handler.qwen import conv2messages, make_context
 
 from gpt_server.model_worker.base import ModelWorkerBase
-
-
-class InvalidScoreLogitsProcessor(LogitsProcessor):
-    def __call__(
-        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
-    ) -> torch.FloatTensor:
-        if torch.isnan(scores).any() or torch.isinf(scores).any():
-            scores.zero_()
-            scores[..., 5] = 5e4
-        return scores
-
-
-invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
 class QwenWorker(ModelWorkerBase):
@@ -41,50 +27,25 @@ class QwenWorker(ModelWorkerBase):
             model_names,
             limit_worker_concurrency,
             conv_template,
-            model_type = "AutoModelForCausalLM",
+            model_type="AutoModelForCausalLM",
         )
 
-    def load_model_tokenizer(self, model_path):
-        return super().load_model_tokenizer(model_path)
-
-    def generate_stream_gate(self, params):
+    async def generate_stream_gate(self, params):
         self.call_ct += 1
         print("params", params)
         print("worker_id:", self.worker_id)
         try:
             prompt = params["prompt"]
-            temperature = float(params.get("temperature", 0.8))
-            top_p = float(params.get("top_p", 0.8))
-            max_new_tokens = int(params.get("max_new_tokens", 512))
             query, messages = conv2messages(prompt=prompt)
-            print(1, query)
-            print(2, messages)
-            stream_generator = self.model.chat_stream(
-                tokenizer=self.tokenizer,
-                query=query,
-                history=messages if messages else None,
-                system="You are a helpful assistant.",
-                # stop_words_ids=None,
-                # logits_processor=None,
-                generation_config=GenerationConfig(
-                    # temperature=temperature,
-                    chat_format="chatml",
-                    eos_token_id = 151643,
-                    pad_token_id=151643,
-                    max_window_size=6144,
-                    max_new_tokens=max_new_tokens,
-                    do_sample=True,
-                    top_k = 0,
-                    top_p=top_p,
-                    repetition_penalty = 1.1,
-                    transformers_version="4.31.0"
-                ),
+            raw_text, context_tokens = make_context(
+                tokenizer=self.tokenizer, query=query, history=None, system=""
             )
-            for text in stream_generator:
-                ret = {
-                    "text": text,
-                    "error_code": 0,
-                }
+            input_ids = torch.tensor([context_tokens]).to(self.device)
+            params["input_ids"] = input_ids
+            async for response, usage in self.backend.stream_chat(
+                query=query, params=params
+            ):
+                ret = {"text": response, "error_code": 0, "usage": usage}
 
                 yield json.dumps(ret).encode() + b"\0"
 
