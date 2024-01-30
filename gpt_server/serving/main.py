@@ -25,7 +25,7 @@ def signal_handler(signum, frame):
     raise KeyboardInterrupt
 
 
-signal.signal(signal.SIGINT, signal_handler)
+# signal.signal(signal.SIGINT, signal_handler)
 
 with open("./config.yaml", "r") as f:
     config = yaml.safe_load(f)

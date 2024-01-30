@@ -7,6 +7,7 @@ import subprocess
 def run_cmd(cmd):
     print("执行命令命令如下：")
     print(cmd)  # 执行
+    print()
     subprocess.run(cmd, shell=True)
 
 
