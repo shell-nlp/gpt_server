@@ -18,6 +18,7 @@ transformers-stream-generator = "^0.0.4"
 openai = "0.28.0"
 vllm = "^0.2.6"
 ray = "^2.9.0"
+einops = "^0.7.0"
 
 [[tool.poetry.source]]
 name = "ustc"

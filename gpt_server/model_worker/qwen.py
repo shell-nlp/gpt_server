@@ -1,9 +1,12 @@
 import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
-from transformers import GenerationConfig
 import torch
-from gpt_server.model_handler.qwen import conv2messages, make_context
+from gpt_server.model_handler.qwen import (
+    conv2messages,
+    make_context,
+    get_stop_words_ids,
+)
 
 from gpt_server.model_worker.base import ModelWorkerBase
 
@@ -40,7 +43,11 @@ class QwenWorker(ModelWorkerBase):
             raw_text, context_tokens = make_context(
                 tokenizer=self.tokenizer, query=query, history=None, system=""
             )
-            input_ids = torch.tensor([context_tokens]).to(self.device)
+            stop_words_ids = get_stop_words_ids(
+                tokenizer=self.tokenizer, chat_format="chatml"
+            )
+            params["stop_words_ids"] = stop_words_ids
+            input_ids = torch.tensor([context_tokens])
             params["input_ids"] = input_ids
             async for response, usage in self.backend.stream_chat(
                 query=query, params=params

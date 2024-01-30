@@ -1,20 +1,10 @@
 from typing import Any, Dict
 import torch
 from transformers import TextIteratorStreamer
-from transformers.generation.logits_process import LogitsProcessor
+from transformers.generation.logits_process import LogitsProcessorList
 from threading import Thread
 from gpt_server.model_backend.base import ModelBackend
-
-
-class InvalidScoreLogitsProcessor(LogitsProcessor):
-    def __call__(
-        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
-    ) -> torch.FloatTensor:
-        if torch.isnan(scores).any() or torch.isinf(scores).any():
-            scores.zero_()
-            scores[..., 5] = 5e4
-        return scores
-
+from gpt_server.model_backend.utils import InvalidScoreLogitsProcessor
 
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
@@ -34,6 +24,8 @@ class HFBackend(ModelBackend):
         # presence_penalty = float(params.get("presence_penalty", 0.0))
         # frequency_penalty = float(params.get("frequency_penalty", 0.0))
         input_ids = params.get("input_ids")
+        stop_words_ids = params.get("stop_words_ids", [])
+        logits_processor = LogitsProcessorList([invalid_score_processor])
         streamer = TextIteratorStreamer(
             self.tokenizer,
             skip_prompt=True,
@@ -46,6 +38,7 @@ class HFBackend(ModelBackend):
             do_sample=True,
             temperature=temperature,
             top_p=top_p,
+            logits_processor=logits_processor,
             # top_k=top_k,
             # presence_penalty=presence_penalty,
             # frequency_penalty=frequency_penalty,
