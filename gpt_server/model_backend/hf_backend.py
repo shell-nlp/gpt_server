@@ -4,7 +4,10 @@ from transformers import TextIteratorStreamer
 from transformers.generation.logits_process import LogitsProcessorList
 from threading import Thread
 from gpt_server.model_backend.base import ModelBackend
-from gpt_server.model_backend.utils import InvalidScoreLogitsProcessor
+from gpt_server.model_backend.utils import (
+    InvalidScoreLogitsProcessor,
+    StopWordsLogitsProcessor,
+)
 
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
@@ -25,6 +28,7 @@ class HFBackend(ModelBackend):
         # frequency_penalty = float(params.get("frequency_penalty", 0.0))
         input_ids = params.get("input_ids")
         stop_words_ids = params.get("stop_words_ids", [])
+
         logits_processor = LogitsProcessorList([invalid_score_processor])
         streamer = TextIteratorStreamer(
             self.tokenizer,
