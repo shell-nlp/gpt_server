@@ -1,7 +1,13 @@
-from typing import Iterable, List
-from transformers.generation.logits_process import LogitsProcessor, LogitsProcessorList
+from typing import List
+from transformers.generation.logits_process import LogitsProcessor
+from transformers.generation.stopping_criteria import (
+    StoppingCriteria,
+    StoppingCriteriaList,
+    STOPPING_CRITERIA_INPUTS_DOCSTRING,
+    add_start_docstrings,
+)
+
 import torch
-import numpy as np
 
 
 class InvalidScoreLogitsProcessor(LogitsProcessor):
@@ -14,82 +20,22 @@ class InvalidScoreLogitsProcessor(LogitsProcessor):
         return scores
 
 
-class StopWordsLogitsProcessor(LogitsProcessor):
+class StopAtSpecificTokenCriteria(StoppingCriteria):
     """
-    :class:`transformers.LogitsProcessor` that enforces that when specified sequences appear, stop geration.
-    Args:
-        stop_words_ids (:obj:`List[List[int]]`):
-            List of list of token ids of stop ids. In order to get the tokens of the words
-            that should not appear in the generated text, use :obj:`tokenizer(bad_word,
-            add_prefix_space=True).input_ids`.
-        eos_token_id (:obj:`int`):
-            The id of the `end-of-sequence` token.
+    当生成出第一个指定token时，立即停止生成
     """
 
-    def __init__(self, stop_words_ids: Iterable[Iterable[int]], eos_token_id: int):
-        if not isinstance(stop_words_ids, List) or len(stop_words_ids) == 0:
-            raise ValueError(
-                f"`stop_words_ids` has to be a non-emtpy list, but is {stop_words_ids}."
-            )
-        if any(not isinstance(bad_word_ids, list) for bad_word_ids in stop_words_ids):
-            raise ValueError(
-                f"`stop_words_ids` has to be a list of lists, but is {stop_words_ids}."
-            )
-        if any(
-            any(
-                (not isinstance(token_id, (int, np.integer)) or token_id < 0)
-                for token_id in stop_word_ids
-            )
-            for stop_word_ids in stop_words_ids
-        ):
-            raise ValueError(
-                f"Each list in `stop_words_ids` has to be a list of positive integers, but is {stop_words_ids}."
-            )
+    def __init__(self, token_id_list: List[int] = None):
+        """
+        :param token_id_list: 停止生成的指定token的id的列表
+        """
+        self.token_id_list = token_id_list
 
-        self.stop_words_ids = list(
-            filter(
-                lambda bad_token_seq: bad_token_seq != [eos_token_id], stop_words_ids
-            )
-        )
-        self.eos_token_id = eos_token_id
-        for stop_token_seq in self.stop_words_ids:
-            assert (
-                len(stop_token_seq) > 0
-            ), "Stop words token sequences {} cannot have an empty list".format(
-                stop_words_ids
-            )
-
+    @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
     def __call__(
-        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
-    ) -> torch.FloatTensor:
-        stopped_samples = self._calc_stopped_samples(input_ids)
-        for i, should_stop in enumerate(stopped_samples):
-            if should_stop:
-                scores[i, self.eos_token_id] = float(2**15)
-        return scores
-
-    def _tokens_match(self, prev_tokens: torch.LongTensor, tokens: List[int]) -> bool:
-        if len(tokens) == 0:
-            # if bad word tokens is just one token always ban it
-            return True
-        elif len(tokens) > len(prev_tokens):
-            # if bad word tokens are longer then prev input_ids they can't be equal
-            return False
-        elif prev_tokens[-len(tokens) :].tolist() == tokens:
-            # if tokens match
-            return True
-        else:
-            return False
-
-    def _calc_stopped_samples(self, prev_input_ids: Iterable[int]) -> Iterable[int]:
-        stopped_samples = []
-        for prev_input_ids_slice in prev_input_ids:
-            match = False
-            for stop_token_seq in self.stop_words_ids:
-                if self._tokens_match(prev_input_ids_slice, stop_token_seq):
-                    # if tokens do not match continue
-                    match = True
-                    break
-            stopped_samples.append(match)
-
-        return stopped_samples
+        self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
+    ) -> bool:
+        # return np.argmax(scores[-1].detach().cpu().numpy()) in self.token_id_list
+        # 储存scores会额外占用资源，所以直接用input_ids进行判断
+        print(input_ids[0][-1].detach().cpu().numpy(),"\t",self.token_id_list)
+        return input_ids[0][-1].detach().cpu().numpy() in self.token_id_list

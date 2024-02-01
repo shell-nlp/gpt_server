@@ -6,7 +6,8 @@ from threading import Thread
 from gpt_server.model_backend.base import ModelBackend
 from gpt_server.model_backend.utils import (
     InvalidScoreLogitsProcessor,
-    StopWordsLogitsProcessor,
+    StoppingCriteriaList,
+    StopAtSpecificTokenCriteria,
 )
 
 invalid_score_processor = InvalidScoreLogitsProcessor()
@@ -28,7 +29,10 @@ class HFBackend(ModelBackend):
         # frequency_penalty = float(params.get("frequency_penalty", 0.0))
         input_ids = params.get("input_ids")
         stop_words_ids = params.get("stop_words_ids", [])
-
+        stopping_criteria = StoppingCriteriaList()  # 停止条件
+        stopping_criteria.append(
+            StopAtSpecificTokenCriteria(token_id_list=stop_words_ids)
+        )
         logits_processor = LogitsProcessorList([invalid_score_processor])
         streamer = TextIteratorStreamer(
             self.tokenizer,
@@ -43,6 +47,7 @@ class HFBackend(ModelBackend):
             temperature=temperature,
             top_p=top_p,
             logits_processor=logits_processor,
+            stopping_criteria=stopping_criteria
             # top_k=top_k,
             # presence_penalty=presence_penalty,
             # frequency_penalty=frequency_penalty,

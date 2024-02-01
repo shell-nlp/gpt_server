@@ -47,7 +47,9 @@ class QwenWorker(ModelWorkerBase):
                 tokenizer=self.tokenizer, chat_format="chatml"
             )
             skip_word_list = [self.tokenizer.im_end_id, self.tokenizer.im_start_id, self.tokenizer.eos_token_id or 151643]
-            params["stop_words_ids"] = stop_words_ids
+            print(self.tokenizer.decode(self.tokenizer.im_end_id))
+            # print(2,stop_words_ids)
+            params["stop_words_ids"] = skip_word_list
             input_ids = torch.tensor([context_tokens])
             params["input_ids"] = input_ids
             async for response, usage in self.backend.stream_chat(
