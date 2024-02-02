@@ -27,6 +27,7 @@ class HFBackend(ModelBackend):
         # TODO ValueError: The following `model_kwargs` are not used by the model: ['presence_penalty', 'frequency_penalty'] (note: typos in the generate arguments will also show up in this list)
         # presence_penalty = float(params.get("presence_penalty", 0.0))
         # frequency_penalty = float(params.get("frequency_penalty", 0.0))
+        stop = params.get("stop", [])  # 停止的 token
         input_ids = params.get("input_ids")
         stop_words_ids = params.get("stop_words_ids", [])
         stopping_criteria = StoppingCriteriaList()  # 停止条件
@@ -47,7 +48,7 @@ class HFBackend(ModelBackend):
             temperature=temperature,
             top_p=top_p,
             logits_processor=logits_processor,
-            stopping_criteria=stopping_criteria
+            stopping_criteria=stopping_criteria,
             # top_k=top_k,
             # presence_penalty=presence_penalty,
             # frequency_penalty=frequency_penalty,
@@ -58,6 +59,10 @@ class HFBackend(ModelBackend):
         prompt_tokens = len(input_ids.tolist()[0])
         completion_tokens = 0
         for new_text in streamer:
+            for stop_word in stop:
+                if stop_word in new_text:
+                    idx = new_text.rfind(stop_word)
+                    new_text = new_text[:idx]
             completion_tokens += 1
             generated_text += new_text
             usage = {

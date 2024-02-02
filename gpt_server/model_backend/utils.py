@@ -37,5 +37,4 @@ class StopAtSpecificTokenCriteria(StoppingCriteria):
     ) -> bool:
         # return np.argmax(scores[-1].detach().cpu().numpy()) in self.token_id_list
         # 储存scores会额外占用资源，所以直接用input_ids进行判断
-        print(input_ids[0][-1].detach().cpu().numpy(),"\t",self.token_id_list)
         return input_ids[0][-1].detach().cpu().numpy() in self.token_id_list

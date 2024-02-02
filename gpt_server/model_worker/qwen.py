@@ -5,7 +5,6 @@ import torch
 from gpt_server.model_handler.qwen import (
     conv2messages,
     make_context,
-    get_stop_words_ids,
 )
 
 from gpt_server.model_worker.base import ModelWorkerBase
@@ -33,6 +32,15 @@ class QwenWorker(ModelWorkerBase):
             model_type="AutoModelForCausalLM",
         )
 
+        self.stop_words_ids = [
+            self.tokenizer.im_end_id,
+            self.tokenizer.im_start_id,
+            self.tokenizer.eos_token_id or 151643,
+        ]
+        self.stop = [
+            self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
+        ]
+
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         print("params", params)
@@ -43,15 +51,12 @@ class QwenWorker(ModelWorkerBase):
             raw_text, context_tokens = make_context(
                 tokenizer=self.tokenizer, query=query, history=None, system=""
             )
-            stop_words_ids = get_stop_words_ids(
-                tokenizer=self.tokenizer, chat_format="chatml"
-            )
-            skip_word_list = [self.tokenizer.im_end_id, self.tokenizer.im_start_id, self.tokenizer.eos_token_id or 151643]
-            print(self.tokenizer.decode(self.tokenizer.im_end_id))
-            # print(2,stop_words_ids)
-            params["stop_words_ids"] = skip_word_list
             input_ids = torch.tensor([context_tokens])
+            # ---------------添加额外的参数------------------------
+            params["stop"].extend(self.stop)
+            params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
+            # ---------------添加额外的参数------------------------
             async for response, usage in self.backend.stream_chat(
                 query=query, params=params
             ):
