@@ -1,5 +1,5 @@
 from typing import List
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
@@ -22,6 +22,7 @@ class EmbeddingWorker(ModelWorkerBase):
             model_names,
             limit_worker_concurrency,
             conv_template,
+            model_type="embedding",
         )
         model_name = model_path
         model_kwargs = {"device": "cuda"}
@@ -32,9 +33,6 @@ class EmbeddingWorker(ModelWorkerBase):
             encode_kwargs=encode_kwargs,
         )
         self.init_heart_beat()
-
-    def load_model_tokenizer(self, model_path):
-        pass
 
     def generate_stream_gate(self, params):
         pass

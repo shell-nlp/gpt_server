@@ -31,7 +31,7 @@ models:
       - 2
   yi:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: true  # false true
+    enable: false  # false true
     model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
     model_type: yi  # qwen  chatglm3 yi
     work_mode: vllm  # vllm hf
@@ -44,7 +44,7 @@ models:
   # Embedding 模型
   piccolo-base-zh:
     alias: null # 别名   
-    enable: false  # false true
+    enable: true  # false true
     model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
     model_type: embedding
     work_mode: hf

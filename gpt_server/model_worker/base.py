@@ -88,6 +88,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
     def load_model_tokenizer(self, model_path):
         """加载 模型 和 分词器 直接对 self.model 和 self.tokenizer 进行赋值"""
+        if self.model_type == "embedding":
+            return 1
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,
             trust_remote_code=True,
@@ -247,3 +249,12 @@ async def api_get_conv(request: Request):
 @app.post("/model_details")
 async def api_model_details(request: Request):
     return {"context_length": worker.context_len}
+
+
+@app.post("/worker_get_embeddings")
+async def api_get_embeddings(request: Request):
+    params = await request.json()
+    await acquire_worker_semaphore()
+    embedding = worker.get_embeddings(params)
+    release_worker_semaphore()
+    return JSONResponse(content=embedding)
