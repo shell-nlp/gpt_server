@@ -9,7 +9,7 @@ from gpt_server.model_backend.utils import (
     StoppingCriteriaList,
     StopAtSpecificTokenCriteria,
 )
-
+import asyncio
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
@@ -71,3 +71,5 @@ class HFBackend(ModelBackend):
                 "total_tokens": prompt_tokens + completion_tokens,
             }
             yield generated_text, usage
+            # 用来解决输出卡顿的问题
+            await asyncio.sleep(0.02)

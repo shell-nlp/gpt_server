@@ -35,6 +35,7 @@ host = config["serve_args"]["host"]
 port = config["serve_args"]["port"]
 start_server(host, port)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
+process = []
 for model_name, model_config in config["models"].items():
     # 启用的模型
     if model_config["enable"]:
@@ -44,6 +45,7 @@ for model_name, model_config in config["models"].items():
         model_name_or_path = model_config["model_name_or_path"]
         # 模型类型
         model_type = model_config["model_type"]
+        
         # model type 校验
         py_path = f"{root_dir}/model_worker/{model_type}.py"
 
@@ -56,7 +58,7 @@ for model_name, model_config in config["models"].items():
         # if model_config["work_mode"] == "deepspeed":
         # 设置使用 deepspeed
 
-        process = []
+        # process = []
         for worker in workers:
             gpus = worker["gpus"]
             # 将gpus int ---> str
@@ -80,5 +82,5 @@ for model_name, model_config in config["models"].items():
             p = Process(target=run_cmd, args=(cmd,))
             p.start()
             process.append(p)
-        for p in process:
-            p.join()
+for p in process:
+    p.join()

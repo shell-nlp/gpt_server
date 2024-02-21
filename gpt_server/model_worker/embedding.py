@@ -32,7 +32,6 @@ class EmbeddingWorker(ModelWorkerBase):
             model_kwargs=model_kwargs,
             encode_kwargs=encode_kwargs,
         )
-        self.init_heart_beat()
 
     def generate_stream_gate(self, params):
         pass

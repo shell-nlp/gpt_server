@@ -3,12 +3,12 @@ serve_args:
   port: 8082
 
 models:
-  chatglm3-6b-2:  #自定义的模型名称
+  chatglm3:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: false  # false true
+    enable: true  # false true
     model_name_or_path: /home/dev/model/chatglm3-6b/
     model_type: chatglm3  # qwen  chatglm3
-    work_mode: vllm  # vllm hf
+    work_mode: hf  # vllm hf
 
     workers:
     - gpus:
@@ -42,8 +42,8 @@ models:
       # - 0
     
   # Embedding 模型
-  piccolo-base-zh:
-    alias: null # 别名   
+  embedding:
+    alias: piccolo-base-zh # 别名   
     enable: true  # false true
     model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
     model_type: embedding
