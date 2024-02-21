@@ -56,8 +56,8 @@ models:
     #   - 1
 
   # Embedding 模型 同上
-  piccolo-base-zh:
-    alias: null # 别名   
+  embedding:
+    alias: piccolo-base-zh# 别名   
     enable: true  # false true
     model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
     model_type: embedding
