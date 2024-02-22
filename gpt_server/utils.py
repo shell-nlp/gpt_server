@@ -22,6 +22,8 @@ def start_openai_server(host, port):
     """启动openai api 服务"""
     os.environ["FASTCHAT_WORKER_API_EMBEDDING_BATCH_SIZE"] = "100000"
     cmd = f"python -m fastchat.serve.openai_api_server --host {host} --port {port}"
+    # my
+    # cmd = f"python -m gpt_server.serving.openai_api_server --host {host} --port {port}"
     openai_server_process = Process(target=run_cmd, args=(cmd,))
     openai_server_process.start()
 
@@ -48,11 +50,7 @@ def stop_server():
 def delete_log(root_path):
     datanames = os.listdir(os.path.join(root_path, "serving"))  # 查找本目录下所有文件
     for dataname in datanames:
-        if (
-            dataname.startswith("model_worker")
-            or dataname.startswith("openai_api_server")
-            or dataname.startswith("controller.log")
-        ):
+        if dataname.endswith(".log"):
             # print(os.path.join(root_path,f"serving/{dataname}"))
             os.remove(os.path.join(root_path, f"serving/{dataname}"))
 

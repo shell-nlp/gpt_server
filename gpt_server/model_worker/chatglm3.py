@@ -28,6 +28,15 @@ class ChatGLM3Worker(ModelWorkerBase):
             model_type="AutoModel",
         )
 
+        self.stop_words_ids = [
+            64795,
+            64797,
+            2,
+        ]
+        self.stop = [
+            self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
+        ]
+
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         print("params", params)
@@ -35,10 +44,28 @@ class ChatGLM3Worker(ModelWorkerBase):
         try:
             prompt = params["prompt"]
             query, messages = conv2messages(prompt=prompt)
-            input_ids = self.tokenizer.build_chat_input(query, history=[], role="user")[
-                "input_ids"
-            ]
+            # ----------------添加对工具的支持-----------------------------------
+            for item in messages:
+                if item["role"] == "system":
+                    content = item["content"]
+                    if "tools:" in content:  # 说明使用chatglm3官方的指令
+                        print("chatglm3 使用工具!")
+                        idx = content.rfind("tools:")
+                        tools = content[idx + len("tools:") :]
+                        tools_obj = json.loads(tools)
+                        # -------------
+                        item["content"] = content[: idx + len("tools:")]
+                        item["tools"] = tools_obj
+            # ----------------添加对工具的支持-----------------------------------
+            input_ids = self.tokenizer.build_chat_input(
+                query, history=messages, role="user"
+            )["input_ids"]
+            print(self.tokenizer.decode(input_ids.tolist()[0]))
+            # ---------------添加额外的参数------------------------
+            params["stop"].extend(self.stop)
+            params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
+            # ---------------添加额外的参数------------------------
             async for response, usage in self.backend.stream_chat(
                 query=query, params=params
             ):
