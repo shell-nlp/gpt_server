@@ -1,10 +1,8 @@
 FROM continuumio/miniconda3:main
 
-
 COPY ./ /gpt_server
 
 WORKDIR /gpt_server
-
 
 RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \

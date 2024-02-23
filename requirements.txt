@@ -16,7 +16,6 @@ filelock==3.13.1
 frozenlist==1.4.1
 fschat==0.2.36
 fsspec==2023.12.2
--e git+ssh://git@github.com/shell-nlp/gpt_server.git@a95b4281de07b2452342cc86c200064cd2a83af3#egg=gpt_server
 greenlet==3.0.3
 h11==0.14.0
 httpcore==1.0.2
