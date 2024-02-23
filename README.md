@@ -79,6 +79,6 @@ sh start.sh
 
 ## 致谢
 
-    FastChat :    https://github.com/lm-sys/FastChat
+    FastChat :  https://github.com/lm-sys/FastChat
 
-    vllm :           https://github.com/vllm-project/vllm
+    vllm :  https://github.com/vllm-project/vllm

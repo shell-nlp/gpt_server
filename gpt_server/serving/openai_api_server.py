@@ -7,6 +7,7 @@
 Usage:
 python3 -m fastchat.serve.openai_api_server
 """
+
 import asyncio
 import argparse
 import json
@@ -326,7 +327,9 @@ async def get_gen_params(
             elif msg_role == "assistant":
                 conv.append_message(conv.roles[1], message["content"])
             else:
-                raise ValueError(f"Unknown role: {msg_role}")
+                # TODO
+                pass
+                # raise ValueError(f"Unknown role: {msg_role}")
 
         # Add a blank message for the assistant.
         conv.append_message(conv.roles[1], None)
@@ -360,7 +363,8 @@ async def get_gen_params(
     _add_to_set(conv.stop_str, new_stop)
 
     gen_params["stop"] = list(new_stop)
-
+    # TODO add messages
+    gen_params["messages"] = messages
     logger.debug(f"==== request ====\n{gen_params}")
     return gen_params
 
