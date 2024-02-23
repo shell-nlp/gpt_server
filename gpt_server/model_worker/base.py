@@ -68,8 +68,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         """ "支持的最大 token 长度"""
         if self.model is None:
             return 512
-        config = AutoConfig.from_pretrained(self.model_path, trust_remote_code=True)
-        return get_context_length(config)
+        self.model_config = AutoConfig.from_pretrained(self.model_path, trust_remote_code=True)
+        return get_context_length(self.model_config)
 
     def get_model_class(self):
         MODEL_CLASS = AutoModel

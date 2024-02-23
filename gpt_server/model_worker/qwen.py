@@ -33,10 +33,11 @@ class QwenWorker(ModelWorkerBase):
         )
 
         self.stop_words_ids = [
-            self.tokenizer.im_end_id,
-            self.tokenizer.im_start_id,
-            self.tokenizer.eos_token_id or 151643,
+            151645,
+            151644,
+            151643,
         ]
+        print(self.stop_words_ids)
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
@@ -48,10 +49,21 @@ class QwenWorker(ModelWorkerBase):
         try:
             prompt = params["prompt"]
             query, messages = conv2messages(prompt=prompt)
-            raw_text, context_tokens = make_context(
-                tokenizer=self.tokenizer, query=query, history=None, system=""
-            )
-            input_ids = torch.tensor([context_tokens])
+            model_type = getattr(self.model_config, "model_type", "qwen")
+            if model_type == "qwen":
+                print("正在使用qwen-1.0 !")
+                raw_text, context_tokens = make_context(
+                    tokenizer=self.tokenizer, query=query, history=None, system=""
+                )
+                input_ids = torch.tensor([context_tokens])
+            elif model_type == "qwen2":
+                print("正在使用qwen-2.0 !")
+                messages = params["messages"]
+                text = self.tokenizer.apply_chat_template(
+                    conversation=messages, tokenize=False, add_generation_prompt=True
+                )
+                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+            print(self.tokenizer.decode(input_ids.tolist()[0]))
             # ---------------添加额外的参数------------------------
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids

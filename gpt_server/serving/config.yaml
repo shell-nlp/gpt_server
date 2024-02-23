@@ -21,7 +21,7 @@ models:
   qwen:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
     enable: true  # false true
-    model_name_or_path: /home/dev/model/qwen/Qwen-14B-Chat/
+    model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/
     model_type: qwen  # qwen  chatglm3
     work_mode: hf  # vllm hf
 
