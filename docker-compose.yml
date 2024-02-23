@@ -1,0 +1,23 @@
+version: '3'
+services:
+  gpt_server:
+    # 构建
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gpt_server
+    container_name: gpt_server
+    network_mode: host
+    volumes:
+      - "/home/dev/model/:/home/dev/model/"
+    environment:
+      - LD_LIBRARY_PATH=/usr/local/lib/python3.10/site-packages/nvidia/cudnn/lib
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              # count: 2  # 两种方式
+              capabilities: [ gpu ]
+    command: python llmos/liuyu/asr_processing/asr_processing.py

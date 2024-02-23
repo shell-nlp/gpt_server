@@ -5,7 +5,7 @@ serve_args:
 models:
   chatglm3:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: true  # false true
+    enable: false  # false true
     model_name_or_path: /home/dev/model/chatglm3-6b/
     model_type: chatglm3  # qwen  chatglm3
     work_mode: hf  # vllm hf
@@ -20,10 +20,10 @@ models:
   
   qwen:  #自定义的模型名称
     alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: false  # false true
+    enable: true  # false true
     model_name_or_path: /home/dev/model/qwen/Qwen-14B-Chat/
     model_type: qwen  # qwen  chatglm3
-    work_mode: vllm  # vllm hf
+    work_mode: hf  # vllm hf
 
     workers:
     - gpus:
@@ -34,7 +34,7 @@ models:
     enable: false  # false true
     model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
     model_type: yi  # qwen  chatglm3 yi
-    work_mode: vllm  # vllm hf
+    work_mode: hf  # vllm hf
 
     workers:
     - gpus:
@@ -44,7 +44,7 @@ models:
   # Embedding 模型
   embedding:
     alias: piccolo-base-zh # 别名   
-    enable: true  # false true
+    enable: false  # false true
     model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
     model_type: embedding
     work_mode: hf
