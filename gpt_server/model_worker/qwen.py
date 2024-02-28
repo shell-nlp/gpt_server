@@ -37,10 +37,11 @@ class QwenWorker(ModelWorkerBase):
             151644,
             151643,
         ]
-        print(self.stop_words_ids)
+
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
+        print("qwen停用词:", self.stop)
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1

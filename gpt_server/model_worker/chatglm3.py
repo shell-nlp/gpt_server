@@ -2,7 +2,6 @@ import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
-from gpt_server.model_handler.chatglm3 import conv2messages
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
@@ -29,13 +28,14 @@ class ChatGLM3Worker(ModelWorkerBase):
         )
 
         self.stop_words_ids = [
-            64795,
-            64797,
+            64795,  # <|user|>
+            64797,  # <|observation|>
             2,
         ]
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
+        print("chatglm3停用词:", self.stop)
 
     def build_chat_input(self, query, history=None, role="user"):
         if history is None:
