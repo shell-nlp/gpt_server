@@ -33,9 +33,9 @@ class QwenWorker(ModelWorkerBase):
         )
 
         self.stop_words_ids = [
-            151645,
-            151644,
-            151643,
+            151643,  # <|endoftext|>
+            151644,  # <|im_start|>
+            151645,  # <|im_end|>
         ]
 
         self.stop = [
@@ -48,17 +48,18 @@ class QwenWorker(ModelWorkerBase):
         print("params", params)
         print("worker_id:", self.worker_id)
         try:
-            prompt = params["prompt"]
-            query, messages = conv2messages(prompt=prompt)
             model_type = getattr(self.model_config, "model_type", "qwen")
             if model_type == "qwen":
                 print("正在使用qwen-1.0 !")
+                prompt = params["prompt"]
+                query, messages = conv2messages(prompt=prompt)
                 raw_text, context_tokens = make_context(
                     tokenizer=self.tokenizer, query=query, history=None, system=""
                 )
                 input_ids = torch.tensor([context_tokens])
             elif model_type == "qwen2":
                 print("正在使用qwen-2.0 !")
+                query = ""
                 messages = params["messages"]
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages, tokenize=False, add_generation_prompt=True

@@ -10,6 +10,7 @@ from gpt_server.model_backend.utils import (
     StopAtSpecificTokenCriteria,
 )
 import asyncio
+
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
@@ -58,11 +59,16 @@ class HFBackend(ModelBackend):
         generated_text = ""
         prompt_tokens = len(input_ids.tolist()[0])
         completion_tokens = 0
+        stop_flag = False
         for new_text in streamer:
             for stop_word in stop:
                 if stop_word in new_text:
                     idx = new_text.rfind(stop_word)
                     new_text = new_text[:idx]
+                    stop_flag = True
+                    break
+            if stop_flag:
+                break
             completion_tokens += 1
             generated_text += new_text
             usage = {

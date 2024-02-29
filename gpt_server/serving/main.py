@@ -6,7 +6,9 @@ from multiprocessing import Process
 import signal
 
 # 配置根目录
-root_dir = os.path.join(os.path.dirname(__file__), "..")
+
+# root_dir = os.path.join(os.path.dirname(__file__), "..")
+root_dir = os.path.dirname(os.path.dirname(__file__))
 root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)
 from gpt_server.utils import (
@@ -45,7 +47,7 @@ for model_name, model_config in config["models"].items():
         model_name_or_path = model_config["model_name_or_path"]
         # 模型类型
         model_type = model_config["model_type"]
-        
+
         # model type 校验
         py_path = f"{root_dir}/model_worker/{model_type}.py"
 
