@@ -30,7 +30,6 @@ class ChatGLM3Worker(ModelWorkerBase):
         self.stop_words_ids = [
             64795,  # <|user|>
             64797,  # <|observation|>
-            2,
         ]
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids

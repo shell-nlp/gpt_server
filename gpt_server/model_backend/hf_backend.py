@@ -64,11 +64,11 @@ class HFBackend(ModelBackend):
             for stop_word in stop:
                 if stop_word in new_text:
                     idx = new_text.rfind(stop_word)
-                    new_text = new_text[:idx]
                     stop_flag = True
+                    print("停止的单词为:", stop_word, "in", new_text)
+                    new_text = new_text[:idx]
                     break
-            if stop_flag:
-                break
+
             completion_tokens += 1
             generated_text += new_text
             usage = {
@@ -77,5 +77,7 @@ class HFBackend(ModelBackend):
                 "total_tokens": prompt_tokens + completion_tokens,
             }
             yield generated_text, usage
+            if stop_flag:
+                break
             # 用来解决输出卡顿的问题
             await asyncio.sleep(0.02)
