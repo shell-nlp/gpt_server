@@ -61,6 +61,9 @@ class QwenWorker(ModelWorkerBase):
                 print("正在使用qwen-2.0 !")
                 query = ""
                 messages = params["messages"]
+                for msg in messages:
+                    if msg["role"] == "function":
+                        msg["role"] = "Observation:"
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages, tokenize=False, add_generation_prompt=True
                 )
