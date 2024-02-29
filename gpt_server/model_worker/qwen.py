@@ -42,6 +42,9 @@ class QwenWorker(ModelWorkerBase):
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
         print("qwen停用词:", self.stop)
+        self.other_config = {
+            "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content']}}{% if (loop.last and add_generation_prompt) or not loop.last %}{{ '<|im_end|>' + '\n'}}{% endif %}{% endfor %}{% if add_generation_prompt and messages[-1]['role'] != 'assistant' %}{{ '<|im_start|>assistant\n' }}{% endif %}"
+        }
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
@@ -49,21 +52,23 @@ class QwenWorker(ModelWorkerBase):
         print("worker_id:", self.worker_id)
         try:
             model_type = getattr(self.model_config, "model_type", "qwen")
+            query = ""
+            messages = params["messages"]
+            for msg in messages:
+                if msg["role"] == "function":
+                    msg["role"] = "Observation:"
+            # 暂时保留，用于特殊情况的处理
             if model_type == "qwen":
                 print("正在使用qwen-1.0 !")
-                prompt = params["prompt"]
-                query, messages = conv2messages(prompt=prompt)
-                raw_text, context_tokens = make_context(
-                    tokenizer=self.tokenizer, query=query, history=None, system=""
+                text = self.tokenizer.apply_chat_template(
+                    conversation=messages,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                    chat_template=self.other_config["chat_template"],
                 )
-                input_ids = torch.tensor([context_tokens])
+                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             elif model_type == "qwen2":
                 print("正在使用qwen-2.0 !")
-                query = ""
-                messages = params["messages"]
-                for msg in messages:
-                    if msg["role"] == "function":
-                        msg["role"] = "Observation:"
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages, tokenize=False, add_generation_prompt=True
                 )
