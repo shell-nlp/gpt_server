@@ -65,7 +65,7 @@ class HFBackend(ModelBackend):
                 if stop_word in new_text:
                     idx = new_text.rfind(stop_word)
                     stop_flag = True
-                    print("停止的单词为:", stop_word, "in", new_text)
+                    print("********** 停止的单词为:", stop_word, "in", new_text,"**********")
                     new_text = new_text[:idx]
                     break
 

@@ -6,8 +6,6 @@ from multiprocessing import Process
 import signal
 
 # 配置根目录
-
-# root_dir = os.path.join(os.path.dirname(__file__), "..")
 root_dir = os.path.dirname(os.path.dirname(__file__))
 root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)

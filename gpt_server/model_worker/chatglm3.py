@@ -65,30 +65,22 @@ class ChatGLM3Worker(ModelWorkerBase):
         print("params", params)
         print("worker_id:", self.worker_id)
         try:
-            # prompt = params["prompt"]
-            # query, messages = conv2messages(prompt=prompt)
-            # ----------------添加对工具的支持-----------------------------------
-            # for item in messages:
-            #     if item["role"] == "system":
-            #         content = item["content"]
-            #         if "tools:" in content:  # 说明使用chatglm3官方的指令
-            #             print("chatglm3 使用工具!")
-            #             idx = content.rfind("tools:")
-            #             tools = content[idx + len("tools:") :]
-            #             tools_obj = json.loads(tools)
-            #             # -------------
-            #             item["content"] = content[: idx + len("tools:")]
-            #             item["tools"] = tools_obj
             # ----------------添加对工具的支持-----------------------------------
             messages = params["messages"]
+            for msg in messages:
+                if msg["role"] == "function":
+                    msg["role"] = "observation"
+
             if messages[-1]["role"] == "user":
                 last_message = messages.pop()
                 query = last_message["content"]
                 role = "user"  # 下一个角色是什么
-            elif messages[-1]["role"] == "function":
-                messages[-1]["role"] = "observation"
+            elif messages[-1]["role"] == "observation":
                 query = ""
                 role = "assistant"  # 下一个角色是什么
+            elif messages[-1]["role"] == "assistant":
+                query = ""
+                role = "user"
             input_ids = self.build_chat_input(query, history=messages, role=role)[
                 "input_ids"
             ]

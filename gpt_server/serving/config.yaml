@@ -4,8 +4,8 @@ serve_args:
 
 models:
   chatglm3:  #自定义的模型名称
-    alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
-    enable: false  # false true
+    alias: null # 别名     例如  gpt4,gpt3
+    enable: true  # false true
     model_name_or_path: /home/dev/model/chatglm3-6b/
     model_type: chatglm3  # qwen  chatglm3
     work_mode: hf  # vllm hf
@@ -19,7 +19,7 @@ models:
     #   - 0
   
   qwen:  #自定义的模型名称
-    alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
+    alias: null # 别名     例如  gpt4,gpt3
     enable: true  # false true
     # model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
     model_name_or_path: /home/dev/model/qwen/Qwen-14B-Chat/  # Qwen 1.0
@@ -31,7 +31,7 @@ models:
       # - 1
       - 2
   yi:  #自定义的模型名称
-    alias: gpt4,gpt3 # 别名     例如  gpt4,gpt3
+    alias: null # 别名     例如  gpt4,gpt3
     enable: false  # false true
     model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
     model_type: yi  # qwen  chatglm3 yi
