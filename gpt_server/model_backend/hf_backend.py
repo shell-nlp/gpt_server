@@ -32,8 +32,9 @@ class HFBackend(ModelBackend):
         input_ids = params.get("input_ids")
         stop_words_ids = params.get("stop_words_ids", [])
         stopping_criteria = StoppingCriteriaList()  # 停止条件
+        stop_specific_token_criteria = StopAtSpecificTokenCriteria(token_id_list=stop_words_ids)
         stopping_criteria.append(
-            StopAtSpecificTokenCriteria(token_id_list=stop_words_ids)
+            stop_specific_token_criteria
         )
         logits_processor = LogitsProcessorList([invalid_score_processor])
         streamer = TextIteratorStreamer(
@@ -60,24 +61,26 @@ class HFBackend(ModelBackend):
         prompt_tokens = len(input_ids.tolist()[0])
         completion_tokens = 0
         stop_flag = False
-        for new_text in streamer:
-            for stop_word in stop:
-                if stop_word in new_text:
-                    idx = new_text.rfind(stop_word)
-                    stop_flag = True
-                    print("********** 停止的单词为:", stop_word, "in", new_text,"**********")
-                    new_text = new_text[:idx]
+        try:
+            for new_text in streamer:
+                for stop_word in stop:
+                    if stop_word in new_text:
+                        idx = new_text.rfind(stop_word)
+                        stop_flag = True
+                        print("********** 停止的单词为:", stop_word, "in", new_text,"**********")
+                        new_text = new_text[:idx]
+                        break
+                completion_tokens += 1
+                generated_text += new_text
+                usage = {
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                    "total_tokens": prompt_tokens + completion_tokens,
+                }
+                yield generated_text, usage
+                if stop_flag:
                     break
-
-            completion_tokens += 1
-            generated_text += new_text
-            usage = {
-                "prompt_tokens": prompt_tokens,
-                "completion_tokens": completion_tokens,
-                "total_tokens": prompt_tokens + completion_tokens,
-            }
-            yield generated_text, usage
-            if stop_flag:
-                break
-            # 用来解决输出卡顿的问题
-            await asyncio.sleep(0.02)
+                # 用来解决输出卡顿的问题
+                await asyncio.sleep(0.02)
+        except asyncio.CancelledError as e:
+            stop_specific_token_criteria.stop = True

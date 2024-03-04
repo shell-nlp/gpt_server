@@ -30,6 +30,7 @@ class StopAtSpecificTokenCriteria(StoppingCriteria):
         :param token_id_list: 停止生成的指定token的id的列表
         """
         self.token_id_list = token_id_list
+        self.stop = False
 
     @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
     def __call__(
@@ -37,4 +38,6 @@ class StopAtSpecificTokenCriteria(StoppingCriteria):
     ) -> bool:
         # return np.argmax(scores[-1].detach().cpu().numpy()) in self.token_id_list
         # 储存scores会额外占用资源，所以直接用input_ids进行判断
+        if self.stop:
+            return True
         return input_ids[0][-1].detach().cpu().numpy() in self.token_id_list
