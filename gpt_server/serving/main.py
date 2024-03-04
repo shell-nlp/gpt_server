@@ -32,7 +32,7 @@ signal.signal(signal.SIGINT, signal_handler)
 config_path = os.path.join(root_dir, "gpt_server/serving/config.yaml")
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
-print(config)
+# print(config)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
 host = config["serve_args"]["host"]
 port = config["serve_args"]["port"]
@@ -42,7 +42,7 @@ process = []
 for model_name, model_config in config["models"].items():
     # 启用的模型
     if model_config["enable"]:
-        pprint(model_config)
+        # pprint(model_config)
         print()
         # 模型地址
         model_name_or_path = model_config["model_name_or_path"]
@@ -50,7 +50,8 @@ for model_name, model_config in config["models"].items():
         model_type = model_config["model_type"]
 
         # model type 校验
-        py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
+        # py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
+        py_path = f"-m gpt_server.model_worker.{model_type}"
 
         model_names = model_name
         if model_config["alias"]:
