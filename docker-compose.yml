@@ -14,7 +14,6 @@ services:
       - "/home/dev/model/:/home/dev/model/"
     environment:
       - LD_LIBRARY_PATH=/usr/local/lib/python3.10/site-packages/nvidia/cudnn/lib
-      - PYTHONPATH=${PYTHONPATH}:/gpt_server
     deploy:
       resources:
         reservations:
