@@ -6,7 +6,7 @@ import torch
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
-class QwenWorker(ModelWorkerBase):
+class InternlmWorker(ModelWorkerBase):
     def __init__(
         self,
         controller_addr: str,
@@ -29,17 +29,18 @@ class QwenWorker(ModelWorkerBase):
         )
 
         self.stop_words_ids = [
-            151643,  # <|endoftext|>
-            151644,  # <|im_start|>
-            151645,  # <|im_end|>
+            1,  # bos
+            2,  # eos
+            92543,  # <|im_start|>
+            92542,  # <|im_end|>
         ]
 
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        print("qwen停用词:", self.stop)
+        print("Internlm停用词:", self.stop)
         self.other_config = {
-            "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content']}}{% if (loop.last and add_generation_prompt) or not loop.last %}{{ '<|im_end|>' + '\n'}}{% endif %}{% endfor %}{% if add_generation_prompt and messages[-1]['role'] != 'assistant' %}{{ '<|im_start|>assistant\n' }}{% endif %}"
+            "chat_template": "{{ bos_token }}{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
         }
 
     async def generate_stream_gate(self, params):
@@ -47,15 +48,15 @@ class QwenWorker(ModelWorkerBase):
         print("params", params)
         print("worker_id:", self.worker_id)
         try:
-            model_type = getattr(self.model_config, "model_type", "qwen")
+            model_type = getattr(self.model_config, "model_type", "internlm")
             query = ""
             messages = params["messages"]
             for msg in messages:
                 if msg["role"] == "function":
                     msg["role"] = "Observation:"
             # 暂时保留，用于特殊情况的处理
-            if model_type == "qwen":
-                print("正在使用qwen-1.0 !")
+            if model_type == "internlm":
+                print("正在使用internlm-1.0 !")
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages,
                     tokenize=False,
@@ -63,8 +64,8 @@ class QwenWorker(ModelWorkerBase):
                     chat_template=self.other_config["chat_template"],
                 )
                 input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-            elif model_type == "qwen2":
-                print("正在使用qwen-2.0 !")
+            elif model_type == "internlm2":
+                print("正在使用internlm-2.0 !")
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages, tokenize=False, add_generation_prompt=True
                 )
@@ -101,4 +102,4 @@ class QwenWorker(ModelWorkerBase):
 
 
 if __name__ == "__main__":
-    QwenWorker.run()
+    InternlmWorker.run()
