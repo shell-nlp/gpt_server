@@ -48,11 +48,12 @@ def stop_server():
 
 
 def delete_log(root_path):
-    datanames = os.listdir(os.path.join(root_path, "serving"))  # 查找本目录下所有文件
+    serving_path = os.path.join(root_path, "gpt_server/serving")
+    datanames = os.listdir(serving_path)  # 查找本目录下所有文件
     for dataname in datanames:
         if dataname.endswith(".log"):
             # print(os.path.join(root_path,f"serving/{dataname}"))
-            os.remove(os.path.join(root_path, f"serving/{dataname}"))
+            os.remove(os.path.join(serving_path, f"{dataname}"))
 
 
 def get_free_tcp_port():

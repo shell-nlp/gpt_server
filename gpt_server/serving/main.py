@@ -6,9 +6,10 @@ from multiprocessing import Process
 import signal
 
 # 配置根目录
-root_dir = os.path.dirname(os.path.dirname(__file__))
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 root_dir = os.path.abspath(root_dir)
 sys.path.append(root_dir)
+
 from gpt_server.utils import (
     start_server,
     run_cmd,
@@ -26,8 +27,8 @@ def signal_handler(signum, frame):
 
 
 signal.signal(signal.SIGINT, signal_handler)
-
-with open("./config.yaml", "r") as f:
+config_path = os.path.join(root_dir, "gpt_server/serving/config.yaml")
+with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 print(config)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
@@ -47,7 +48,7 @@ for model_name, model_config in config["models"].items():
         model_type = model_config["model_type"]
 
         # model type 校验
-        py_path = f"{root_dir}/model_worker/{model_type}.py"
+        py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
 
         model_names = model_name
         if model_config["alias"]:

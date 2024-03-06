@@ -10,8 +10,5 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
     conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/ && \
     conda config --set show_channel_urls yes && \
-    echo "开始安装cudnn" && conda install -y cudnn && \
-    # echo "开始安装cudatoolkit" && conda install -y cudatoolkit && \
     pip install -r requirements.txt  && pip cache purge
-
 CMD ["/bin/bash"]

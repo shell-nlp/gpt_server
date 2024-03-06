@@ -4,20 +4,23 @@ services:
     # 构建
     build:
       context: .
-      dockerfile: Dockerfile
-    image: gpt_server:v0.0.1
+      dockerfile: Dockerfile.copy
+    image: gpt_server:runtime_v0.0.1
     container_name: gpt_server
     network_mode: host
+    ports:
+      - "8082:8082"
     volumes:
       - "/home/dev/model/:/home/dev/model/"
     environment:
       - LD_LIBRARY_PATH=/usr/local/lib/python3.10/site-packages/nvidia/cudnn/lib
+      - PYTHONPATH=${PYTHONPATH}:/gpt_server
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: [ '0' ]
+              device_ids: [ '2' ]
               # count: 2  # 两种方式
               capabilities: [ gpu ]
-    # command: python llmos/liuyu/asr_processing/asr_processing.py
+    command: python gpt_server/serving/main.py
