@@ -2,7 +2,7 @@ import openai
 
 # 新版本
 openai.api_key = "EMPTY"
-openai.api_base = "http://192.168.102.19:8082/v1"
+openai.api_base = "http://localhost:8082/v1"
 model = "chatglm3"
 stream = False
 data = {

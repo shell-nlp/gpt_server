@@ -136,7 +136,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         controller_addr: str = "http://localhost:21001",
         worker_addr: str = "http://localhost:21002",
         worker_id: str = str(uuid.uuid4())[:8],
-        model_names: List[str] = ["chatglm3-6b-2"],
+        model_names: List[str] = [""],
         limit_worker_concurrency: int = 6,
         conv_template: str = None,  # type: ignore
     ):
