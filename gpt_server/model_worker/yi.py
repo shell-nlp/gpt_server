@@ -42,8 +42,8 @@ class YiWorker(ModelWorkerBase):
         print("params", params)
         print("worker_id:", self.worker_id)
         try:
-            prompt = params["prompt"]
-            messages = conv2messages(prompt=prompt)
+            query = ""
+            messages = params["messages"]
             input_ids = self.tokenizer.apply_chat_template(
                 conversation=messages,
                 tokenize=True,
@@ -53,8 +53,9 @@ class YiWorker(ModelWorkerBase):
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
+            print(self.tokenizer.decode(input_ids.tolist()[0]))
             async for response, usage in self.backend.stream_chat(
-                query="", params=params
+                query=query, params=params
             ):
 
                 ret = {"text": response, "error_code": 0, "usage": usage}

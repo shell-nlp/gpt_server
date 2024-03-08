@@ -15,7 +15,6 @@ models:
     - gpus:
       # - 1
       - 0
-      # - 3
     # - gpus:
     #   - 0
   
@@ -58,7 +57,7 @@ models:
   # Embedding 模型
   embedding:
     alias: piccolo-base-zh # 别名   
-    enable: false  # false true
+    enable: true  # false true
     model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
     model_type: embedding
     work_mode: hf

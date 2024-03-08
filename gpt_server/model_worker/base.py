@@ -211,6 +211,7 @@ async def api_generate_stream(request: Request):
     request_id = random_uuid()
     params["request_id"] = request_id
     params["request"] = request
+    params.pop("prompt")
     generator = worker.generate_stream_gate(params)
     background_tasks = create_background_tasks(request_id)
     return StreamingResponse(generator, background=background_tasks)
@@ -223,6 +224,7 @@ async def api_generate(request: Request):
     request_id = random_uuid()
     params["request_id"] = request_id
     params["request"] = request
+    params.pop("prompt")
     output = await worker.generate_gate(params)
     release_worker_semaphore()
     if os.getenv("USE_VLLM", 0):
