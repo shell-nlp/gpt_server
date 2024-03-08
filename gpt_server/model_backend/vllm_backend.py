@@ -37,6 +37,7 @@ class VllmBackend(ModelBackend):
         top_p = max(top_p, 1e-5)
         if temperature <= 1e-5:
             top_p = 1.0
+            temperature = 0.01
 
         sampling = SamplingParams(
             use_beam_search=False,

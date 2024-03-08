@@ -2,8 +2,6 @@ import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
-from gpt_server.model_handler.yi import conv2messages
-
 from gpt_server.model_worker.base import ModelWorkerBase
 
 

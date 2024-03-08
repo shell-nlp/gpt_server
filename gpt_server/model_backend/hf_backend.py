@@ -31,11 +31,15 @@ class HFBackend(ModelBackend):
         stop = params.get("stop", [])  # 停止的 token
         input_ids = params.get("input_ids")
         stop_words_ids = params.get("stop_words_ids", [])
+        if temperature <= 1e-5:
+            top_p = 1.0
+            temperature = 0.01
+
         stopping_criteria = StoppingCriteriaList()  # 停止条件
-        stop_specific_token_criteria = StopAtSpecificTokenCriteria(token_id_list=stop_words_ids)
-        stopping_criteria.append(
-            stop_specific_token_criteria
+        stop_specific_token_criteria = StopAtSpecificTokenCriteria(
+            token_id_list=stop_words_ids
         )
+        stopping_criteria.append(stop_specific_token_criteria)
         logits_processor = LogitsProcessorList([invalid_score_processor])
         streamer = TextIteratorStreamer(
             self.tokenizer,
@@ -67,7 +71,13 @@ class HFBackend(ModelBackend):
                     if stop_word in new_text:
                         idx = new_text.rfind(stop_word)
                         stop_flag = True
-                        print("********** 停止的单词为:", stop_word, "in", new_text,"**********")
+                        print(
+                            "********** 停止的单词为:",
+                            stop_word,
+                            "in",
+                            new_text,
+                            "**********",
+                        )
                         new_text = new_text[:idx]
                         break
                 completion_tokens += 1
