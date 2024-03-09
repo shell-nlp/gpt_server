@@ -707,10 +707,11 @@ async def generate_completion_stream(payload: Dict[str, Any], worker_addr: str):
 async def generate_completion(payload: Dict[str, Any], worker_addr: str):
     return await fetch_remote(worker_addr + "/worker_generate", payload, "")
 
-
+# TODO 使用CustomEmbeddingsRequest
+from gpt_server.openai_api_protocol.custom_api_protocol import CustomEmbeddingsRequest
 @app.post("/v1/embeddings", dependencies=[Depends(check_api_key)])
 @app.post("/v1/engines/{model_name}/embeddings", dependencies=[Depends(check_api_key)])
-async def create_embeddings(request: EmbeddingsRequest, model_name: str = None):
+async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = None):
     """Creates embeddings for the text"""
     if request.model is None:
         request.model = model_name
@@ -732,6 +733,7 @@ async def create_embeddings(request: EmbeddingsRequest, model_name: str = None):
             "model": request.model,
             "input": batch,
             "encoding_format": request.encoding_format,
+            "query":request.query, # TODO add query 
         }
         embedding = await get_embedding(payload)
         if "error_code" in embedding and embedding["error_code"] != 0:

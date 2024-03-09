@@ -7,6 +7,7 @@
 ## 更新信息
 
 ```plaintext
+3-9   支持了 rerank 模型 （仅仅测试了 bge-reranker）
 3-2   支持了 qwen-2 0.5B, 1.8B, 4B, 7B, 14B, and 72B
 2-4   支持了 vllm 实现
 1-6   支持了 Yi-34B
@@ -25,7 +26,7 @@
 | Qwen-2 (0.5B--72B) | √   |   √   |
 | Yi-34B                 | √ | √   |
 
-## 使用方式
+## 启用方式
 
 ### 1. 修改配置文件
 
@@ -78,6 +79,10 @@ models:
 ```bash
 sh start.sh
 ```
+
+### 3. 使用 openai 库 进行调用
+
+**见 gpt_server/tests 目录 样例测试代码**
 
 ## 致谢
 

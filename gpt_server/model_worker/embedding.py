@@ -24,13 +24,22 @@ class EmbeddingWorker(ModelWorkerBase):
             conv_template,
             model_type="embedding",
         )
-        model_name = model_path
         model_kwargs = {"device": "cuda"}
         self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
-       
-        self.client = sentence_transformers.SentenceTransformer(
-            model_name,**model_kwargs
-        )
+        self.mode = "embedding"
+        # rerank
+        for model_name in model_names:
+            if "rerank" in model_name:
+                self.mode = "rerank"
+                break
+        if self.mode=="rerank":
+            self.client = sentence_transformers.CrossEncoder(model_name=model_path)
+            print("正在使用 rerank 模型...")
+        elif self.mode=="embedding":
+            self.client = sentence_transformers.SentenceTransformer(
+                model_path,**model_kwargs
+            )
+            print("正在使用 embedding 模型...")
 
     def generate_stream_gate(self, params):
         pass
@@ -41,12 +50,19 @@ class EmbeddingWorker(ModelWorkerBase):
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]
-        outputs = self.client.tokenize(texts)
-        token_num = outputs["input_ids"].size(0) * outputs["input_ids"].size(1)
-        
-        texts = list(map(lambda x: x.replace("\n", " "), texts))
-        embedding = self.client.encode(texts,**self.encode_kwargs)
-        ret["embedding"] = embedding.tolist()
+        if self.mode=="embedding":
+            outputs = self.client.tokenize(texts)
+            token_num = outputs["input_ids"].size(0) * outputs["input_ids"].size(1)
+            texts = list(map(lambda x: x.replace("\n", " "), texts))
+            embedding = self.client.encode(texts,**self.encode_kwargs).tolist()
+        elif self.mode=="rerank":
+            query = params.get("query",None)
+            outputs = self.client.tokenizer.tokenize(texts)
+            token_num = len(outputs)
+            sentence_pairs = [[query,inp] for inp in texts]
+            scores = self.client.predict(sentence_pairs)
+            embedding = [[float(score)] for score in scores]
+        ret["embedding"] = embedding
         ret["token_num"] = token_num
         return ret
 
