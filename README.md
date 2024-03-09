@@ -7,7 +7,7 @@
 ## 更新信息
 
 ```plaintext
-3-9   支持了 rerank 模型 （仅仅测试了 bge-reranker）
+3-9   支持了 reranker 模型 （ bge-reranker，bce-reranker-base_v1）
 3-2   支持了 qwen-2 0.5B, 1.8B, 4B, 7B, 14B, and 72B
 2-4   支持了 vllm 实现
 1-6   支持了 Yi-34B
@@ -18,13 +18,27 @@
 
 ## 支持的模型
 
-| 模型                   | HF | vllm |
+
+| Models                  | HF | vllm |
 | ---------------------- | -- | ---- |
-| All-embedding          | √ | ×   |
 | chatglm3-6b             | √ | √   |
 | Qwen (7B, 14B, etc.)) | √ | √   |
 | Qwen-2 (0.5B--72B) | √   |   √   |
 | Yi-34B                 | √ | √   |
+
+-----
+
+<br>
+
+**原则上支持所有的Embedding/Rerank 模型**
+<br>
+以下模型经过测试：
+| Embedding/Rerank  | HF |
+|----|---|
+|bge-reranker|√|
+|bce-reranker|√|
+|bge-embedding|√|
+|bce-embedding|√|
 
 ## 启用方式
 
@@ -83,6 +97,8 @@ sh start.sh
 ### 3. 使用 openai 库 进行调用
 
 **见 gpt_server/tests 目录 样例测试代码**
+<br>
+https://github.com/shell-nlp/gpt_server/tree/main/tests
 
 ## 致谢
 
