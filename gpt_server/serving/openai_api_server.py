@@ -507,7 +507,7 @@ async def chat_completion_stream_generator(
         chunk = ChatCompletionStreamResponse(
             id=id, choices=[choice_data], model=model_name
         )
-        yield f"data: {chunk.json(exclude_unset=True, ensure_ascii=False)}\n\n"
+        yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
 
         previous_text = ""
         async for content in generate_completion_stream(gen_params, worker_addr):
@@ -537,10 +537,10 @@ async def chat_completion_stream_generator(
                 if content.get("finish_reason", None) is not None:
                     finish_stream_events.append(chunk)
                 continue
-            yield f"data: {chunk.json(exclude_unset=True, ensure_ascii=False)}\n\n"
+            yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
     # There is not "content" field in the last delta message, so exclude_none to exclude field "content".
     for finish_chunk in finish_stream_events:
-        yield f"data: {finish_chunk.json(exclude_none=True, ensure_ascii=False)}\n\n"
+        yield f"data: {finish_chunk.model_dump_json(exclude_unset=True)}\n\n"
     yield "data: [DONE]\n\n"
 
 
@@ -707,8 +707,11 @@ async def generate_completion_stream(payload: Dict[str, Any], worker_addr: str):
 async def generate_completion(payload: Dict[str, Any], worker_addr: str):
     return await fetch_remote(worker_addr + "/worker_generate", payload, "")
 
+
 # TODO 使用CustomEmbeddingsRequest
 from gpt_server.openai_api_protocol.custom_api_protocol import CustomEmbeddingsRequest
+
+
 @app.post("/v1/embeddings", dependencies=[Depends(check_api_key)])
 @app.post("/v1/engines/{model_name}/embeddings", dependencies=[Depends(check_api_key)])
 async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = None):
@@ -733,7 +736,7 @@ async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = 
             "model": request.model,
             "input": batch,
             "encoding_format": request.encoding_format,
-            "query":request.query, # TODO add query 
+            "query": request.query,  # TODO add query
         }
         embedding = await get_embedding(payload)
         if "error_code" in embedding and embedding["error_code"] != 0:

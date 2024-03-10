@@ -1,14 +1,5 @@
-# 安装 lmdeploy
 import os
 
-# LMDEPLOY_VERSION = "0.2.1"
-# PYTHON_VERSION = "310"
-# proxy_ip = "http://10.20.20.32:7890"
-# os.environ["HTTP_PROXY"] = proxy_ip
-# os.environ["HTTPS_PROXY"] = proxy_ip
-# cmd = f"pip install https://github.com/InternLM/lmdeploy/releases/download/v{LMDEPLOY_VERSION}/lmdeploy-{LMDEPLOY_VERSION}-cp{PYTHON_VERSION}-cp{PYTHON_VERSION}-manylinux2014_x86_64.whl"
-# print(cmd)
-# os.system(cmd)
 from lmdeploy import (
     pipeline,
     GenerationConfig,

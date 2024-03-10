@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
-from typing import Literal, Optional, List, Dict, Any, Union
+from typing import Optional
 from fastchat.protocol.openai_api_protocol import EmbeddingsRequest
 
+
 class CustomEmbeddingsRequest(EmbeddingsRequest):
-    query:Optional[str] = None
+    query: Optional[str] = None
