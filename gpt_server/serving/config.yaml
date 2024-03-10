@@ -51,8 +51,7 @@ models:
 
       workers:
       - gpus:
-        - 2
-        # - 0
+        - 0
     
   # Embedding 模型
   - piccolo-base-zh:
@@ -66,12 +65,10 @@ models:
       - gpus:
         - 0
 
-
-
   - bce-reranker-base_v1:
       alias: null # 别名   
-      enable: false  # false true
-      model_name_or_path: your path
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/maidalun1020/bce-reranker-base_v1/
       model_type: embedding
       work_mode: hf
 

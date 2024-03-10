@@ -12,8 +12,6 @@ services:
       - "8082:8082"
     volumes:
       - "/home/dev/model/:/home/dev/model/"
-    environment:
-      - LD_LIBRARY_PATH=/usr/local/lib/python3.10/site-packages/nvidia/cudnn/lib
     deploy:
       resources:
         reservations:
