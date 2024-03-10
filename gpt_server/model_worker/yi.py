@@ -48,10 +48,13 @@ class YiWorker(ModelWorkerBase):
                 add_generation_prompt=True,
                 return_tensors="pt",
             )
+            prompt = self.tokenizer.decode(input_ids.tolist()[0])
+            print(prompt)
+            params["prompt"] = prompt
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
-            print(self.tokenizer.decode(input_ids.tolist()[0]))
+
             async for response, usage in self.backend.stream_chat(
                 query=query, params=params
             ):

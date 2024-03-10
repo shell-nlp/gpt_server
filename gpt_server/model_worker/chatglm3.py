@@ -84,8 +84,10 @@ class ChatGLM3Worker(ModelWorkerBase):
             input_ids = self.build_chat_input(query, history=messages, role=role)[
                 "input_ids"
             ]
-            print(self.tokenizer.decode(input_ids.tolist()[0]))
+            prompt = self.tokenizer.decode(input_ids.tolist()[0])
+            print(prompt)
             # ---------------添加额外的参数------------------------
+            params["prompt"] = prompt
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids

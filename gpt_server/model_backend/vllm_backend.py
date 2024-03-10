@@ -12,7 +12,7 @@ class VllmBackend(ModelBackend):
         self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
     async def stream_chat(self, query: str, params: Dict[str, Any]) -> AsyncGenerator:
-        context = params.pop("prompt")
+        prompt = params.pop("prompt")
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
@@ -51,7 +51,7 @@ class VllmBackend(ModelBackend):
             frequency_penalty=frequency_penalty,
         )
         results_generator = self.engine.generate(
-            context,
+            prompt,
             sampling_params=sampling,
             request_id=request_id,
             prompt_token_ids=prompt_token_ids,  # 这个是不同之处
