@@ -171,7 +171,8 @@ async def check_length(request, prompt, max_tokens, worker_addr):
         "count",
     )
     length = min(max_tokens, context_len - token_num)
-
+    # TODO 覆盖 fastchat 的 length
+    length = max_tokens
     if length <= 0:
         return None, create_error_response(
             ErrorCode.CONTEXT_OVERFLOW,
