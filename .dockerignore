@@ -2,4 +2,4 @@ tests/
 .vscode/
 .venv/
 __pycache__/
-*.log
+*.log*
