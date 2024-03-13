@@ -2,12 +2,13 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力，**在此基础上完美适配了更多的模型**，**优化了fastchat兼容较差的模型**、支持了**vllm**和**hf**的加载方式、chat模板支持了function角色，**降低了模型适配的难度和项目使用的难度**，从而更容易的部署自己最新的模型。
 
-（仓库初步构建中，欢迎提出改进或者适配模型的建议。）
+（仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
 ## 更新信息
 
 ```plaintext
 3-9   支持了 reranker 模型 （ bge-reranker，bce-reranker-base_v1）
+3-3   支持了 internlm-1.0 ,internlm-2.0
 3-2   支持了 qwen-2 0.5B, 1.8B, 4B, 7B, 14B, and 72B
 2-4   支持了 vllm 实现
 1-6   支持了 Yi-34B
@@ -25,6 +26,8 @@
 | Qwen (7B, 14B, etc.)) | √ | √   |
 | Qwen-2 (0.5B--72B) | √   |   √   |
 | Yi-34B                 | √ | √   |
+| Internlm-1.0                 | √ | √   |
+| Internlm-2.0                 | √ | √   |
 
 -----
 
@@ -39,7 +42,7 @@
 |bce-reranker|√|
 |bge-embedding|√|
 |bce-embedding|√|
-
+|piccolo-base-zh-embedding|√|
 ## 启用方式
 
 ### 1. 修改配置文件
@@ -105,3 +108,7 @@ https://github.com/shell-nlp/gpt_server/tree/main/tests
     FastChat :  https://github.com/lm-sys/FastChat
 
     vllm :  https://github.com/vllm-project/vllm
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=shell-nlp/gpt_server&type=Date)](https://star-history.com/#shell-nlp/gpt_server&Date)
