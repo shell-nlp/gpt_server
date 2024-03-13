@@ -32,12 +32,12 @@ class EmbeddingWorker(ModelWorkerBase):
             if "rerank" in model_name:
                 self.mode = "rerank"
                 break
-        if self.mode=="rerank":
+        if self.mode == "rerank":
             self.client = sentence_transformers.CrossEncoder(model_name=model_path)
             print("正在使用 rerank 模型...")
-        elif self.mode=="embedding":
+        elif self.mode == "embedding":
             self.client = sentence_transformers.SentenceTransformer(
-                model_path,**model_kwargs
+                model_path, **model_kwargs
             )
             print("正在使用 embedding 模型...")
 
@@ -50,16 +50,18 @@ class EmbeddingWorker(ModelWorkerBase):
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]
-        if self.mode=="embedding":
+        if self.mode == "embedding":
             outputs = self.client.tokenize(texts)
             token_num = outputs["input_ids"].size(0) * outputs["input_ids"].size(1)
             texts = list(map(lambda x: x.replace("\n", " "), texts))
-            embedding = self.client.encode(texts,**self.encode_kwargs).tolist()
-        elif self.mode=="rerank":
-            query = params.get("query",None)
-            outputs = self.client.tokenizer.tokenize(texts)
-            token_num = len(outputs)
-            sentence_pairs = [[query,inp] for inp in texts]
+            embedding = self.client.encode(texts, **self.encode_kwargs).tolist()
+        elif self.mode == "rerank":
+            query = params.get("query", None)
+            # outputs = self.client.tokenizer.tokenize(texts)
+            # token_num = len(outputs)
+            # TODO 暂时不计算 rerank token num
+            token_num = 0
+            sentence_pairs = [[query, inp] for inp in texts]
             scores = self.client.predict(sentence_pairs)
             embedding = [[float(score)] for score in scores]
         ret["embedding"] = embedding
