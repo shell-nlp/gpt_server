@@ -2,12 +2,14 @@ import socket
 import os
 from multiprocessing import Process
 import subprocess
+from loguru import logger
 
 
-def run_cmd(cmd):
-    print("执行命令命令如下：")
-    print(cmd)  # 执行
-    print()
+def run_cmd(cmd: str, *args, **kwargs):
+    use_vllm = kwargs.get("use_vllm", 0)
+    if use_vllm:
+        os.environ["USE_VLLM"] = "1"
+    logger.info(f"执行命令如下：\n{cmd}\n")
     subprocess.run(cmd, shell=True)
 
 
@@ -44,7 +46,7 @@ def stop_server():
     )
     run_cmd(stop_fastchat)
     run_cmd(stop_gpt_server)
-    print("停止服务成功！")
+    logger.info("停止服务成功！")
 
 
 def delete_log(root_path):
@@ -52,7 +54,6 @@ def delete_log(root_path):
     datanames = os.listdir(serving_path)  # 查找本目录下所有文件
     for dataname in datanames:
         if dataname.endswith(".log"):
-            # print(os.path.join(root_path,f"serving/{dataname}"))
             os.remove(os.path.join(serving_path, f"{dataname}"))
 
 

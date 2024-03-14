@@ -74,7 +74,9 @@ for model_config_ in config["models"]:
                 os.environ["CUDA_VISIBLE_DEVICES"] = gpus_str
 
                 if model_config["work_mode"] == "vllm":
-                    os.environ["USE_VLLM"] = "1"
+                    use_vllm = 1
+                else:
+                    use_vllm = 0
 
                 cmd = (
                     run_mode
@@ -84,7 +86,7 @@ for model_config_ in config["models"]:
                     + f" --model_names {model_names}"
                 )
 
-                p = Process(target=run_cmd, args=(cmd,))
+                p = Process(target=run_cmd, args=(cmd,), kwargs={"use_vllm": use_vllm})
                 p.start()
                 process.append(p)
 for p in process:

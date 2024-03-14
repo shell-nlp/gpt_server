@@ -47,6 +47,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             conv_template,
         )
         os.environ["WORKER_NAME"] = self.__class__.__name__
+        self.worker_name = self.__class__.__name__
         self.USE_VLLM = os.getenv("USE_VLLM", 0)
         self.model_type = model_type
         self.model_path = model_path
@@ -59,7 +60,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         global worker
         if worker is None:
             worker = self
-            print("worker 已赋值")
+            logger.info("worker 已赋值")
 
     def get_context_length(
         self,
@@ -70,7 +71,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         self.model_config = AutoConfig.from_pretrained(
             self.model_path, trust_remote_code=True
         )
-        print("模型配置：", self.model_config)
+        logger.info("模型配置：", self.model_config)
         return get_context_length_(self.model_config)
 
     def get_model_class(self):
@@ -100,12 +101,12 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         if self.USE_VLLM:
             from gpt_server.model_backend.vllm_backend import VllmBackend
 
-            logger.info("使用vllm 后端")
+            logger.info(f"{self.worker_name} 使用 vllm 后端")
             self.backend = VllmBackend(model_path=self.model_path)
         else:
             from gpt_server.model_backend.hf_backend import HFBackend
 
-            logger.info("使用hf 后端")
+            logger.info(f"{self.worker_name}使用 hf 后端")
             MODEL_CLASS = self.get_model_class()
             self.model = MODEL_CLASS.from_pretrained(
                 model_path,
