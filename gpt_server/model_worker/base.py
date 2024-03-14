@@ -5,9 +5,8 @@ from abc import ABC, abstractmethod
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastchat.serve.base_model_worker import BaseModelWorker
-from fastchat.utils import (
-    get_context_length,
-)
+from fastchat.utils import get_context_length as get_context_length_
+
 from vllm.utils import random_uuid
 from loguru import logger
 import os
@@ -68,8 +67,11 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         """ "支持的最大 token 长度"""
         if self.model is None:
             return 512
-        self.model_config = AutoConfig.from_pretrained(self.model_path, trust_remote_code=True)
-        return get_context_length(self.model_config)
+        self.model_config = AutoConfig.from_pretrained(
+            self.model_path, trust_remote_code=True
+        )
+        print("模型配置：", self.model_config)
+        return get_context_length_(self.model_config)
 
     def get_model_class(self):
         MODEL_CLASS = AutoModel
