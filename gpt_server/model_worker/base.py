@@ -52,6 +52,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         self.model_type = model_type
         self.model_path = model_path
         self.model = None
+        self.backend = None
         self.tokenizer = None
         self.load_model_tokenizer(model_path)
         self.context_len = self.get_context_length()
@@ -66,7 +67,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         self,
     ):
         """ "支持的最大 token 长度"""
-        if self.model is None:
+        if self.model is None and self.backend is None:
             return 512
         self.model_config = AutoConfig.from_pretrained(
             self.model_path, trust_remote_code=True
@@ -106,7 +107,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         else:
             from gpt_server.model_backend.hf_backend import HFBackend
 
-            logger.info(f"{self.worker_name}使用 hf 后端")
+            logger.info(f"{self.worker_name} 使用 hf 后端")
             MODEL_CLASS = self.get_model_class()
             self.model = MODEL_CLASS.from_pretrained(
                 model_path,
