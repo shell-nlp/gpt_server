@@ -1,17 +1,8 @@
-import openai
+from openai import OpenAI
 
+# 新版本 opnai
+client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
+data = client.embeddings.create(
+    model="bge-reranker-base", input=["你是谁", "今年几岁"], extra_body={"query": "你多大了"})
 
-# 新版本
-openai.api_key = "EMPTY"
-openai.api_base = "http://localhost:8082/v1"
-model = "bce-reranker-base_v1"
-data = {
-    "model": model,
-    "query":"你多大了",
-    "input": [
-        "你是谁",
-        "今年几岁",
-    ],
-}
-data = openai.Embedding().create(**data)
-print(data["data"])
+print(data.data)

@@ -1,25 +1,16 @@
-import openai
+from openai import OpenAI
+# 新版本 opnai
+client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 
-# 新版本
-openai.api_key = "EMPTY"
-openai.api_base = "http://localhost:8082/v1"
-model = "qwen"  # internlm chatglm3  qwen
 stream = True
-data = {
-    "model": model,
-    "messages": [{"role": "user", "content": "你是谁"}],
-    "stream": stream,
-}
-completion = openai.ChatCompletion.create(**data)
+output = client.chat.completions.create(
+    model="qwen",  # internlm chatglm3  qwen
+    messages=[{"role": "user", "content": "你是谁"}],
+    stream=stream,
+)
 if stream:
-    text = ""
-    for choices in completion:
-        c = choices.choices[0]
-        delta = c.delta
-        if hasattr(delta, "content"):
-            text += delta.content
-            print(delta.content, end="", flush=True)
-    print()
+    for chunk in output:
+        print(chunk.choices[0].delta.content or "", end="", flush=True)
 else:
-    for choice in completion.choices:
-        print(choice.message.content)
+    print(output.choices[0].message.content)
+print()
