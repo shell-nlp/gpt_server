@@ -61,7 +61,7 @@ models:
 
       workers:
       - gpus:
-        - 0
+        - 2
 
   - bce-embedding-base_v1:
       alias: text-embedding-ada-002 # 别名   
@@ -72,11 +72,11 @@ models:
 
       workers:
       - gpus:
-        - 0
+        - 2
 
   - bce-reranker-base_v1:
       alias: null # 别名   
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/maidalun1020/bce-reranker-base_v1/
       model_type: embedding
       work_mode: hf
@@ -84,6 +84,16 @@ models:
       workers:
       - gpus:
         - 0
+  - bge-reranker-base:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
+      model_type: embedding
+      work_mode: hf
+
+      workers:
+      - gpus:
+        - 2
 
         
 
