@@ -83,3 +83,4 @@ class VllmBackend(ModelBackend):
 
             if aborted:
                 break
+        print(text_outputs)

@@ -58,9 +58,9 @@ def main(args):
     n_words = sum(results)
     time_seconds = time.time() - tik
     print(
-        f"Time (Completion): {time_seconds}, n threads: {args.n_thread}, "
-        f"throughput: {n_words / time_seconds} words/s."
-        f"RPS: {args.n_thread / time_seconds} req/s."
+        f"Time (Completion): {time_seconds}, threads: {args.n_thread}, ",
+        f"throughput: {n_words / time_seconds} words/s.",
+        f"RPS: {args.n_thread / time_seconds} req/s.",
     )
 
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--server-address", type=str,
                         default="http://localhost:8082")
-    parser.add_argument("--model-name", type=str, default="qwen")
+    parser.add_argument("--model-name", type=str, default="chatglm3")
     parser.add_argument("--max-new-tokens", type=int, default=2048)
     parser.add_argument("--n-thread", type=int, default=6)
     parser.add_argument("--test-dispatch", action="store_true")
