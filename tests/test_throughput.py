@@ -1,23 +1,14 @@
-"""Benchmarking script to test the throughput of serving workers."""
 import argparse
-
 import threading
 import time
 
 
-from fastchat.conversation import get_conv_template
-
-
 def main(args):
-    import openai
+    from openai import OpenAI
 
     server_address = args.server_address
 
-    openai.api_key = "EMPTY"
-    openai.api_base = f"{server_address}/v1"
-
-    models = openai.Model().list()
-    model_list = [i["id"] for i in models["data"]]
+    client = OpenAI(api_key="EMPTY", base_url=f"{server_address}/v1")
 
     print(f"server_address: {server_address}")
 
@@ -26,30 +17,24 @@ def main(args):
     data = {
         "model": args.model_name,
         "messages": [{"role": "user", "content": content}],
-        "temperature": 0.6,
+        "temperature": 0.0,
         "max_tokens": args.max_new_tokens,
         "stream": True,
     }
 
-    # completion = openai.ChatCompletion.create(**data)
-    # text = ""
-    # for choices in completion:
-    #     c = choices.choices[0]
-    #     delta = c.delta
-    #     if hasattr(delta, "content"):
-    #         text += delta.content
     def send_request(results, i):
         thread_server_address = server_address
         print(f"thread {i} goes to {thread_server_address}")
-        completion = openai.ChatCompletion.create(**data)
+        output = client.chat.completions.create(
+            model=args.model_name, messages=[
+                {"role": "user", "content": content}],
+            stream=True)
+
         text = ""
-        for choices in completion:
-            c = choices.choices[0]
-            delta = c.delta
-            if hasattr(delta, "content"):
-                text += delta.content
-                # print(delta.content)
-        # print(text)
+        for chunk in output:
+            token = chunk.choices[0].delta.content
+            if token:
+                text += token
         print(f"完成 threads {i}")
         response_new_words = text
         # print(f"=== Thread {i} ===, words: {1}, error code: {error_code}")
@@ -63,28 +48,29 @@ def main(args):
     for i in range(args.n_thread):
         t = threading.Thread(target=send_request, args=(results, i))
         t.start()
-        # time.sleep(0.5)
+        # t.join()
         threads.append(t)
 
     for t in threads:
         t.join()
 
     print(f"Time (POST): {time.time() - tik} s")
-
     n_words = sum(results)
     time_seconds = time.time() - tik
     print(
         f"Time (Completion): {time_seconds}, n threads: {args.n_thread}, "
         f"throughput: {n_words / time_seconds} words/s."
+        f"RPS: {args.n_thread / time_seconds} req/s."
     )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--server-address", type=str, default="http://localhost:8082")
-    parser.add_argument("--model-name", type=str, default="chatglm3")
+    parser.add_argument("--server-address", type=str,
+                        default="http://localhost:8082")
+    parser.add_argument("--model-name", type=str, default="qwen")
     parser.add_argument("--max-new-tokens", type=int, default=2048)
-    parser.add_argument("--n-thread", type=int, default=16)
+    parser.add_argument("--n-thread", type=int, default=6)
     parser.add_argument("--test-dispatch", action="store_true")
     args = parser.parse_args()
 
