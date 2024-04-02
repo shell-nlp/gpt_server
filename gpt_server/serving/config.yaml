@@ -94,8 +94,17 @@ models:
       workers:
       - gpus:
         - 2
+  
+  - acge_text_embedding:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/aspire/acge_text_embedding
+      model_type: embedding
+      work_mode: hf
 
-        
+      workers:
+      - gpus:
+        - 2
 
 
 

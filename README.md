@@ -48,6 +48,10 @@
 |bge-embedding|√|
 |bce-embedding|√|
 |piccolo-base-zh-embedding|√|
+|acge_text_embedding|√| 
+
+
+目前 **acge_text_embedding** MTEB榜单排行第一, 超越付费的闭源服务，阿里云OpenSearch服务(第二)和baichuan-text-embedding(第五)
 
 ## 启用方式
 
