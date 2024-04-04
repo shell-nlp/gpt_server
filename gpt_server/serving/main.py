@@ -71,7 +71,8 @@ for model_config_ in config["models"]:
                 gpus_str = ",".join(gpus)
                 num_gpus = len(gpus)
                 run_mode = "python "
-                os.environ["CUDA_VISIBLE_DEVICES"] = gpus_str
+                # os.environ["CUDA_VISIBLE_DEVICES"] = gpus_str
+                CUDA_VISIBLE_DEVICES = f"CUDA_VISIBLE_DEVICES={gpus_str} "
 
                 if model_config["work_mode"] == "vllm":
                     use_vllm = 1
@@ -79,9 +80,10 @@ for model_config_ in config["models"]:
                     use_vllm = 0
 
                 cmd = (
-                    run_mode
+                    CUDA_VISIBLE_DEVICES
+                    + run_mode
                     + py_path
-                    + f" --gpus {gpus_str}"
+                    # + f" --gpus {gpus_str}"
                     + f" --model_name_or_path {model_name_or_path}"
                     + f" --model_names {model_names}"
                 )

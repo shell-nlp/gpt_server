@@ -4,7 +4,7 @@ client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 
 stream = True
 output = client.chat.completions.create(
-    model="qwen",  # internlm chatglm3  qwen
+    model="chatglm3",  # internlm chatglm3  qwen
     messages=[{"role": "user", "content": "你是谁"}],
     stream=stream,
 )

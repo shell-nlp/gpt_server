@@ -72,9 +72,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--server-address", type=str, default="http://localhost:8082")
-    parser.add_argument("--model-name", type=str, default="qwen")
+    parser.add_argument("--model-name", type=str, default="chatglm3")
     parser.add_argument("--max-new-tokens", type=int, default=2048)
-    parser.add_argument("--n-thread", type=int, default=10)
+    parser.add_argument("--n-thread", type=int, default=6)
     parser.add_argument("--test-dispatch", action="store_true")
     args = parser.parse_args()
 
