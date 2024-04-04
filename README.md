@@ -3,7 +3,7 @@
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 1. **在此基础上完美适配了更多的模型**，**优化了fastchat兼容较差的模型**
 2. 支持了**vllm**和**hf**的加载方式
-3. 支持所有兼容sentence_transformers的语义向量模型（Embedding,Reranker）
+3. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 4. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
 5. **降低了模型适配的难度和项目使用的难度**(仅需适配10行以内的相似代码)，从而更容易的部署自己最新的模型。
 
@@ -12,13 +12,14 @@
 ## 更新信息
 
 ```plaintext
+4-4   支持了 embedding模型 acge_text_embedding (通过测试)
 3-9   支持了 reranker 模型 （ bge-reranker，bce-reranker-base_v1）
 3-3   支持了 internlm-1.0 ,internlm-2.0
 3-2   支持了 qwen-2 0.5B, 1.8B, 4B, 7B, 14B, and 72B
 2-4   支持了 vllm 实现
 1-6   支持了 Yi-34B
 12-31 支持了 qwen-7b, qwen-14b
-12-30 支持了 all-embedding(所有的词嵌入模型)
+12-30 支持了 all-embedding(理论上支持所有的词嵌入模型)
 12-24 支持了 chatglm3-6b 
 ```
 
