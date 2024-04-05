@@ -81,7 +81,7 @@ for model_config_ in config["models"]:
                     CUDA_VISIBLE_DEVICES
                     + run_mode
                     + py_path
-                    # + f" --gpus {gpus_str}"
+                    + f" --num_gpus {num_gpus}"
                     + f" --model_name_or_path {model_name_or_path}"
                     + f" --model_names {model_names}"
                     + f" --backend {backend}"

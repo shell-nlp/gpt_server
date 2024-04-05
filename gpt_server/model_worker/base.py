@@ -161,7 +161,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         import argparse
 
         parser = argparse.ArgumentParser()
-        parser.add_argument("--gpus", type=str, default="gpus")
+        parser.add_argument("--num_gpus", type=int, default=1)
         parser.add_argument("--backend", type=str, default="hf")
 
         parser.add_argument(
@@ -172,9 +172,10 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         )
 
         args = parser.parse_args()
-        if args.backend=="vllm":
+        os.environ["num_gpus"] = str(args.num_gpus)
+        if args.backend == "vllm":
             os.environ["USE_VLLM"] = "1"
-        
+
         host = "localhost"
         port = get_free_tcp_port()
         worker_addr = f"http://{host}:{port}"

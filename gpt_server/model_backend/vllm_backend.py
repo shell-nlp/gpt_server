@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict, AsyncGenerator
 from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
 from fastchat.utils import is_partial_stop
@@ -5,12 +6,17 @@ from gpt_server.model_backend.base import ModelBackend
 
 # 解决vllm中 ray集群在 TP>1时死的Bug
 import ray
-ray.init(ignore_reinit_error=True,num_cpus=4)
+
+ray.init(ignore_reinit_error=True, num_cpus=4)
+
 
 class VllmBackend(ModelBackend):
     def __init__(self, model_path) -> None:
         engine_args = AsyncEngineArgs(
-            model_path, tensor_parallel_size=1, trust_remote_code=True,gpu_memory_utilization=0.8
+            model_path,
+            tensor_parallel_size=int(os.getenv("num_gpus", "1")),
+            trust_remote_code=True,
+            gpu_memory_utilization=0.8,
         )
         self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
