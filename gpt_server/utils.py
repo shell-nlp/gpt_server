@@ -6,9 +6,6 @@ from loguru import logger
 
 
 def run_cmd(cmd: str, *args, **kwargs):
-    use_vllm = kwargs.get("use_vllm", 0)
-    if use_vllm:
-        os.environ["USE_VLLM"] = "1"
     logger.info(f"执行命令如下：\n{cmd}\n")
     subprocess.run(cmd, shell=True)
 
