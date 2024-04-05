@@ -1,8 +1,11 @@
 from typing import Any, Dict, AsyncGenerator
+import ray
 from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
 from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 
+# 解决vllm中 ray集群在 TP>1时死的Bug
+ray.init(ignore_reinit_error=True,num_cpus=32)
 
 class VllmBackend(ModelBackend):
     def __init__(self, model_path) -> None:
