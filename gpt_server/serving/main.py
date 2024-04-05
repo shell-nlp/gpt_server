@@ -4,6 +4,8 @@ import os
 import sys
 from multiprocessing import Process
 import signal
+import ray
+ray.shutdown()
 
 # 配置根目录
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
