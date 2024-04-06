@@ -104,7 +104,7 @@ models:
 
 #### 2. 运行命令
 
-[start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/scipt/start.sh "服务主文件")
+[start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/start.sh "服务主文件")
 
 ```bash
 sh start.sh
