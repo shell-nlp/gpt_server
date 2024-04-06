@@ -20,14 +20,13 @@ def start_controller():
 def start_openai_server(host, port):
     """启动openai api 服务"""
     os.environ["FASTCHAT_WORKER_API_EMBEDDING_BATCH_SIZE"] = "100000"
-    # cmd = f"python -m fastchat.serve.openai_api_server --host {host} --port {port}"
-    # my
+
     cmd = f"python -m gpt_server.serving.openai_api_server --host {host} --port {port}"
     openai_server_process = Process(target=run_cmd, args=(cmd,))
     openai_server_process.start()
 
 
-def start_server(host, port):
+def start_server(host: str = "0.0.0.0", port: int = 8081):
     """启动服务"""
     # 判断端口是否被占用
     used_ports = []
