@@ -16,6 +16,7 @@ os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
 sys.path.append(root_dir)
 from gpt_server.utils import (
     start_server,
+    start_api_server,
     run_cmd,
     stop_server,
     delete_log,
@@ -26,7 +27,7 @@ delete_log(root_dir)
 
 
 def signal_handler(signum, frame):
-    stop_server()
+    # stop_server()
     raise KeyboardInterrupt
 
 
@@ -38,7 +39,7 @@ with open(config_path, "r") as f:
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
 host = config["serve_args"]["host"]
 port = config["serve_args"]["port"]
-start_server(host, port)
+start_api_server(host, port)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
 process = []
 for model_config_ in config["models"]:
