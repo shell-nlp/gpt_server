@@ -31,7 +31,7 @@ def signal_handler(signum, frame):
 
 
 signal.signal(signal.SIGINT, signal_handler)
-config_path = os.path.join(root_dir, "gpt_server/serving/config.yaml")
+config_path = os.path.join(root_dir, "gpt_server/script/config.yaml")
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 # print(config)

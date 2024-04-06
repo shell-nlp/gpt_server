@@ -60,10 +60,10 @@
 
 #### 1. 修改配置文件
 
-[config.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/serving/config.yaml "配置文件")
+[config.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml "配置文件")
 
 ```bash
-cd gpt_erver/serving
+cd gpt_server/script
 vim config.yaml
 ```
 
@@ -104,7 +104,7 @@ models:
 
 #### 2. 运行命令
 
-[main.py](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/serving/main.py "服务主文件")
+[start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/scipt/start.sh "服务主文件")
 
 ```bash
 sh start.sh

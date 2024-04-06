@@ -20,4 +20,4 @@ services:
               device_ids: [ '0', '1', '2' ]
               # count: 2  # 两种方式
               capabilities: [ gpu ]
-    command: python gpt_server/serving/main.py
+    command: sh gpt_server/script/start.sh

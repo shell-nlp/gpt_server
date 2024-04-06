@@ -60,7 +60,7 @@ def stop_server():
 
 
 def delete_log(root_path):
-    serving_path = os.path.join(root_path, "gpt_server/serving")
+    serving_path = os.path.join(root_path, "gpt_server/script")
     datanames = os.listdir(serving_path)  # 查找本目录下所有文件
     for dataname in datanames:
         if dataname.endswith(".log"):
