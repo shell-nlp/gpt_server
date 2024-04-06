@@ -29,8 +29,22 @@ def start_openai_server(host, port):
 
 def start_server(host, port):
     """启动服务"""
-    start_controller()
-    start_openai_server(host, port)
+    # 判断端口是否被占用
+    used_ports = []
+    if is_port_in_use(21001):
+        used_ports.append(21001)
+    if is_port_in_use(port):
+        used_ports.append(port)
+    if len(used_ports) > 0:
+        logger.warning(
+            f"端口：{used_ports} 已被占用!为了系统的正常运行,请确保是被已启动的gpt_server服务占用。"
+        )
+    if 21001 not in used_ports:
+        # 启动控制器
+        start_controller()
+    if port not in used_ports:
+        # 启动openai_api服务
+        start_openai_server(host, port)
 
 
 def stop_server():
@@ -61,3 +75,16 @@ def get_free_tcp_port():
     _, port = tcp.getsockname()
     tcp.close()
     return port
+
+
+def is_port_in_use(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind(("localhost", port))
+            return False
+        except:
+            return True
+
+
+if __name__ == "__main__":
+    print(is_port_in_use(21001))

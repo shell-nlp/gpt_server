@@ -137,8 +137,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
     def get_worker(
         cls,
         model_path: str,
+        worker_addr: str,
         controller_addr: str = "http://localhost:21001",
-        worker_addr: str = "http://localhost:21002",
         worker_id: str = str(uuid.uuid4())[:8],
         model_names: List[str] = [""],
         limit_worker_concurrency: int = 6,
