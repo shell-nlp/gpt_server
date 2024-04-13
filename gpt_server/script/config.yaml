@@ -50,7 +50,19 @@ models:
       workers:
       - gpus:
         - 0
-    
+  
+   - deepseek:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/deepseek-ai/deepseek-coder-33b-instruct 
+      model_type: deepseek  # qwen  chatglm3 yi internlm
+      work_mode: hf  # vllm hf
+
+      workers:
+      - gpus:
+        - 1
+        - 0
+
   # Embedding 模型
   - piccolo-base-zh:
       alias: null # 别名   

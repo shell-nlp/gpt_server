@@ -12,6 +12,7 @@
 ## 更新信息
 
 ```plaintext
+4-13  支持了 deepseek
 4-4   支持了 embedding模型 acge_text_embedding (通过测试)
 3-9   支持了 reranker 模型 （ bge-reranker，bce-reranker-base_v1）
 3-3   支持了 internlm-1.0 ,internlm-2.0
@@ -34,6 +35,7 @@
 | Yi-34B                 | √ | √   |
 | Internlm-1.0                 | √ | √   |
 | Internlm-2.0                 | √ | √   |
+| deepseek                 | √ | √   |
 
 -----
 
