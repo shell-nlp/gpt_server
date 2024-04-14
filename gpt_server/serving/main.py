@@ -27,7 +27,7 @@ delete_log(root_dir)
 
 
 def signal_handler(signum, frame):
-    # stop_server()
+    stop_server()
     raise KeyboardInterrupt
 
 
