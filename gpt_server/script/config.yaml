@@ -10,7 +10,7 @@ models:
       model_name_or_path: /home/dev/model/chatglm3-6b/
       model_type: chatglm3  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         # - 1
@@ -24,7 +24,7 @@ models:
       model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
       model_type: qwen  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 1
@@ -34,7 +34,7 @@ models:
       model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
       model_type: yi  # qwen  chatglm3 yi internlm
       work_mode: hf  # vllm hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 2
@@ -46,7 +46,7 @@ models:
       model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2-chat-7b/
       model_type: internlm  # qwen  chatglm3 yi internlm
       work_mode: hf  # vllm hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 0
@@ -58,7 +58,7 @@ models:
       model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
       model_type: embedding
       work_mode: hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 2
@@ -69,7 +69,7 @@ models:
       model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
       model_type: embedding
       work_mode: hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 2
@@ -80,7 +80,7 @@ models:
       model_name_or_path: /home/dev/model/maidalun1020/bce-reranker-base_v1/
       model_type: embedding
       work_mode: hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 0
@@ -90,7 +90,7 @@ models:
       model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
       model_type: embedding
       work_mode: hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 2
@@ -101,7 +101,7 @@ models:
       model_name_or_path: /home/dev/model/aspire/acge_text_embedding
       model_type: embedding
       work_mode: hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 2

@@ -2,10 +2,11 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 1. **在此基础上完美适配了更多的模型**，**优化了fastchat兼容较差的模型**
-2. 支持了**vllm**和**hf**的加载方式
-3. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
-4. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
-5. **降低了模型适配的难度和项目使用的难度**(仅需适配10行以内的相似代码)，从而更容易的部署自己最新的模型。
+2. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
+3. 支持了**vllm**和**hf**的加载方式
+4. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
+5. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
+6. **降低了模型适配的难度和项目使用的难度**(仅需适配10行以内的相似代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
@@ -81,7 +82,7 @@ models:
       model_name_or_path: /home/dev/model/chatglm3-6b/  # 模型的路径
       model_type: chatglm3  # 模型的类型 现在暂时 只有 chatglm3  embedding
       work_mode: hf # 启动方式  vllm  hf
-
+      device: gpu  # gpu / cpu
       workers: 
       - gpus: # 第一个 worker 每一个 -gpus 表示一个 worker
         - 1  # 每个worker 使用的gpu
@@ -97,7 +98,7 @@ models:
       model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
       model_type: embedding
       work_mode: hf
-
+      device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 0

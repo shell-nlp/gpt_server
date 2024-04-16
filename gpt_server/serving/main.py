@@ -5,6 +5,8 @@ import sys
 from multiprocessing import Process
 import signal
 import ray
+import torch
+
 ray.shutdown()
 
 # 配置根目录
@@ -74,8 +76,16 @@ for model_config_ in config["models"]:
                 gpus_str = ",".join(gpus)
                 num_gpus = len(gpus)
                 run_mode = "python "
-
-                CUDA_VISIBLE_DEVICES = f"CUDA_VISIBLE_DEVICES={gpus_str} "
+                CUDA_VISIBLE_DEVICES = ""
+                if (
+                    torch.cuda.is_available()
+                    and model_config["device"].lower() == "gpu"
+                ):
+                    CUDA_VISIBLE_DEVICES = f"CUDA_VISIBLE_DEVICES={gpus_str} "
+                elif model_config["device"].lower() == "cpu":
+                    CUDA_VISIBLE_DEVICES = ""
+                else:
+                    raise Exception("目前仅支持 CPU/GPU设备!")
                 backend = model_config["work_mode"]
 
                 cmd = (
