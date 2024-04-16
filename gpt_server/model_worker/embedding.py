@@ -24,7 +24,7 @@ class EmbeddingWorker(ModelWorkerBase):
             conv_template,
             model_type="embedding",
         )
-        model_kwargs = {"device": "cuda"}
+        # model_kwargs = {"device": "cuda"}
         self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
         self.mode = "embedding"
         # rerank
@@ -36,9 +36,7 @@ class EmbeddingWorker(ModelWorkerBase):
             self.client = sentence_transformers.CrossEncoder(model_name=model_path)
             print("正在使用 rerank 模型...")
         elif self.mode == "embedding":
-            self.client = sentence_transformers.SentenceTransformer(
-                model_path, **model_kwargs
-            )
+            self.client = sentence_transformers.SentenceTransformer(model_path)
             print("正在使用 embedding 模型...")
 
     def generate_stream_gate(self, params):
