@@ -28,6 +28,18 @@ models:
       workers:
       - gpus:
         - 1
+
+  - llama3:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/unsloth/unsloth/llama-3-8b-Instruct/
+      model_type: llama  # qwen  chatglm3 yi internlm
+      work_mode: hf  # vllm hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 0
+
   - yi:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
