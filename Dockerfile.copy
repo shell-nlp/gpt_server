@@ -1,4 +1,4 @@
-FROM gpt_server:v0.0.3
+FROM gpt_server:v0.2
 
 COPY ./ /gpt_server
 

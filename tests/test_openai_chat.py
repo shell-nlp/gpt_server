@@ -1,11 +1,12 @@
 from openai import OpenAI
+
 # 新版本 opnai
 client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 
 stream = True
 output = client.chat.completions.create(
-    model="llama3",  # internlm chatglm3  qwen  llama3
-    messages=[{"role": "user", "content": "who are you "}],
+    model="qwen",  # internlm chatglm3  qwen  llama3
+    messages=[{"role": "user", "content": "你是谁"}],
     stream=stream,
 )
 if stream:
