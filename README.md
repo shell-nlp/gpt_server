@@ -38,7 +38,7 @@
 | Internlm-1.0                 | √ | √   |
 | Internlm-2.0                 | √ | √   |
 | Deepseek                 | √ | √   |
-| Llama-3                 | √ | -   |
+| Llama-3                 | √ | √   |
 
 -----
 
