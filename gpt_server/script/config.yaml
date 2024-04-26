@@ -9,7 +9,7 @@ models:
       enable: true  # false true
       model_name_or_path: /home/dev/model/chatglm3-6b/
       model_type: chatglm3  # qwen  chatglm3 yi internlm
-      work_mode: vllm  # vllm hf
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
@@ -23,7 +23,7 @@ models:
       enable: true  # false true
       model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
       model_type: qwen  # qwen  chatglm3 yi internlm
-      work_mode: vllm  # vllm hf
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
@@ -34,7 +34,7 @@ models:
       enable: false  # false true
       model_name_or_path: /home/dev/model/unsloth/unsloth/llama-3-8b-Instruct/
       model_type: llama  # qwen  chatglm3 yi internlm
-      work_mode: hf  # vllm hf
+      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
@@ -45,7 +45,7 @@ models:
       enable: false  # false true
       model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
       model_type: yi  # qwen  chatglm3 yi internlm
-      work_mode: hf  # vllm hf
+      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
@@ -57,7 +57,7 @@ models:
       enable: false  # false true
       model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2-chat-7b/
       model_type: internlm  # qwen  chatglm3 yi internlm
-      work_mode: hf  # vllm hf
+      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:

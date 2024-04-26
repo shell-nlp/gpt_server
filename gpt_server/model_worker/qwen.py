@@ -1,6 +1,7 @@
 import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
+from loguru import logger
 import torch
 
 from gpt_server.model_worker.base import ModelWorkerBase
@@ -37,15 +38,15 @@ class QwenWorker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        print("qwen停用词:", self.stop)
+        logger.info(f"qwen停用词: {self.stop}")
         self.other_config = {
             "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content']}}{% if (loop.last and add_generation_prompt) or not loop.last %}{{ '<|im_end|>' + '\n'}}{% endif %}{% endfor %}{% if add_generation_prompt and messages[-1]['role'] != 'assistant' %}{{ '<|im_start|>assistant\n' }}{% endif %}"
         }
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
-        print("params", params)
-        print("worker_id:", self.worker_id)
+        logger.info(f"params {params}")
+        logger.info(f"worker_id: {self.worker_id}")
         try:
             model_type = getattr(self.model_config, "model_type", "qwen")
             query = ""
@@ -55,7 +56,7 @@ class QwenWorker(ModelWorkerBase):
                     msg["role"] = "Observation:"
             # 暂时保留，用于特殊情况的处理
             if model_type == "qwen":
-                print("正在使用qwen-1.0 !")
+                logger.info("正在使用qwen-1.0 !")
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages,
                     tokenize=False,
@@ -64,13 +65,13 @@ class QwenWorker(ModelWorkerBase):
                 )
                 input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             elif model_type == "qwen2":
-                print("正在使用qwen-2.0 !")
+                logger.info("正在使用qwen-2.0 !")
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages, tokenize=False, add_generation_prompt=True
                 )
                 input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             prompt = self.tokenizer.decode(input_ids.tolist()[0])
-            print(prompt)
+            logger.info(prompt)
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
             params["prompt"] = prompt

@@ -7,7 +7,6 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastchat.serve.base_model_worker import BaseModelWorker
 from fastchat.utils import get_context_length as get_context_length_
 
-from vllm.utils import random_uuid
 from loguru import logger
 import os
 from transformers import (
@@ -48,7 +47,6 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         )
         os.environ["WORKER_NAME"] = self.__class__.__name__
         self.worker_name = self.__class__.__name__
-        self.USE_VLLM = os.getenv("USE_VLLM", 0)
         self.model_type = model_type
         self.model_path = model_path
         self.model = None
@@ -99,12 +97,19 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             trust_remote_code=True,
             encode_special_tokens=True,
         )
-        if self.USE_VLLM:
+        if os.getenv("backend") == "vllm":
             from gpt_server.model_backend.vllm_backend import VllmBackend
 
             logger.info(f"{self.worker_name} 使用 vllm 后端")
             self.backend = VllmBackend(model_path=self.model_path)
-        else:
+
+        elif "lmdeploy" in os.getenv("backend"):
+            from gpt_server.model_backend.lmdeploy_backend import LMDeployBackend
+
+            logger.info(f"{self.worker_name} 使用 LMDeploy 后端")
+            self.backend = LMDeployBackend(model_path=self.model_path)
+
+        elif os.getenv("backend") == "hf":
             from gpt_server.model_backend.hf_backend import HFBackend
 
             logger.info(f"{self.worker_name} 使用 hf 后端")
@@ -119,6 +124,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             self.model = self.model.eval()
             # 加载 HF 后端
             self.backend = HFBackend(tokenizer=self.tokenizer, model=self.model)
+        logger.info("load_model_tokenizer 完成")
 
     @abstractmethod
     def generate_stream_gate(self, params):
@@ -174,7 +180,13 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
-            os.environ["USE_VLLM"] = "1"
+            os.environ["backend"] = "vllm"
+        elif args.backend == "hf":
+            os.environ["backend"] = "hf"
+        elif args.backend == "lmdeploy-pytorch":
+            os.environ["backend"] = "lmdeploy-pytorch"
+        elif args.backend == "lmdeploy-turbomind":
+            os.environ["backend"] = "lmdeploy-turbomind"
 
         host = "localhost"
         port = get_free_tcp_port()
@@ -207,16 +219,25 @@ def create_background_tasks(request_id):
     background_tasks = BackgroundTasks()
     background_tasks.add_task(release_worker_semaphore)
     #
-    if os.getenv("USE_VLLM", 0):
+    if os.getenv("backend") == "vllm":
         background_tasks.add_task(abort_request)
     return background_tasks
+
+
+request_id = 0
+
+
+def gen_request_id():
+    global request_id
+    request_id += 1
+    return str(request_id)
 
 
 @app.post("/worker_generate_stream")
 async def api_generate_stream(request: Request):
     params = await request.json()
     await acquire_worker_semaphore()
-    request_id = random_uuid()
+    request_id = gen_request_id()
     params["request_id"] = request_id
     params["request"] = request
     params.pop("prompt")
@@ -229,13 +250,13 @@ async def api_generate_stream(request: Request):
 async def api_generate(request: Request):
     params = await request.json()
     await acquire_worker_semaphore()
-    request_id = random_uuid()
+    request_id = gen_request_id()
     params["request_id"] = request_id
     params["request"] = request
     params.pop("prompt")
     output = await worker.generate_gate(params)
     release_worker_semaphore()
-    if os.getenv("USE_VLLM", 0):
+    if os.getenv("backend") == "vllm":
         await worker.backend.engine.abort(request_id)
     return JSONResponse(output)
 

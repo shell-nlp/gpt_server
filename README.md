@@ -3,22 +3,24 @@
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 1. **在此基础上完美适配了更多的模型**，**优化了fastchat兼容较差的模型**
 2. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
-3. 支持了**vllm**和**hf**的加载方式
+3. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 4. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 5. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
-6. **降低了模型适配的难度和项目使用的难度**(仅需适配10行以内的相似代码)，从而更容易的部署自己最新的模型。
+6. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
 <br>
 
 ## 项目实时进展
-近期将实现**LMDeploy**后端，其中包括lmdeploy的Pytorch后端和TurboMind后端。
+已经实现**LMDeploy**后端，其中包括lmdeploy的Pytorch后端和TurboMind后端。
 
 LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型上，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍。
+
 ## 更新信息
 
 ```plaintext
+4-27  支持了 LMDeploy 加速推理后端
 4-20  支持了 llama-3
 4-13  支持了 deepseek
 4-4   支持了 embedding模型 acge_text_embedding (通过测试)
@@ -32,19 +34,20 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 12-24 支持了 chatglm3-6b 
 ```
 
-## 支持的模型
+## 支持的模型以及推理后端
 
+**推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
 
-| Models                  | HF | vllm |
-| ---------------------- | -- | ---- |
-| chatglm3-6b             | √ | √   |
-| Qwen (7B, 14B, etc.)) | √ | √   |
-| Qwen-2 (0.5B--72B) | √   |   √   |
-| Yi-34B                 | √ | √   |
-| Internlm-1.0                 | √ | √   |
-| Internlm-2.0                 | √ | √   |
-| Deepseek                 | √ | √   |
-| Llama-3                 | √ | √   |
+| Models / BackEnd                 | HF | vllm |LMDeploy TurboMind|LMDeploy PyTorch|
+| :--: | :--: | :--: |:--:|:--:|
+| chatglm3-6b             | √ | √   |√   |√   |
+| Qwen (7B, 14B, etc.)) | √ | √   |√   |√   |
+| Qwen-2 (0.5B--72B) | √   |   √   |√   |√   |
+| Yi-34B                 | √ | √   |√   |√   |
+| Internlm-1.0                 | √ | √   |√   |√   |
+| Internlm-2.0                 | √ | √   |√   |√   |
+| Deepseek                 | √ | √   |√   |√   |
+| Llama-3                 | √ | √   |√   |√   |
 
 -----
 
@@ -68,8 +71,19 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 ## 启用方式
 
 ### Python启动
+#### 1. 配置python环境
+```bash
+# 1. 创建conda 环境
+conda create -n gpt_server python=3.10
 
-#### 1. 修改配置文件
+# 2. 激活conda 环境
+conda activate gpt_server
+
+# 3. 安装依赖
+pip install requirements.txt
+```
+
+#### 2. 修改启动配置文件
 
 [config.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml "配置文件")
 
@@ -113,7 +127,7 @@ models:
 
 ```
 
-#### 2. 运行命令
+#### 3. 运行命令
 
 [start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/start.sh "服务主文件")
 
@@ -121,20 +135,25 @@ models:
 sh start.sh
 ```
 
-### Docker安装
-待填充
 
-### 3. 使用 openai 库 进行调用
+#### 4. 使用 openai 库 进行调用
 
 **见 gpt_server/tests 目录 样例测试代码**
 <br>
 https://github.com/shell-nlp/gpt_server/tree/main/tests
 
+
+### Docker安装
+待填充
+
+
 ## 致谢
 
-    FastChat :  https://github.com/lm-sys/FastChat
+    FastChat : https://github.com/lm-sys/FastChat
 
-    vllm :  https://github.com/vllm-project/vllm
+      vLLM   : https://github.com/vllm-project/vllm
+
+    LMDeploy ： https://github.com/InternLM/lmdeploy
 
 ## Star History
 
