@@ -56,6 +56,7 @@ class DeepSeekWorker(ModelWorkerBase):
             prompt = self.tokenizer.decode(input_ids.tolist()[0])
             print(prompt)
             # ---------------添加额外的参数------------------------
+            params["messages"] = messages
             params["prompt"] = prompt
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
