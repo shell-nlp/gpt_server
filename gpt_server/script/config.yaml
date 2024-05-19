@@ -28,6 +28,8 @@ models:
       workers:
       - gpus:
         - 1
+      # - gpus:
+      #   - 3
 
   - llama3:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
@@ -100,6 +102,16 @@ models:
       alias: null # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
+  - bge-base-zh:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
       model_type: embedding
       work_mode: hf
       device: gpu  # gpu / cpu

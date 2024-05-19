@@ -63,18 +63,18 @@ class QwenWorker(ModelWorkerBase):
                     add_generation_prompt=True,
                     chat_template=self.other_config["chat_template"],
                 )
+                logger.info(text)
                 input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             elif model_type == "qwen2":
                 logger.info("正在使用qwen-2.0 !")
                 text = self.tokenizer.apply_chat_template(
                     conversation=messages, tokenize=False, add_generation_prompt=True
                 )
+                logger.info(text)
                 input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-            prompt = self.tokenizer.decode(input_ids.tolist()[0])
-            logger.info(prompt)
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
-            params["prompt"] = prompt
+            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids

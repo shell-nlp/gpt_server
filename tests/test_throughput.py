@@ -72,10 +72,18 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--server-address", type=str, default="http://localhost:8082")
+
     parser.add_argument("--model-name", type=str, default="qwen")
     parser.add_argument("--max-new-tokens", type=int, default=2048)
-    parser.add_argument("--n-thread", type=int, default=8)
+    parser.add_argument("--n-thread", type=int, default=20)
     parser.add_argument("--test-dispatch", action="store_true")
     args = parser.parse_args()
-
-    main(args)
+    threads = []
+    for i in range(1):
+        t = threading.Thread(target=main, args=(args,))
+        t.start()
+        threads.append(t)
+        time.sleep(1)
+    for t in threads:
+        t.join()
+    # main(args)
