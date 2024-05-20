@@ -25,11 +25,12 @@ def start_openai_server(host, port):
     openai_server_process = Process(target=run_cmd, args=(cmd,))
     openai_server_process.start()
 
+
 def start_api_server(host: str = "0.0.0.0", port: int = 8081):
     cmd = f"python -m gpt_server.serving.start_api_server --host {host} --port {port}"
     start_server_process = Process(target=run_cmd, args=(cmd,))
     start_server_process.start()
-    
+
 
 def start_server(host: str = "0.0.0.0", port: int = 8081):
     """启动服务"""
@@ -65,15 +66,12 @@ def stop_server():
 
 
 def delete_log(root_path):
-    scipt_path = os.path.join(root_path, "gpt_server/script")
-    serving_path = os.path.join(root_path, "gpt_server/serving")
-    
-    serving_path_datanames = os.listdir(serving_path)  # 查找本目录下所有文件
-    scipt_path_datanames = os.listdir(scipt_path)
-    datanames = serving_path_datanames + scipt_path_datanames
+    logs_path = os.environ.get("LOGDIR")
+    logs_path_datanames = os.listdir(logs_path)  # 查找本目录下所有文件
+    datanames = logs_path_datanames
     for dataname in datanames:
         if dataname.endswith(".log"):
-            os.remove(os.path.join(serving_path, f"{dataname}"))
+            os.remove(os.path.join(logs_path, f"{dataname}"))
 
 
 def get_free_tcp_port():
