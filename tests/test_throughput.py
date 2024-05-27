@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--model-name", type=str, default="qwen")
     parser.add_argument("--max-new-tokens", type=int, default=2048)
-    parser.add_argument("--n-thread", type=int, default=20)
+    parser.add_argument("--n-thread", type=int, default=16)
     parser.add_argument("--test-dispatch", action="store_true")
     args = parser.parse_args()
     threads = []

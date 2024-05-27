@@ -51,27 +51,36 @@ class QwenWorker(ModelWorkerBase):
             model_type = getattr(self.model_config, "model_type", "qwen")
             query = ""
             messages = params["messages"]
-            for msg in messages:
-                if msg["role"] == "function":
-                    msg["role"] = "Observation:"
-            # 暂时保留，用于特殊情况的处理
-            if model_type == "qwen":
-                logger.info("正在使用qwen-1.0 !")
-                text = self.tokenizer.apply_chat_template(
-                    conversation=messages,
-                    tokenize=False,
-                    add_generation_prompt=True,
-                    chat_template=self.other_config["chat_template"],
-                )
-                logger.info(text)
-                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-            elif model_type == "qwen2":
-                logger.info("正在使用qwen-2.0 !")
-                text = self.tokenizer.apply_chat_template(
-                    conversation=messages, tokenize=False, add_generation_prompt=True
-                )
-                logger.info(text)
-                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+            if isinstance(messages, list):
+                task = "chat"
+                for msg in messages:
+                    if msg["role"] == "function":
+                        msg["role"] = "Observation:"
+            elif isinstance(messages, str):
+                task = "completion"
+
+            if task == "chat":
+                # 暂时保留，用于特殊情况的处理
+                if model_type == "qwen":
+                    logger.info("正在使用qwen-1.0 !")
+                    text = self.tokenizer.apply_chat_template(
+                        conversation=messages,
+                        tokenize=False,
+                        add_generation_prompt=True,
+                        chat_template=self.other_config["chat_template"],
+                    )
+                elif model_type == "qwen2":
+                    logger.info("正在使用qwen-2.0 !")
+                    text = self.tokenizer.apply_chat_template(
+                        conversation=messages,
+                        tokenize=False,
+                        add_generation_prompt=True,
+                    )
+            elif task == "completion":
+                text = messages
+
+            logger.info(text)
+            input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
             params["prompt"] = text

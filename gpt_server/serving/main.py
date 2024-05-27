@@ -16,7 +16,7 @@ root_dir = os.path.abspath(root_dir)
 original_pythonpath = os.environ.get("PYTHONPATH", "")
 os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
 sys.path.append(root_dir)
-os.environ["LOGDIR"] = os.path.join(root_dir, "./logs")
+os.environ["LOGDIR"] = os.path.join(root_dir, "logs")
 from gpt_server.utils import (
     start_server,
     start_api_server,
@@ -26,7 +26,7 @@ from gpt_server.utils import (
 )
 
 # 删除日志
-delete_log(root_dir)
+delete_log()
 
 
 def signal_handler(signum, frame):

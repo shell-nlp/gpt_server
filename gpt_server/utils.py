@@ -65,8 +65,13 @@ def stop_server():
     logger.info("停止服务成功！")
 
 
-def delete_log(root_path):
+def delete_log():
     logs_path = os.environ.get("LOGDIR")
+    logger.debug(f"logs_path: {logs_path}")
+    # 如果目录不存在则创建
+    if not os.path.exists(logs_path):
+        os.makedirs(logs_path, exist_ok=True)
+
     logs_path_datanames = os.listdir(logs_path)  # 查找本目录下所有文件
     datanames = logs_path_datanames
     for dataname in datanames:
