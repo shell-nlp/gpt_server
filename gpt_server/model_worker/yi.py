@@ -40,7 +40,6 @@ class YiWorker(ModelWorkerBase):
         print("params", params)
         print("worker_id:", self.worker_id)
         try:
-            query = ""
             messages = params["messages"]
             input_ids = self.tokenizer.apply_chat_template(
                 conversation=messages,
@@ -56,9 +55,7 @@ class YiWorker(ModelWorkerBase):
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
 
-            async for response, usage in self.backend.stream_chat(
-                query=query, params=params
-            ):
+            async for response, usage in self.backend.stream_chat(params=params):
 
                 ret = {"text": response, "error_code": 0, "usage": usage}
 

@@ -43,7 +43,6 @@ class DeepSeekWorker(ModelWorkerBase):
         print("params", params)
         print("worker_id:", self.worker_id)
         try:
-            query = ""
             messages = params["messages"]
             # for msg in messages:
             #     if msg["role"] == "function":
@@ -62,9 +61,7 @@ class DeepSeekWorker(ModelWorkerBase):
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------
-            async for response, usage in self.backend.stream_chat(
-                query=query, params=params
-            ):
+            async for response, usage in self.backend.stream_chat(params=params):
                 ret = {"text": response, "error_code": 0, "usage": usage}
 
                 yield json.dumps(ret).encode() + b"\0"
