@@ -2,7 +2,7 @@ import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
-
+from loguru import logger
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
@@ -44,19 +44,22 @@ class DeepSeekWorker(ModelWorkerBase):
         print("worker_id:", self.worker_id)
         try:
             messages = params["messages"]
-            # for msg in messages:
-            #     if msg["role"] == "function":
-            #         msg["role"] = "Observation:"
-
-            text = self.tokenizer.apply_chat_template(
-                conversation=messages, tokenize=False, add_generation_prompt=True
-            )
+            if isinstance(messages, list):
+                task = "chat"
+            elif isinstance(messages, str):
+                task = "completion"
+            if task == "chat":
+                text = self.tokenizer.apply_chat_template(
+                    conversation=messages, tokenize=False, add_generation_prompt=True
+                )
+            elif task == "completion":
+                text = messages
+            
+            logger.info(text)
             input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-            prompt = self.tokenizer.decode(input_ids.tolist()[0])
-            print(prompt)
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
-            params["prompt"] = prompt
+            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids

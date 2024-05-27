@@ -2,6 +2,7 @@ import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
+from loguru import logger
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
@@ -67,28 +68,35 @@ class ChatGLM3Worker(ModelWorkerBase):
         try:
             # ----------------添加对工具的支持-----------------------------------
             messages = params["messages"]
-            for msg in messages:
-                if msg["role"] == "function":
-                    msg["role"] = "observation"
+            if isinstance(messages, list):
+                task = "chat"
+                for msg in messages:
+                    if msg["role"] == "function":
+                        msg["role"] = "observation"
 
-            if messages[-1]["role"] == "user":
-                last_message = messages.pop()
-                query = last_message["content"]
-                role = "user"  # 下一个角色是什么
-            elif messages[-1]["role"] == "observation":
-                query = ""
-                role = "assistant"  # 下一个角色是什么
-            elif messages[-1]["role"] == "assistant":
-                query = ""
-                role = "user"
-            input_ids = self.build_chat_input(query, history=messages, role=role)[
-                "input_ids"
-            ]
-            prompt = self.tokenizer.decode(input_ids.tolist()[0])
-            print(prompt)
+                if messages[-1]["role"] == "user":
+                    last_message = messages.pop()
+                    query = last_message["content"]
+                    role = "user"  # 下一个角色是什么
+                elif messages[-1]["role"] == "observation":
+                    query = ""
+                    role = "assistant"  # 下一个角色是什么
+                elif messages[-1]["role"] == "assistant":
+                    query = ""
+                    role = "user"
+                input_ids = self.build_chat_input(query, history=messages, role=role)[
+                    "input_ids"
+                ]
+            elif isinstance(messages, str):
+                task = "completion"
+                text = messages
+                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+
+            text = self.tokenizer.decode(input_ids.tolist()[0])
+            logger.info(text)
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
-            params["prompt"] = prompt
+            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
