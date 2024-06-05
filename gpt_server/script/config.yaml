@@ -103,7 +103,7 @@ models:
 
   - bce-embedding-base_v1:
       alias: text-embedding-ada-002 # 别名   
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
       model_type: embedding
       work_mode: hf
@@ -144,9 +144,29 @@ models:
         - 2
   
   - acge_text_embedding:
-      alias: null # 别名   
+      alias: text-embedding-ada-002 # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/aspire/acge_text_embedding
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
+  - yinka:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/Classical/Yinka/
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
+  - zpoint:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/iampanda/zpoint_large_embedding_zh/
       model_type: embedding
       work_mode: hf
       device: gpu  # gpu / cpu

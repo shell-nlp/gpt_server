@@ -20,11 +20,12 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 ## 更新信息
 
 ```plaintext
+6-5   支持了 Yinka、zpoint_large_embedding_zh 嵌入模型
 6-5   支持了 glm4-9b系列（hf和vllm）
 4-27  支持了 LMDeploy 加速推理后端
 4-20  支持了 llama-3
 4-13  支持了 deepseek
-4-4   支持了 embedding模型 acge_text_embedding (通过测试)
+4-4   支持了 embedding模型 acge_text_embedding
 3-9   支持了 reranker 模型 （ bge-reranker，bce-reranker-base_v1）
 3-3   支持了 internlm-1.0 ,internlm-2.0
 3-2   支持了 qwen-2 0.5B, 1.8B, 4B, 7B, 14B, and 72B
@@ -66,9 +67,13 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 |bce-embedding|√|
 |piccolo-base-zh-embedding|√|
 |acge_text_embedding|√| 
+|Yinka|√| 
+|zpoint_large_embedding_zh|√| 
 
 
-目前 **acge_text_embedding** MTEB榜单排行第一, 超越付费的闭源服务，阿里云OpenSearch服务(第二)和baichuan-text-embedding(第五)
+目前 **zpoint_large_embedding_z** MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
+
+
 
 ## 启用方式
 
