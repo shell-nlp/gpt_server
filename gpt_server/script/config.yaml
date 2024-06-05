@@ -31,6 +31,19 @@ models:
       # - gpus:
       #   - 3
 
+  - mixtral:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT/
+      model_type: qwen  # qwen  chatglm3 yi internlm
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 3
+        - 0
+    
+
   - llama3:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true

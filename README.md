@@ -80,7 +80,7 @@ conda create -n gpt_server python=3.10
 conda activate gpt_server
 
 # 3. 安装依赖
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 #### 2. 修改启动配置文件
@@ -98,22 +98,81 @@ serve_args:
   port: 8082
 
 models:
-  - chatglm3-6b:  # 自定义的模型名称
-      alias: gpt4,gpt3 # 模型别名     例如  gpt4,gpt3
-      enable: false  # 是否启动这个模型   false / true
-      model_name_or_path: /home/dev/model/chatglm3-6b/  # 模型的路径
-      model_type: chatglm3  # 模型的类型 现在暂时 只有 chatglm3  embedding
-      work_mode: hf # 启动方式  vllm  hf
+  - chatglm3:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/chatglm3-6b/
+      model_type: chatglm3  # qwen  chatglm3 yi internlm
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
-      workers: 
-      - gpus: # 第一个 worker 每一个 -gpus 表示一个 worker
-        - 1  # 每个worker 使用的gpu
-        - 2
-        # - 3
-      # - gpus:   # 第二个 worker
-      #   - 1
+      workers:
+      - gpus:
+        # - 1
+        - 0
+      # - gpus:
+      #   - 0
+  
+  - qwen:  #自定义的模型名称
+      alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
+      model_type: qwen  # qwen  chatglm3 yi internlm
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 1
+      # - gpus:
+      #   - 3
 
-  # Embedding 模型 同上
+  - mixtral:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT/
+      model_type: qwen  # qwen  chatglm3 yi internlm
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 3
+        - 0
+    
+
+  - llama3:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/unsloth/unsloth/llama-3-8b-Instruct/
+      model_type: llama  # qwen  chatglm3 yi internlm
+      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 0
+
+  - yi:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
+      model_type: yi  # qwen  chatglm3 yi internlm
+      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
+        # - 0
+
+  - internlm:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2-chat-7b/
+      model_type: internlm  # qwen  chatglm3 yi internlm
+      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 0
+    
+  # Embedding 模型
   - piccolo-base-zh:
       alias: null # 别名   
       enable: true  # false true
@@ -123,7 +182,60 @@ models:
       device: gpu  # gpu / cpu
       workers:
       - gpus:
+        - 2
+
+  - bce-embedding-base_v1:
+      alias: text-embedding-ada-002 # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
+
+  - bce-reranker-base_v1:
+      alias: null # 别名   
+      enable: false  # false true
+      model_name_or_path: /home/dev/model/maidalun1020/bce-reranker-base_v1/
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
         - 0
+  - bge-reranker-base:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
+  - bge-base-zh:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
+  
+  - acge_text_embedding:
+      alias: null # 别名   
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/aspire/acge_text_embedding
+      model_type: embedding
+      work_mode: hf
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        - 2
 
 ```
 

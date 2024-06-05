@@ -18,7 +18,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: [ '0', '1', '2' ]
+              device_ids: [ '0', '1', '2', '3' ]
               # count: 2  # 两种方式
               capabilities: [ gpu ]
     command: sh gpt_server/script/start.sh
