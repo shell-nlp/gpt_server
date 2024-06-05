@@ -20,6 +20,7 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 ## 更新信息
 
 ```plaintext
+6-5   支持了 glm4-9b系列（hf和vllm）
 4-27  支持了 LMDeploy 加速推理后端
 4-20  支持了 llama-3
 4-13  支持了 deepseek
@@ -40,6 +41,7 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 
 | Models / BackEnd                 | HF | vllm |LMDeploy TurboMind|LMDeploy PyTorch|
 | :--: | :--: | :--: |:--:|:--:|
+| chatglm4-9b             | √ | √   |×  |×   |
 | chatglm3-6b             | √ | √   |√   |√   |
 | Qwen (7B, 14B, etc.)) | √ | √   |√   |√   |
 | Qwen-2 (0.5B--72B) | √   |   √   |√   |√   |
@@ -100,9 +102,9 @@ serve_args:
 models:
   - chatglm3:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/chatglm3-6b/
-      model_type: chatglm3  # qwen  chatglm3 yi internlm
+      model_type: chatglm  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -111,7 +113,17 @@ models:
         - 0
       # - gpus:
       #   - 0
-  
+  - chatglm4:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/THUDM/glm-4-9b-chat/
+      model_type: chatglm  # qwen  chatglm3 yi internlm
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        # - 1
+        - 0
   - qwen:  #自定义的模型名称
       alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
       enable: true  # false true

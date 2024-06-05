@@ -6,7 +6,7 @@ from loguru import logger
 from gpt_server.model_worker.base import ModelWorkerBase
 
 
-class ChatGLM3Worker(ModelWorkerBase):
+class ChatGLMWorker(ModelWorkerBase):
     def __init__(
         self,
         controller_addr: str,
@@ -28,14 +28,12 @@ class ChatGLM3Worker(ModelWorkerBase):
             model_type="AutoModel",
         )
 
+        self.stop = ["<|user|>", "<|observation|>", "<|endoftext|>"]
         self.stop_words_ids = [
-            64795,  # <|user|>
-            64797,  # <|observation|>
+            self.tokenizer.convert_tokens_to_ids(i) for i in self.stop
         ]
-        self.stop = [
-            self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
-        ]
-        print("chatglm3停用词:", self.stop)
+
+        print("chatglm3停用词:", self.stop, self.stop_words_ids)
 
     def build_chat_input(self, query, history=None, role="user"):
         if history is None:
@@ -56,7 +54,7 @@ class ChatGLM3Worker(ModelWorkerBase):
             )
         if role == "user":
             input_ids.extend(self.tokenizer.build_single_message(role, "", query))
-        input_ids.extend([self.tokenizer.get_command("<|assistant|>")])
+        input_ids.extend([self.tokenizer.convert_tokens_to_ids("<|assistant|>")])
         return self.tokenizer.batch_encode_plus(
             [input_ids], return_tensors="pt", is_split_into_words=True
         )
@@ -125,4 +123,4 @@ class ChatGLM3Worker(ModelWorkerBase):
 
 
 if __name__ == "__main__":
-    ChatGLM3Worker.run()
+    ChatGLMWorker.run()
