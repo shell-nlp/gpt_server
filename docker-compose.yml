@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.copy
-    image: gpt_server:runtime_v0.2
+    image: gpt_server:v0.2
     container_name: gpt_server
     # restart: always
     network_mode: host

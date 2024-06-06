@@ -33,7 +33,7 @@ class ChatGLMWorker(ModelWorkerBase):
             self.tokenizer.convert_tokens_to_ids(i) for i in self.stop
         ]
 
-        print("chatglm3停用词:", self.stop, self.stop_words_ids)
+        print("chatglm停用词:", self.stop, self.stop_words_ids)
 
     def build_chat_input(self, query, history=None, role="user"):
         if history is None:
