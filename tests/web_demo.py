@@ -1,5 +1,5 @@
 import argparse
-
+from typing import List, Tuple
 import gradio as gr
 from openai import OpenAI
 
@@ -8,10 +8,10 @@ parser = argparse.ArgumentParser(
     description="Chatbot Interface with Customizable Parameters"
 )
 parser.add_argument(
-    "--model-url", type=str, default="http://0.0.0.0:8082/v1", help="Model URL"
+    "--model-url", type=str, default="http://localhost:8082/v1", help="Model URL"
 )
 parser.add_argument(
-    "-m", "--model", type=str, default="qwen", help="Model name for the chatbot"
+    "-m", "--model", type=str, default="chatglm4", help="Model name for the chatbot"
 )
 parser.add_argument(
     "--temp", type=float, default=0.8, help="Temperature for text generation"
@@ -19,7 +19,7 @@ parser.add_argument(
 parser.add_argument(
     "--stop-token-ids", type=str, default="", help="Comma-separated stop token IDs"
 )
-parser.add_argument("--host", type=str, default=None)
+parser.add_argument("--host", type=str, default="0.0.0.0")
 parser.add_argument("--port", type=int, default=8083)
 
 # Parse the arguments
@@ -37,7 +37,7 @@ client = OpenAI(
 models = [i.id for i in client.models.list()]
 
 
-def predict(message, history):
+def predict(message: str, history: List[Tuple[str, str]]):
     # Convert chat history to OpenAI format
     history_openai_format = [
         {"role": "system", "content": "You are a great ai assistant."}
@@ -70,7 +70,6 @@ def predict(message, history):
         yield partial_message
 
 
-# Create and launch a chat interface with Gradio
-gr.ChatInterface(predict).queue().launch(
-    server_name=args.host, server_port=args.port, share=True
-)
+demo = gr.ChatInterface(predict)
+
+demo.queue().launch(server_name=args.host, server_port=args.port, share=False)
