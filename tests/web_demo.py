@@ -1,7 +1,28 @@
 import argparse
-from typing import List, Tuple
 import gradio as gr
 from openai import OpenAI
+import os
+import sys
+import yaml
+
+# 配置根目录
+root_dir = os.path.dirname(os.path.dirname(__file__))
+root_dir = os.path.abspath(root_dir)
+
+original_pythonpath = os.environ.get("PYTHONPATH", "")
+os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
+sys.path.append(root_dir)
+support_models = []
+config_path = os.path.join(root_dir, "gpt_server/script/config.yaml")
+with open(config_path, "r") as f:
+    config = yaml.safe_load(f)
+# TODO 没有添加别名
+for model_config_ in config["models"]:
+    for model_name, model_config in model_config_.items():
+        # 启用的模型
+        if model_config["enable"]:
+            if model_config["model_type"] != "embedding":
+                support_models.append(model_name)
 
 # Argument parser setup
 parser = argparse.ArgumentParser(
@@ -34,22 +55,29 @@ client = OpenAI(
     api_key=openai_api_key,
     base_url=openai_api_base,
 )
-models = [i.id for i in client.models.list()]
 
 
-def predict(message: str, history: List[Tuple[str, str]]):
+models = [i.id for i in client.models.list() if i.id in support_models]
+
+
+def predict(
+    user_input: str,
+    chatbot: list,
+    model: str,
+):
+    chatbot.append((user_input, ""))
     # Convert chat history to OpenAI format
     history_openai_format = [
         {"role": "system", "content": "You are a great ai assistant."}
     ]
-    for human, assistant in history:
+    for human, assistant in chatbot:
         history_openai_format.append({"role": "user", "content": human})
         history_openai_format.append({"role": "assistant", "content": assistant})
-    history_openai_format.append({"role": "user", "content": message})
+    history_openai_format.append({"role": "user", "content": user_input})
 
     # Create a chat completion request and send it to the API server
     stream = client.chat.completions.create(
-        model=args.model,  # Model name to use
+        model=model,  # Model name to use
         messages=history_openai_format,  # Chat history
         temperature=args.temp,  # Temperature for text generation
         stream=True,  # Stream response
@@ -67,9 +95,43 @@ def predict(message: str, history: List[Tuple[str, str]]):
     partial_message = ""
     for chunk in stream:
         partial_message += chunk.choices[0].delta.content or ""
-        yield partial_message
+        chatbot[-1] = (user_input, partial_message)
+        yield chatbot
 
 
-demo = gr.ChatInterface(predict)
+def reset_state():
+    return []
 
-demo.queue().launch(server_name=args.host, server_port=args.port, share=False)
+
+def reset_user_input():
+    return gr.update(value="")
+
+
+with gr.Blocks() as demo:
+    gr.HTML("""<h1 align="center">GPT_SERVER</h1>""")
+    model = (
+        gr.Dropdown(
+            choices=models,
+            label="选择模型",
+            value=models[0],
+            type="value",
+            interactive=True,
+        ),
+    )
+    chatbot = gr.Chatbot()
+    with gr.Column():
+        user_input = gr.Textbox(show_label=False, placeholder="Input...", lines=10)
+        with gr.Row():
+            submitBtn = gr.Button("Submit", variant="primary")
+            emptyBtn = gr.Button("Clear History")
+    submitBtn.click(
+        predict,
+        [user_input, chatbot, model[0]],
+        [chatbot],
+        show_progress=True,
+    )
+    submitBtn.click(reset_user_input, [], [user_input])
+    emptyBtn.click(reset_state, outputs=[chatbot], show_progress=True)
+demo.queue().launch(
+    share=False, inbrowser=True, server_name="0.0.0.0", server_port=8083
+)
