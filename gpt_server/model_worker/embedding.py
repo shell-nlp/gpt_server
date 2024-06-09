@@ -42,7 +42,7 @@ class EmbeddingWorker(ModelWorkerBase):
     def generate_stream_gate(self, params):
         pass
 
-    def get_embeddings(self, params):
+    async def get_embeddings(self, params):
         print("params", params)
         print("worker_id:", self.worker_id)
         self.call_ct += 1

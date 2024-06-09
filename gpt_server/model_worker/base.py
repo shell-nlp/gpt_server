@@ -192,12 +192,16 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         port = get_free_tcp_port()
         worker_addr = f"http://{host}:{port}"
 
-        worker = cls.get_worker(
-            worker_addr=worker_addr,
-            model_path=args.model_name_or_path,
-            model_names=args.model_names,
-            conv_template="chatglm3",  # TODO 默认是chatglm3用于统一处理
-        )
+        @app.on_event("startup")
+        async def startup():
+            global worker
+
+            worker = cls.get_worker(
+                worker_addr=worker_addr,
+                model_path=args.model_name_or_path,
+                model_names=args.model_names,
+                conv_template="chatglm3",  # TODO 默认是chatglm3用于统一处理
+            )
 
         uvicorn.run(app, host=host, port=port)
 
@@ -286,6 +290,6 @@ async def api_model_details(request: Request):
 async def api_get_embeddings(request: Request):
     params = await request.json()
     await acquire_worker_semaphore()
-    embedding = worker.get_embeddings(params)
+    embedding = await worker.get_embeddings(params)
     release_worker_semaphore()
     return JSONResponse(content=embedding)
