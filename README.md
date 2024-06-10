@@ -1,6 +1,7 @@
 # gpt_server
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
+
 1. **在此基础上完美适配了更多的模型**，**优化了fastchat兼容较差的模型**
 2. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
 3. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
@@ -13,6 +14,7 @@
 <br>
 
 ## 项目实时进展
+
 已经实现**LMDeploy**后端，其中包括lmdeploy的Pytorch后端和TurboMind后端。
 
 LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型上，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍。
@@ -40,45 +42,45 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 
 **推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
 
-| Models / BackEnd                 | HF | vllm |LMDeploy TurboMind|LMDeploy PyTorch|
-| :--: | :--: | :--: |:--:|:--:|
-| chatglm4-9b             | √ | √   |×  |×   |
-| chatglm3-6b             | √ | √   |√   |√   |
-| Qwen (7B, 14B, etc.)) | √ | √   |√   |√   |
-| Qwen-2 (0.5B--72B) | √   |   √   |√   |√   |
-| Yi-34B                 | √ | √   |√   |√   |
-| Internlm-1.0                 | √ | √   |√   |√   |
-| Internlm-2.0                 | √ | √   |√   |√   |
-| Deepseek                 | √ | √   |√   |√   |
-| Llama-3                 | √ | √   |√   |√   |
+|    Models / BackEnd    | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
+| :--------------------: | :-: | :--: | :----------------: | :--------------: |
+|      chatglm4-9b      | √ |  √  |         ×         |        ×        |
+|      chatglm3-6b      | √ |  √  |         √         |        √        |
+| Qwen (7B, 14B, etc.)) | √ |  √  |         √         |        √        |
+|   Qwen-2 (0.5B--72B)   | √ |  √  |         √         |        √        |
+|         Yi-34B         | √ |  √  |         √         |        √        |
+|      Internlm-1.0      | √ |  √  |         √         |        √        |
+|      Internlm-2.0      | √ |  √  |         √         |        √        |
+|        Deepseek        | √ |  √  |         √         |        √        |
+|        Llama-3        | √ |  √  |         √         |        √        |
 
------
+---
 
 <br>
 
 **原则上支持所有的Embedding/Rerank 模型**
 <br>
 以下模型经过测试：
-| Embedding/Rerank  | HF |
-|----|---|
-|bge-reranker|√|
-|bce-reranker|√|
-|bge-embedding|√|
-|bce-embedding|√|
-|piccolo-base-zh-embedding|√|
-|acge_text_embedding|√| 
-|Yinka|√| 
-|zpoint_large_embedding_zh|√| 
 
+| Embedding/Rerank          | HF |
+| ------------------------- | -- |
+| bge-reranker              | √ |
+| bce-reranker              | √ |
+| bge-embedding             | √ |
+| bce-embedding             | √ |
+| piccolo-base-zh-embedding | √ |
+| acge_text_embedding       | √ |
+| Yinka                     | √ |
+| zpoint_large_embedding_zh | √ |
 
 目前 **zpoint_large_embedding_z** MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
-
-
 
 ## 启用方式
 
 ### Python启动
+
 #### 1. 配置python环境
+
 ```bash
 # 1. 创建conda 环境
 conda create -n gpt_server python=3.10
@@ -153,7 +155,7 @@ models:
       - gpus:
         - 3
         - 0
-    
+  
 
   - llama3:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
@@ -188,7 +190,7 @@ models:
       workers:
       - gpus:
         - 0
-    
+  
   # Embedding 模型
   - piccolo-base-zh:
       alias: null # 别名   
@@ -258,12 +260,16 @@ models:
 
 #### 3. 运行命令
 
+```
+cd gpt_server/tests
+python web_demo.py
+```
+
 [start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/start.sh "服务主文件")
 
 ```bash
 sh start.sh
 ```
-
 
 #### 4. 使用 openai 库 进行调用
 
@@ -271,16 +277,28 @@ sh start.sh
 <br>
 https://github.com/shell-nlp/gpt_server/tree/main/tests
 
+#### 5. 使用WebUI
+
+```bash
+cd gpt_server/script
+python web_demo.py
+```
+
+WebUI界面:
+
+![web_demo.png](assets/web_demo.png)
+
+
 
 ### Docker安装
-待填充
 
+待填充
 
 ## 致谢
 
     FastChat : https://github.com/lm-sys/FastChat
 
-      vLLM   : https://github.com/vllm-project/vllm
+    vLLM   : https://github.com/vllm-project/vllm
 
     LMDeploy ： https://github.com/InternLM/lmdeploy
 
