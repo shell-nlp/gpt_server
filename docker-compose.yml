@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.copy
     image: gpt_server:v0.2
+    shm_size: '4g' # 设置共享内存为4GB
     container_name: gpt_server
     # restart: always
     network_mode: host

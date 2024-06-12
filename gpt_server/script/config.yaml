@@ -134,7 +134,7 @@ models:
         - 2
   - bge-base-zh:
       alias: null # 别名   
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
       model_type: embedding
       work_mode: hf
@@ -155,7 +155,7 @@ models:
         - 2
   - yinka:
       alias: null # 别名   
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/Classical/Yinka/
       model_type: embedding
       work_mode: hf

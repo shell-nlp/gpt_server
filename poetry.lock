@@ -2,13 +2,13 @@
 
 [[package]]
 name = "accelerate"
-version = "0.27.2"
+version = "0.29.3"
 description = "Accelerate"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "accelerate-0.27.2-py3-none-any.whl", hash = "sha256:a818dd27b9ba24e9eb5030d1b285cf4cdd1b41bbfa675fb4eb2477ddfc097074"},
-    {file = "accelerate-0.27.2.tar.gz", hash = "sha256:cc715fe9a8bc7a286259bfb6d65fb78363badd3371e7cbda4e4a4ef34a0010aa"},
+    {file = "accelerate-0.29.3-py3-none-any.whl", hash = "sha256:99d633d4b6126817c5e554487406748be95c8d1d1e659dd2fd60657e35f532dd"},
+    {file = "accelerate-0.29.3.tar.gz", hash = "sha256:1a5a845b06b24b41736b219b2b20fd021ca5dff4070a252445fd6de736e347ac"},
 ]
 
 [package.dependencies]
@@ -21,14 +21,14 @@ safetensors = ">=0.3.1"
 torch = ">=1.10.0"
 
 [package.extras]
-dev = ["bitsandbytes", "black (>=23.1,<24.0)", "datasets", "deepspeed (<0.13.0)", "evaluate", "hf-doc-builder (>=0.3.0)", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "rich", "ruff (>=0.1.15,<0.2.0)", "scikit-learn", "scipy", "timm", "torchpippy (>=0.2.0)", "tqdm", "transformers"]
-quality = ["black (>=23.1,<24.0)", "hf-doc-builder (>=0.3.0)", "ruff (>=0.1.15,<0.2.0)"]
+dev = ["bitsandbytes", "black (>=23.1,<24.0)", "datasets", "deepspeed", "evaluate", "hf-doc-builder (>=0.3.0)", "parameterized", "pytest (>=7.2.0,<=8.0.0)", "pytest-subtests", "pytest-xdist", "rich", "ruff (>=0.2.1,<0.3.0)", "scikit-learn", "scipy", "timm", "torchpippy (>=0.2.0)", "tqdm", "transformers"]
+quality = ["black (>=23.1,<24.0)", "hf-doc-builder (>=0.3.0)", "ruff (>=0.2.1,<0.3.0)"]
 rich = ["rich"]
 sagemaker = ["sagemaker"]
-test-dev = ["bitsandbytes", "datasets", "deepspeed (<0.13.0)", "evaluate", "scikit-learn", "scipy", "timm", "torchpippy (>=0.2.0)", "tqdm", "transformers"]
-test-prod = ["parameterized", "pytest", "pytest-subtests", "pytest-xdist"]
+test-dev = ["bitsandbytes", "datasets", "deepspeed", "evaluate", "scikit-learn", "scipy", "timm", "torchpippy (>=0.2.0)", "tqdm", "transformers"]
+test-prod = ["parameterized", "pytest (>=7.2.0,<=8.0.0)", "pytest-subtests", "pytest-xdist"]
 test-trackers = ["comet-ml", "dvclive", "tensorboard", "wandb"]
-testing = ["bitsandbytes", "datasets", "deepspeed (<0.13.0)", "evaluate", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "scikit-learn", "scipy", "timm", "torchpippy (>=0.2.0)", "tqdm", "transformers"]
+testing = ["bitsandbytes", "datasets", "deepspeed", "evaluate", "parameterized", "pytest (>=7.2.0,<=8.0.0)", "pytest-subtests", "pytest-xdist", "scikit-learn", "scipy", "timm", "torchpippy (>=0.2.0)", "tqdm", "transformers"]
 
 [package.source]
 type = "legacy"
@@ -1589,22 +1589,25 @@ reference = "ustc"
 
 [[package]]
 name = "lmdeploy"
-version = "0.4.0"
+version = "0.4.2"
 description = "A toolset for compressing, deploying and serving LLM"
 optional = false
 python-versions = "*"
 files = [
-    {file = "lmdeploy-0.4.0-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:f89c3fff5120a5dc092188fa5411bb96b3f40f7dff1778687b842b3b5a9d3174"},
-    {file = "lmdeploy-0.4.0-cp310-cp310-win_amd64.whl", hash = "sha256:f6dbda9ad6678dcb6c3708563bb51b19b31d80612d21d06459fc91f6c6d4557a"},
-    {file = "lmdeploy-0.4.0-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:1a407f293d9b211a19cd8a1cf9383591df81397886c9cec60433948620bdd1f4"},
-    {file = "lmdeploy-0.4.0-cp311-cp311-win_amd64.whl", hash = "sha256:ac277abac1d16efd7f7d51124e8312211e0a7ffbfc33c66960e58c52c2e5f92a"},
-    {file = "lmdeploy-0.4.0-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:099c082f076c9670e3eb51cc32293a91246ad8232df3924441e27f25c19604dc"},
-    {file = "lmdeploy-0.4.0-cp38-cp38-win_amd64.whl", hash = "sha256:ce7b55d10b6dd38696c6053cae99237b97f131d9cdf59eff08455bf4cb056aa6"},
-    {file = "lmdeploy-0.4.0-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:e25305708ba06a6b414972173b7089db275576a1e2479d1d2a8424ebc0b6acd6"},
-    {file = "lmdeploy-0.4.0-cp39-cp39-win_amd64.whl", hash = "sha256:506eaa51f681703b8900281fafdb4735984386517514ef72224906cea76d5281"},
+    {file = "lmdeploy-0.4.2-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:4104eb7f9da1f760d8506f31f8ee60f2595484bbb839ddf146cc8da62d226864"},
+    {file = "lmdeploy-0.4.2-cp310-cp310-win_amd64.whl", hash = "sha256:6ce0907b41452d1228a031cc3b5e5ee9457ede8ea1925a5ef16043557b2a6dfa"},
+    {file = "lmdeploy-0.4.2-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:c97288657d1788f4a005f27a7a5ce2e57825a2b087ce01ceb8a55f93cfb86cef"},
+    {file = "lmdeploy-0.4.2-cp311-cp311-win_amd64.whl", hash = "sha256:94cd1c2df488788a72915f2b7a4e563a70a0abf18e0fea7444108d51eccb7af1"},
+    {file = "lmdeploy-0.4.2-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:774968237db8fd220f1f5ce9575a8b3d90a3f5e02efe81cbae290e4e31374519"},
+    {file = "lmdeploy-0.4.2-cp312-cp312-win_amd64.whl", hash = "sha256:317953b41bfa9cca31e808d9a6955e358f856f0b522eadd620ceffe3b05013f9"},
+    {file = "lmdeploy-0.4.2-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:a52fb959f838594148b2cc556c6fb9f8a740a50d63da6008cb9817daf72a1f0f"},
+    {file = "lmdeploy-0.4.2-cp38-cp38-win_amd64.whl", hash = "sha256:fbe4e69b4976dcd1bceb5c57218905dcd0867c6821a0534c82d11419c8ae4428"},
+    {file = "lmdeploy-0.4.2-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:69c0cc8aeb11056825e9eca55b8fe9568f305c7201b1eb4ead2553375da998f9"},
+    {file = "lmdeploy-0.4.2-cp39-cp39-win_amd64.whl", hash = "sha256:b66981d38de34195ef46a487df1f79bdfd43d8c066ca593f9d974c2a7d937984"},
 ]
 
 [package.dependencies]
+accelerate = ">=0.29.3"
 einops = "*"
 fastapi = "*"
 fire = "*"
@@ -1624,12 +1627,13 @@ sentencepiece = "*"
 shortuuid = "*"
 tiktoken = "*"
 torch = ">=2.0.0,<=2.2.2"
+torchvision = ">=0.15.0,<=0.17.2"
 transformers = "*"
-triton = ">=2.1.0,<=2.2.0"
+triton = {version = ">=2.1.0,<=2.2.0", markers = "sys_platform == \"linux\""}
 uvicorn = "*"
 
 [package.extras]
-all = ["accelerate", "datasets", "einops", "fastapi", "fire", "gradio (<4.0.0)", "mmengine-lite", "numpy", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "peft (<=0.9.0)", "pillow", "protobuf", "pybind11", "pydantic (>2.0.0)", "pynvml", "safetensors", "sentencepiece", "setuptools", "shortuuid", "tiktoken", "torch (>=2.0.0,<=2.2.2)", "transformers", "transformers-stream-generator", "triton (>=2.1.0,<=2.2.0)", "tritonclient[grpc]", "uvicorn"]
+all = ["accelerate", "accelerate (>=0.29.3)", "datasets", "einops", "fastapi", "fire", "gradio (<4.0.0)", "mmengine-lite", "numpy", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "peft (<=0.9.0)", "pillow", "protobuf", "pybind11", "pydantic (>2.0.0)", "pynvml", "safetensors", "sentencepiece", "setuptools", "shortuuid", "tiktoken", "torch (>=2.0.0,<=2.2.2)", "torchvision (>=0.15.0,<=0.17.2)", "transformers", "transformers-stream-generator", "triton (>=2.1.0,<=2.2.0)", "tritonclient[grpc]", "uvicorn"]
 lite = ["accelerate", "datasets", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "transformers-stream-generator"]
 serve = ["gradio (<4.0.0)", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "protobuf", "tritonclient[grpc]"]
 
@@ -4475,6 +4479,53 @@ url = "https://mirrors.ustc.edu.cn/pypi/web/simple"
 reference = "ustc"
 
 [[package]]
+name = "torchvision"
+version = "0.17.1"
+description = "image and video datasets and models for torch deep learning"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "torchvision-0.17.1-cp310-cp310-macosx_10_13_x86_64.whl", hash = "sha256:06418880212b66e45e855dd39f536e7fd48b4e6b034a11dd9fe9e2384afb51ec"},
+    {file = "torchvision-0.17.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:33d65d0c7fdcb3f7bc1dd8ed30ea3cd7e0587b4ad1b104b5677c8191a8bad9f1"},
+    {file = "torchvision-0.17.1-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:aaefef2be6a02f206085ce4bb6c0078b03ebf48cb6ff82bd762ff6248475e08e"},
+    {file = "torchvision-0.17.1-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:ebe5fdb466aff8a8e8e755de84a843418b6f8d500624752c05eaa638d7700f3d"},
+    {file = "torchvision-0.17.1-cp310-cp310-win_amd64.whl", hash = "sha256:9d4d45a996f4313e9c5db4da71d31508d44f7ccfbf29d3442bdcc2ad13e0b6f3"},
+    {file = "torchvision-0.17.1-cp311-cp311-macosx_10_13_x86_64.whl", hash = "sha256:ea2ccdbf5974e0bf27fd6644a33b19cb0700297cf397bb0469e762c11c6c4105"},
+    {file = "torchvision-0.17.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:9106e32c9f1e70afa8172cf1b064cf9c2998d8dff0769ec69d537b20209ee43d"},
+    {file = "torchvision-0.17.1-cp311-cp311-manylinux1_x86_64.whl", hash = "sha256:5966936c669a08870f6547cd0a90d08b157aeda03293f79e2adbb934687175ed"},
+    {file = "torchvision-0.17.1-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:e74f5a26ef8190eab0c38b3f63914fea94e58e3b2f0e5466611c9f63bd91a80b"},
+    {file = "torchvision-0.17.1-cp311-cp311-win_amd64.whl", hash = "sha256:a2109c1a1dcf71e8940d43e91f78c4dd5bf0fcefb3a0a42244102752009f5862"},
+    {file = "torchvision-0.17.1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:5d241d2a5fb4e608677fccf6f80b34a124446d324ee40c7814ce54bce888275b"},
+    {file = "torchvision-0.17.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e0fe98d9d92c23d2262ff82f973242951b9357fb640f8888ac50848bd00f5b45"},
+    {file = "torchvision-0.17.1-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:32dc5de86d2ade399e11087095674ca08a1649fb322cfe69336d28add467edcb"},
+    {file = "torchvision-0.17.1-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:54902877410ffb5458ee52b6d0de4b25cf01496bee736d6825301a5f0398536e"},
+    {file = "torchvision-0.17.1-cp312-cp312-win_amd64.whl", hash = "sha256:cc22c1ed0f1aba3f98fd72b6f60021f57aec1d2f6af518522e8a0a83848de3a8"},
+    {file = "torchvision-0.17.1-cp38-cp38-macosx_10_13_x86_64.whl", hash = "sha256:2621097065fa1c827885e2b52102e839a3541b933b7a90e0fa3c42c3de1bc3cf"},
+    {file = "torchvision-0.17.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:5ce76466af2b5a30573939cae1e6e62e29316ceb3ee748091002f312ab0912f6"},
+    {file = "torchvision-0.17.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:bd5dcd14a32945c72f5c19341add94aa7c23dd7bca2bafde44d0f3c4344d17ed"},
+    {file = "torchvision-0.17.1-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:dca22795cc02ca0d5ddc08c1422ff620bc9899f63d15dc36f71ef37250e17b75"},
+    {file = "torchvision-0.17.1-cp38-cp38-win_amd64.whl", hash = "sha256:524405457dd97d9ab0e48df502f819d0f41a113ce8f00470bb9926d9d36efcf1"},
+    {file = "torchvision-0.17.1-cp39-cp39-macosx_10_13_x86_64.whl", hash = "sha256:58299a724b37b893c7ce4d0b32ea1480c30e467cc114167964b45f6013f6c2d3"},
+    {file = "torchvision-0.17.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:8a1b17fb158b2b881f2c8796fe1839a624e49d5fd07aa61f6dae60ba4819421a"},
+    {file = "torchvision-0.17.1-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:429d63eb7551aa4d8f6cdf08d109b5570c20cbcce36d9cb95b24556418e4dc82"},
+    {file = "torchvision-0.17.1-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:0ecc9a58171bd555aed583bf2f72e7fd6cc4f767c14f8b80b6a8725eacf4ceb1"},
+    {file = "torchvision-0.17.1-cp39-cp39-win_amd64.whl", hash = "sha256:5f427ebee15521edcd836bfe05e86feb5189b5c943b9e3999ed0e3f391fbaa1d"},
+]
+
+[package.dependencies]
+numpy = "*"
+pillow = ">=5.3.0,<8.3.dev0 || >=8.4.dev0"
+torch = "2.2.1"
+
+[package.extras]
+scipy = ["scipy"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.ustc.edu.cn/pypi/web/simple"
+reference = "ustc"
+
+[[package]]
 name = "tqdm"
 version = "4.66.2"
 description = "Fast, Extensible Progress Meter"
@@ -5248,4 +5299,4 @@ reference = "ustc"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "86fd0a3beca24a1ed9bed58b465121959f7adcde0063c7f93cb34fa4762cf600"
+content-hash = "2349bdf5bef6b0d030e9613de0507139bd6a7f9c4d56a6274760242a7c56749b"
