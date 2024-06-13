@@ -41,8 +41,8 @@ class LlamaWorker(ModelWorkerBase):
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
-        print("params", params)
-        print("worker_id:", self.worker_id)
+        logger.info(f"params {params}")
+        logger.info(f"worker_id: {self.worker_id}")
         try:
             messages = params["messages"]
             if isinstance(messages, list):

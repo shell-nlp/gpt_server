@@ -45,8 +45,8 @@ class InternlmWorker(ModelWorkerBase):
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
-        print("params", params)
-        print("worker_id:", self.worker_id)
+        logger.info(f"params {params}")
+        logger.info(f"worker_id: {self.worker_id}")
         try:
             model_type = getattr(self.model_config, "model_type", "internlm")
             messages = params["messages"]

@@ -61,8 +61,8 @@ class ChatGLMWorker(ModelWorkerBase):
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
-        print("params", params)
-        print("worker_id:", self.worker_id)
+        logger.info(f"params {params}")
+        logger.info(f"worker_id: {self.worker_id}")
         try:
             # ----------------添加对工具的支持-----------------------------------
             messages = params["messages"]

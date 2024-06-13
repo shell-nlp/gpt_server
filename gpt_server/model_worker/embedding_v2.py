@@ -1,3 +1,4 @@
+import os
 from typing import List
 from gpt_server.model_worker.base import ModelWorkerBase
 import sentence_transformers
@@ -27,6 +28,12 @@ class EmbeddingWorker(ModelWorkerBase):
             conv_template,
             model_type="embedding",
         )
+        if os.environ.get("CUDA_VISIBLE_DEVICES", "") == "":
+            device = "cpu"
+        else:
+            device = "cuda"
+        logger.info(f"使用{device}加载...")
+        model_kwargs = {"device": device}
         self.request_queue: Queue = Queue()
         self.loop = asyncio.get_running_loop()
         self.loop.create_task(self.batch_processor())
@@ -43,10 +50,14 @@ class EmbeddingWorker(ModelWorkerBase):
                 self.mode = "rerank"
                 break
         if self.mode == "rerank":
-            self.client = sentence_transformers.CrossEncoder(model_name=model_path)
+            self.client = sentence_transformers.CrossEncoder(
+                model_name=model_path, **model_kwargs
+            )
             print("正在使用 rerank 模型...")
         elif self.mode == "embedding":
-            self.client = sentence_transformers.SentenceTransformer(model_path)
+            self.client = sentence_transformers.SentenceTransformer(
+                model_path, **model_kwargs
+            )
             print("正在使用 embedding 模型...")
 
     def generate_stream_gate(self, params):
@@ -95,8 +106,8 @@ class EmbeddingWorker(ModelWorkerBase):
         await self.add_request(params, future)
 
     async def get_embeddings(self, params):
-        print("params", params)
-        print("worker_id:", self.worker_id)
+        logger.info(f"params {params}")
+        logger.info(f"worker_id: {self.worker_id}")
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]

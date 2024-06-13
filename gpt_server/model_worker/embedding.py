@@ -1,6 +1,9 @@
+import os
 from typing import List
-from gpt_server.model_worker.base import ModelWorkerBase
+
 import sentence_transformers
+from loguru import logger
+from gpt_server.model_worker.base import ModelWorkerBase
 
 
 class EmbeddingWorker(ModelWorkerBase):
@@ -24,7 +27,12 @@ class EmbeddingWorker(ModelWorkerBase):
             conv_template,
             model_type="embedding",
         )
-        # model_kwargs = {"device": "cuda"}
+        if os.environ.get("CUDA_VISIBLE_DEVICES", "") == "":
+            device = "cpu"
+        else:
+            device = "cuda"
+        logger.info(f"使用{device}加载...")
+        model_kwargs = {"device": device}
         self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
         self.mode = "embedding"
         # rerank
@@ -33,18 +41,22 @@ class EmbeddingWorker(ModelWorkerBase):
                 self.mode = "rerank"
                 break
         if self.mode == "rerank":
-            self.client = sentence_transformers.CrossEncoder(model_name=model_path)
-            print("正在使用 rerank 模型...")
+            self.client = sentence_transformers.CrossEncoder(
+                model_name=model_path, **model_kwargs
+            )
+            logger.info("正在使用 rerank 模型...")
         elif self.mode == "embedding":
-            self.client = sentence_transformers.SentenceTransformer(model_path)
-            print("正在使用 embedding 模型...")
+            self.client = sentence_transformers.SentenceTransformer(
+                model_path, **model_kwargs
+            )
+            logger.info("正在使用 embedding 模型...")
 
     def generate_stream_gate(self, params):
         pass
 
     async def get_embeddings(self, params):
-        print("params", params)
-        print("worker_id:", self.worker_id)
+        logger.info(f"params {params}")
+        logger.info(f"worker_id: {self.worker_id}")
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]
