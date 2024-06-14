@@ -1,5 +1,4 @@
 import yaml
-from pprint import pprint
 import os
 import sys
 from multiprocessing import Process
@@ -7,6 +6,7 @@ import signal
 import ray
 import torch
 
+os.environ['OPENBLAS_NUM_THREADS'] = '1' # 解决线程不足时，OpenBLAS blas_thread_init报错
 ray.shutdown()
 
 # 配置根目录
