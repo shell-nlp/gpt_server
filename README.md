@@ -39,6 +39,15 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 12-24 支持了 chatglm3-6b 
 ```
 
+## 路线
+
+* [X] 支持HF后端
+* [X] 支持vLLM后端
+* [X] 支持LMDeploy后端
+* [ ] 支持Embedding模型动态组批（进行中...）
+* [ ] 支持Reranker模型动态组批
+* [ ] 支持onnx/tensorrt加速推理
+
 ## 支持的模型以及推理后端
 
 **推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
@@ -48,8 +57,8 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 |      chatglm4-9b      | √ |  √  |         ×         |        ×        |
 |      chatglm3-6b      | √ |  √  |         √         |        √        |
 | Qwen (7B, 14B, etc.)) | √ |  √  |         √         |        √        |
-|   Qwen-1.5 (0.5B--72B)   | √ |  √  |         √         |        √        |
-| Qwen-2  | √ |  √  |         √         |        √        |
+|  Qwen-1.5 (0.5B--72B)  | √ |  √  |         √         |        √        |
+|         Qwen-2         | √ |  √  |         √         |        √        |
 |         Yi-34B         | √ |  √  |         √         |        √        |
 |      Internlm-1.0      | √ |  √  |         √         |        √        |
 |      Internlm-2.0      | √ |  √  |         √         |        √        |
@@ -61,7 +70,7 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 <br>
 
 **原则上支持所有的Embedding/Rerank 模型**
-<br>
+`<br>`
 以下模型经过测试：
 
 | Embedding/Rerank          | HF |
@@ -276,7 +285,7 @@ sh start.sh
 #### 4. 使用 openai 库 进行调用
 
 **见 gpt_server/tests 目录 样例测试代码**
-<br>
+`<br>`
 https://github.com/shell-nlp/gpt_server/tree/main/tests
 
 #### 5. 使用WebUI
@@ -289,8 +298,6 @@ python web_demo.py
 WebUI界面:
 
 ![web_demo.png](assets/web_demo.png)
-
-
 
 ### Docker安装
 
