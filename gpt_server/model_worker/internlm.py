@@ -38,7 +38,7 @@ class InternlmWorker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        print("Internlm停用词:", self.stop)
+        logger.info(f"Internlm停用词:: {self.stop}")
         self.other_config = {
             "chat_template": "{{ bos_token }}{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
         }
@@ -98,7 +98,7 @@ class InternlmWorker(ModelWorkerBase):
             }
             yield json.dumps(ret).encode() + b"\0"
         except (ValueError, RuntimeError) as e:
-            print(e)
+            logger.info(e)
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",
                 "error_code": ErrorCode.INTERNAL_ERROR,

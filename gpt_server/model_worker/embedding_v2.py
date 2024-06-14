@@ -36,11 +36,10 @@ class EmbeddingWorker(ModelWorkerBase):
         model_kwargs = {"device": device}
         self.request_queue: Queue = Queue()
         self.loop = asyncio.get_running_loop()
-        self.loop.create_task(self.batch_processor())
-        # self.loop = asyncio.get_running_loop()
-        # self.worker_tasks = [
-        #     self.loop.create_task(self.batch_processor()) for i in range(1)
-        # ]
+
+        self.worker_tasks = [
+            self.loop.create_task(self.batch_processor()) for _ in range(1)
+        ]
         # -------------------------------------------------------------------------
         self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
         self.mode = "embedding"
@@ -53,12 +52,20 @@ class EmbeddingWorker(ModelWorkerBase):
             self.client = sentence_transformers.CrossEncoder(
                 model_name=model_path, **model_kwargs
             )
-            print("正在使用 rerank 模型...")
+            logger.info("正在使用 rerank 模型...")
         elif self.mode == "embedding":
             self.client = sentence_transformers.SentenceTransformer(
                 model_path, **model_kwargs
             )
-            print("正在使用 embedding 模型...")
+            logger.info("正在使用 embedding 模型...")
+        self.warm_up()
+
+    def warm_up(self):
+        logger.info("开始 warm_up")
+        if self.mode == "embedding":
+            self.client.encode(sentences=["你是谁"] * 10)
+        elif self.mode == "rerank":
+            self.client.predict(sentences=[["你好", "你好啊"] * 10])
 
     def generate_stream_gate(self, params):
         pass
@@ -72,7 +79,7 @@ class EmbeddingWorker(ModelWorkerBase):
                 while len(requests) < batch_size:
                     # 等待 100ms
                     request = await asyncio.wait_for(
-                        self.request_queue.get(), timeout=0.1
+                        self.request_queue.get(), timeout=0.06
                     )
                     requests.append(request)
             except asyncio.TimeoutError:

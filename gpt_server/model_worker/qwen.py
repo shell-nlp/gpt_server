@@ -99,7 +99,7 @@ class QwenWorker(ModelWorkerBase):
             }
             yield json.dumps(ret).encode() + b"\0"
         except (ValueError, RuntimeError) as e:
-            print(e)
+            logger.info(e)
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",
                 "error_code": ErrorCode.INTERNAL_ERROR,

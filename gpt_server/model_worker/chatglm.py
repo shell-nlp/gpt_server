@@ -33,7 +33,7 @@ class ChatGLMWorker(ModelWorkerBase):
             self.tokenizer.convert_tokens_to_ids(i) for i in self.stop
         ]
 
-        print("chatglm停用词:", self.stop, self.stop_words_ids)
+        logger.info(f"chatglm停用词: {self.stop}")
 
     def build_chat_input(self, query, history=None, role="user"):
         if history is None:
@@ -111,7 +111,7 @@ class ChatGLMWorker(ModelWorkerBase):
             }
             yield json.dumps(ret).encode() + b"\0"
         except (ValueError, RuntimeError) as e:
-            print(e)
+            logger.info(e)
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",
                 "error_code": ErrorCode.INTERNAL_ERROR,

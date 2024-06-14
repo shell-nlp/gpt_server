@@ -36,7 +36,7 @@ class DeepSeekWorker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        print("DeepSeek停用词:", self.stop)
+        logger.info(f"DeepSeek停用词: {self.stop}")
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
@@ -76,7 +76,7 @@ class DeepSeekWorker(ModelWorkerBase):
             }
             yield json.dumps(ret).encode() + b"\0"
         except (ValueError, RuntimeError) as e:
-            print(e)
+            logger.info(e)
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",
                 "error_code": ErrorCode.INTERNAL_ERROR,
