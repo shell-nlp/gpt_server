@@ -4,11 +4,12 @@ import time
 
 
 async def f():
-    batch = 1
+    batch = 5
     client = AsyncOpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
     data = await client.embeddings.create(
-        model="zpoint",
+        model="bge-reranker-base",
         input=["你是谁"] * batch,
+        extra_body={"query": "你多大了"},
     )
     return data.data
 
@@ -16,7 +17,7 @@ async def f():
 async def main():
     t1 = time.time()
     coro_list = []
-    thread_num = 50
+    thread_num = 100
     for i in range(thread_num):
         coro_list.append(f())
     res = await asyncio.gather(*coro_list)
@@ -42,7 +43,6 @@ async def main():
 # 1        100    2901.79 ms
 # 1        1000   26.6 s
 # 100      1      2228.17 ms
-
 
 
 if __name__ == "__main__":

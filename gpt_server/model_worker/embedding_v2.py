@@ -65,7 +65,7 @@ class EmbeddingWorker(ModelWorkerBase):
         if self.mode == "embedding":
             self.client.encode(sentences=["你是谁"] * 10)
         elif self.mode == "rerank":
-            self.client.predict(sentences=[["你好", "你好啊"] * 10])
+            self.client.predict(sentences=[["你好", "你好啊"]] * 10)
 
     def generate_stream_gate(self, params):
         pass
@@ -85,23 +85,43 @@ class EmbeddingWorker(ModelWorkerBase):
             except asyncio.TimeoutError:
                 pass
             if requests:
-                # 开始进行动态组批
-                ## 1. 展平text
-                # all_input = [ List[str] ]
-                all_input = [request[0]["input"] for request in requests]
-                all_texts = [text for input in all_input for text in input]
-
-                futures = [request[1] for request in requests]
                 try:
-                    embeddings = self.client.encode(
-                        all_texts, **self.encode_kwargs
-                    ).tolist()
+                    all_input = [request[0]["input"] for request in requests]
+                    futures = [request[1] for request in requests]
+
+                    if self.mode == "embedding":
+                        # 开始进行动态组批
+                        ## 1. 展平text
+                        # all_input = [ List[str] ]
+                        # request[0] ---> params
+                        all_texts = [text for input in all_input for text in input]
+                        embeddings = self.client.encode(
+                            all_texts, **self.encode_kwargs
+                        ).tolist()
+
+                    elif self.mode == "rerank":
+                        # all_input = [ List[str] ]
+                        # all_query = [str]
+                        # all_texts = [str]
+                        # request[0] ---> params
+                        all_query = [request[0]["query"] for request in requests]
+                        all_sentence_pairs = []
+
+                        for query, inps in zip(all_query, all_input):
+                            sentence_pairs = [[query, inp] for inp in inps]
+
+                            all_sentence_pairs.extend(sentence_pairs)
+                        logger.debug(all_sentence_pairs)
+                        scores = self.client.predict(all_sentence_pairs)
+                        embeddings = [[float(score)] for score in scores]
+
                     idx = 0
                     for future, request in zip(futures, requests):
                         num_texts = len(request[0]["input"])
                         future.set_result(embeddings[idx : idx + num_texts])
                         idx += num_texts
                 except Exception as e:
+                    logger.exception(e)
                     for future in futures:
                         future.set_exception(e)
 
@@ -110,6 +130,9 @@ class EmbeddingWorker(ModelWorkerBase):
         await self.request_queue.put(item=(params, future))
 
     async def aembed(self, params: dict, future: asyncio.Future):
+        await self.add_request(params, future)
+
+    async def rerank(self, params: dict, future: asyncio.Future):
         await self.add_request(params, future)
 
     async def get_embeddings(self, params):
@@ -125,14 +148,9 @@ class EmbeddingWorker(ModelWorkerBase):
             await self.aembed(params, future)
             embedding = await future
         elif self.mode == "rerank":
-            query = params.get("query", None)
-            # outputs = self.client.tokenizer.tokenize(texts)
-            # token_num = len(outputs)
-            # TODO 暂时不计算 rerank token num
             token_num = 0
-            sentence_pairs = [[query, inp] for inp in texts]
-            scores = self.client.predict(sentence_pairs)
-            embedding = [[float(score)] for score in scores]
+            await self.rerank(params, future)
+            embedding = await future
         ret["embedding"] = embedding
         ret["token_num"] = token_num
         return ret
