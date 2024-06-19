@@ -41,7 +41,11 @@ class EmbeddingWorker(ModelWorkerBase):
             self.loop.create_task(self.batch_processor()) for _ in range(1)
         ]
         # -------------------------------------------------------------------------
-        self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
+        self.batch_size = 64
+        self.encode_kwargs = {
+            "normalize_embeddings": True,
+            "batch_size": self.batch_size,
+        }
         self.mode = "embedding"
         # rerank
         for model_name in model_names:
@@ -74,15 +78,17 @@ class EmbeddingWorker(ModelWorkerBase):
         logger.warning("进入batch_processor")
         while True:
             requests = []
-            batch_size = 32
+            batch_size = 0
             try:
-                while len(requests) < batch_size:
+                while batch_size < self.batch_size:
                     # 等待 100ms
                     request = await asyncio.wait_for(
-                        self.request_queue.get(), timeout=0.06
+                        self.request_queue.get(), timeout=0.1
                     )
                     requests.append(request)
-            except asyncio.TimeoutError:
+                    batch_size += len(request[0]["input"])
+
+            except asyncio.TimeoutError as e:
                 pass
             if requests:
                 try:
@@ -95,6 +101,7 @@ class EmbeddingWorker(ModelWorkerBase):
                         # all_input = [ List[str] ]
                         # request[0] ---> params
                         all_texts = [text for input in all_input for text in input]
+                        logger.debug(all_texts)
                         embeddings = self.client.encode(
                             all_texts, **self.encode_kwargs
                         ).tolist()
