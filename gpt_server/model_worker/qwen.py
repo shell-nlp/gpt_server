@@ -5,6 +5,7 @@ from loguru import logger
 import torch
 
 from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_handler.tools import add_tools2messages
 
 
 class QwenWorker(ModelWorkerBase):
@@ -49,7 +50,8 @@ class QwenWorker(ModelWorkerBase):
         logger.info(f"worker_id: {self.worker_id}")
         try:
             model_type = getattr(self.model_config, "model_type", "qwen")
-            messages = params["messages"]
+            messages = add_tools2messages(params=params, model_adapter="default")
+
             if isinstance(messages, list):
                 task = "chat"
                 for msg in messages:

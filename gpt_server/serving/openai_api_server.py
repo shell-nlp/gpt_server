@@ -284,6 +284,7 @@ async def get_gen_params(
     stop: Optional[Union[str, List[str]]],
     best_of: Optional[int] = None,
     use_beam_search: Optional[bool] = None,
+    tools: Optional[list] = None,
 ) -> Dict[str, Any]:
     conv = await get_conv(model_name, worker_addr)
     conv = Conversation(
@@ -364,8 +365,11 @@ async def get_gen_params(
     _add_to_set(conv.stop_str, new_stop)
 
     gen_params["stop"] = list(new_stop)
-    # TODO add messages
+    # ------- TODO add messages tools -------
     gen_params["messages"] = messages
+    gen_params["tools"] = tools
+    # ------- TODO add messages tools -------
+
     logger.debug(f"==== request ====\n{gen_params}")
     return gen_params
 
@@ -414,8 +418,13 @@ async def show_available_models():
     return ModelList(data=model_cards)
 
 
+from gpt_server.openai_api_protocol.custom_api_protocol import (
+    CustomChatCompletionRequest,
+)
+
+
 @app.post("/v1/chat/completions", dependencies=[Depends(check_api_key)])
-async def create_chat_completion(request: ChatCompletionRequest):
+async def create_chat_completion(request: CustomChatCompletionRequest):
     """Creates a completion for the chat message"""
     error_check_ret = await check_model(request)
     if error_check_ret is not None:
@@ -438,6 +447,7 @@ async def create_chat_completion(request: ChatCompletionRequest):
         max_tokens=request.max_tokens,
         echo=False,
         stop=request.stop,
+        tools=request.tools,
     )
 
     max_new_tokens, error_check_ret = await check_length(

@@ -44,6 +44,7 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 * [X] 支持HF后端
 * [X] 支持vLLM后端
 * [X] 支持LMDeploy后端
+* [ ] 支持 function call 功能 (tools)（进行中...）
 * [ ] 支持Embedding模型动态组批（进行中...）
 * [ ] 支持Reranker模型动态组批
 * [ ] 支持onnx/tensorrt加速推理
@@ -52,18 +53,18 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 
 **推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
 
-|    Models / BackEnd    | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------------: | :-: | :--: | :----------------: | :--------------: |
-|      chatglm4-9b      | √ |  √  |         ×         |        ×        |
-|      chatglm3-6b      | √ |  √  |         √         |        √        |
-| Qwen (7B, 14B, etc.)) | √ |  √  |         √         |        √        |
-|  Qwen-1.5 (0.5B--72B)  | √ |  √  |         √         |        √        |
-|         Qwen-2         | √ |  √  |         √         |        √        |
-|         Yi-34B         | √ |  √  |         √         |        √        |
-|      Internlm-1.0      | √ |  √  |         √         |        √        |
-|      Internlm-2.0      | √ |  √  |         √         |        √        |
-|        Deepseek        | √ |  √  |         √         |        √        |
-|        Llama-3        | √ |  √  |         √         |        √        |
+|   Models / BackEnd    |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |
+| :-------------------: | :---: | :---: | :----------------: | :--------------: |
+|      chatglm4-9b      |   √   |   √   |         ×          |        ×         |
+|      chatglm3-6b      |   √   |   √   |         √          |        √         |
+| Qwen (7B, 14B, etc.)) |   √   |   √   |         √          |        √         |
+| Qwen-1.5 (0.5B--72B)  |   √   |   √   |         √          |        √         |
+|        Qwen-2         |   √   |   √   |         √          |        √         |
+|        Yi-34B         |   √   |   √   |         √          |        √         |
+|     Internlm-1.0      |   √   |   √   |         √          |        √         |
+|     Internlm-2.0      |   √   |   √   |         √          |        √         |
+|       Deepseek        |   √   |   √   |         √          |        √         |
+|        Llama-3        |   √   |   √   |         √          |        √         |
 
 ---
 
@@ -73,16 +74,16 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 <br>
 以下模型经过测试：
 
-| Embedding/Rerank          | HF |
-| ------------------------- | -- |
-| bge-reranker              | √ |
-| bce-reranker              | √ |
-| bge-embedding             | √ |
-| bce-embedding             | √ |
-| piccolo-base-zh-embedding | √ |
-| acge_text_embedding       | √ |
-| Yinka                     | √ |
-| zpoint_large_embedding_zh | √ |
+| Embedding/Rerank          | HF  |
+| ------------------------- | --- |
+| bge-reranker              | √   |
+| bce-reranker              | √   |
+| bge-embedding             | √   |
+| bce-embedding             | √   |
+| piccolo-base-zh-embedding | √   |
+| acge_text_embedding       | √   |
+| Yinka                     | √   |
+| zpoint_large_embedding_zh | √   |
 
 目前 **zpoint_large_embedding_z** MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
