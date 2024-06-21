@@ -4,7 +4,7 @@ from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
 from loguru import logger
 from gpt_server.model_worker.base import ModelWorkerBase
-from gpt_server.model_handler.tools import add_tools2messages
+from gpt_server.model_handler.tools import add_tools2messages, glm4_tool_extractor
 
 
 class ChatGLMWorker(ModelWorkerBase):
@@ -104,7 +104,13 @@ class ChatGLMWorker(ModelWorkerBase):
                 ret = {"text": response, "error_code": 0, "usage": usage}
 
                 yield json.dumps(ret).encode() + b"\0"
-
+            # ------ add tool_calls ------
+            tool_calls = glm4_tool_extractor(response)
+            if params.get("tools", False) and isinstance(
+                tool_calls, list
+            ):  # 如果传入tools
+                ret["tool_calls"] = tool_calls
+                yield json.dumps(ret).encode() + b"\0"
         except torch.cuda.OutOfMemoryError as e:
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",

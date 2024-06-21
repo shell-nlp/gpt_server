@@ -7,7 +7,8 @@
 3. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 4. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 5. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
-6. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
+6. 支持了**function call (tools)** 能力
+7. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
@@ -22,6 +23,7 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 ## 更新信息
 
 ```plaintext
+6-22  支持了 Qwen系列、ChatGLM系列 function call (tools) 能力
 6-12  支持了 qwen-2
 6-5   支持了 Yinka、zpoint_large_embedding_zh 嵌入模型
 6-5   支持了 glm4-9b系列（hf和vllm）
@@ -44,7 +46,7 @@ LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型�
 * [X] 支持HF后端
 * [X] 支持vLLM后端
 * [X] 支持LMDeploy后端
-* [ ] 支持 function call 功能 (tools)（进行中...）
+* [X] 支持 function call 功能 (tools)（Qwen系列、ChatGLM系列已经支持,后面有需求再继续扩展）
 * [ ] 支持Embedding模型动态组批（进行中...）
 * [ ] 支持Reranker模型动态组批
 * [ ] 支持onnx/tensorrt加速推理

@@ -420,6 +420,9 @@ async def show_available_models():
 
 from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomChatCompletionRequest,
+    CustomChatMessage,
+    CustomChatCompletionResponse,
+    CustomChatCompletionResponseChoice,
 )
 
 
@@ -485,9 +488,13 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         if content["error_code"] != 0:
             return create_error_response(content["error_code"], content["text"])
         choices.append(
-            ChatCompletionResponseChoice(
+            CustomChatCompletionResponseChoice(
                 index=i,
-                message=ChatMessage(role="assistant", content=content["text"]),
+                message=CustomChatMessage(
+                    role="assistant",
+                    content=content["text"],
+                    tool_calls=content.get("tool_calls", None),
+                ),
                 finish_reason=content.get("finish_reason", "stop"),
             )
         )
@@ -495,8 +502,10 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
             task_usage = UsageInfo.parse_obj(content["usage"])
             for usage_key, usage_value in task_usage.dict().items():
                 setattr(usage, usage_key, getattr(usage, usage_key) + usage_value)
-
-    return ChatCompletionResponse(model=request.model, choices=choices, usage=usage)
+    print(666, choices[0].message.tool_calls, type(choices[0].message.tool_calls))
+    return CustomChatCompletionResponse(
+        model=request.model, choices=choices, usage=usage
+    )
 
 
 async def chat_completion_stream_generator(

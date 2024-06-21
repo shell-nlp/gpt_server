@@ -1,6 +1,7 @@
 import re
 from typing import Any, Dict, List, Tuple, Union
 import json
+import uuid
 
 # default
 TOOL_SYSTEM_PROMPT = """Answer the following questions as best you can. You have access to the following tools:
@@ -79,20 +80,25 @@ def default_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
     if not action_match:
         return content
 
-    results = []
-
+    tool_calls = []
     for match in action_match:
         tool_name, tool_input = match
         tool_name = tool_name.strip()
         tool_input = tool_input.strip().strip('"').strip("```")
 
         try:
-            arguments = json.loads(tool_input)
-            results.append((tool_name, json.dumps(arguments, ensure_ascii=False)))
+            # arguments = json.loads(tool_input)
+            # results.append((tool_name, json.dumps(arguments, ensure_ascii=False)))
+            tool_call = {
+                "id": "call_{}".format(uuid.uuid4().hex),
+                "function": {"name": tool_name, "arguments": tool_input},
+            }
+            tool_calls.append(tool_call)
+
         except json.JSONDecodeError:
             return content
 
-    return results
+    return tool_calls
 
 
 def glm4_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
@@ -101,11 +107,15 @@ def glm4_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
         return content
     tool_name = lines[0].strip()
     tool_input = lines[1].strip()
-    try:
-        arguments = json.loads(tool_input)
-    except json.JSONDecodeError:
-        return content
-    return [(tool_name, json.dumps(arguments, ensure_ascii=False))]
+
+    tool_calls = [
+        {
+            "id": "call_{}".format(uuid.uuid4().hex),
+            "function": {"name": tool_name, "arguments": tool_input},
+        }
+    ]
+
+    return tool_calls
 
 
 def add_tools2messages(params: dict, model_adapter: str = "default"):
