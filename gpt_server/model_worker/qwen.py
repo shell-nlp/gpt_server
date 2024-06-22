@@ -5,7 +5,8 @@ from loguru import logger
 import torch
 
 from gpt_server.model_worker.base import ModelWorkerBase
-from gpt_server.model_handler.tools import add_tools2messages, default_tool_extractor
+from gpt_server.model_handler.qwen_react import qwen_tool_extractor
+from gpt_server.model_handler.utils import add_tools2messages
 
 
 class QwenWorker(ModelWorkerBase):
@@ -39,6 +40,8 @@ class QwenWorker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
+        # 拓展额外的stop
+        self.stop.extend(["Observation:"])
         logger.info(f"qwen停用词: {self.stop}")
         self.other_config = {
             "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content']}}{% if (loop.last and add_generation_prompt) or not loop.last %}{{ '<|im_end|>' + '\n'}}{% endif %}{% endfor %}{% if add_generation_prompt and messages[-1]['role'] != 'assistant' %}{{ '<|im_start|>assistant\n' }}{% endif %}"
@@ -50,7 +53,7 @@ class QwenWorker(ModelWorkerBase):
         logger.info(f"worker_id: {self.worker_id}")
         try:
             model_type = getattr(self.model_config, "model_type", "qwen")
-            messages = add_tools2messages(params=params, model_adapter="default")
+            messages = add_tools2messages(params=params, model_adapter="qwen")
 
             if isinstance(messages, list):
                 task = "chat"
@@ -94,10 +97,11 @@ class QwenWorker(ModelWorkerBase):
 
                 yield json.dumps(ret).encode() + b"\0"
             # ------ add tool_calls ------
-            tool_calls = default_tool_extractor(response)
+            tool_calls = qwen_tool_extractor(response)
             if params.get("tools", False) and isinstance(
                 tool_calls, list
             ):  # 如果传入tools
+                logger.debug(f"工具解析成功, tool_calls: {tool_calls}")
                 ret["tool_calls"] = tool_calls
                 yield json.dumps(ret).encode() + b"\0"
         except torch.cuda.OutOfMemoryError as e:
