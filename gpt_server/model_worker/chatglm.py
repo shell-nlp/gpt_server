@@ -31,9 +31,14 @@ class ChatGLMWorker(ModelWorkerBase):
         )
 
         self.stop = ["<|user|>", "<|observation|>", "<|endoftext|>"]
-        self.stop_words_ids = [
-            self.tokenizer.convert_tokens_to_ids(i) for i in self.stop
-        ]
+        # 拓展额外的stop
+        self.stop.extend(["Observation:"])
+        self.stop_words_ids = []
+        for i in self.stop:
+            try:
+                self.stop_words_ids.append(self.tokenizer.convert_tokens_to_ids(i))
+            except Exception as e:
+                pass
 
         logger.info(f"chatglm停用词: {self.stop}")
 
@@ -71,7 +76,7 @@ class ChatGLMWorker(ModelWorkerBase):
             if isinstance(messages, list):
                 task = "chat"
                 for msg in messages:
-                    if msg["role"] == "function":
+                    if msg["role"] == "function" or msg["role"] == "tool":
                         msg["role"] = "observation"
 
                 if messages[-1]["role"] == "user":

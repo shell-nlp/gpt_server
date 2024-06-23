@@ -4,37 +4,56 @@ import uuid
 
 GLM4_TOOL_SUFFIX_PROMPT = "在调用上述函数时，请使用 Json 格式表示调用的参数。"
 
-GLM4_TOOL_PROMPT = (
-    "你是一个名为 GLM-4 的人工智能助手。你是基于智谱AI训练的语言模型 GLM-4 模型开发的，你的任务是针对用户的问题和要求提供适当的答复和支持，"
-    "{tool_text}"
-)
+GLM4_TOOL_PROMPT = """"你是一个名为 GLM-4 的人工智能助手。你是基于智谱AI训练的语言模型 GLM-4 模型开发的，你的任务是针对用户的问题和要求提供适当的答复和支持。
+
+# 可用工具
+{tool_text}
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin!
+
+Question:
+"""
 
 
 def glm4_tool_formatter(tools: List[Dict[str, Any]]) -> str:
-    tool_text = ""
+    tool_text = "\n"
+    tool_names = []
     for tool in tools:
         tool = tool["function"]
         tool_name = tool["name"]
-        tool_text += f"\n\n## {tool_name}\n\n{json.dumps(tool, ensure_ascii=False, indent=4)}\n{GLM4_TOOL_SUFFIX_PROMPT}"
-    return GLM4_TOOL_PROMPT.format(tool_text=tool_text)
+        tool_text += f"## {tool_name}\n\n{json.dumps(tool, ensure_ascii=False, indent=4)}\n{GLM4_TOOL_SUFFIX_PROMPT}\n\n"
+        tool_names.append(tool_name)
+    return GLM4_TOOL_PROMPT.format(
+        tool_text=tool_text, tool_names=", ".join(tool_names)
+    ).strip()
 
 
 def glm4_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
-    lines = content.strip().split("\n")
-    if len(lines) != 2:
-        return content
-    tool_name = lines[0].strip()
-    tool_input = lines[1].strip()
+    i = content.rfind("Action:")
+    j = content.rfind("Action Input:")
+    tool_name = content[i + len("Action:") : j].strip().strip(".")
+    tool_input = content[j + len("Action Input:") :].strip()
     try:
-        json.loads(tool_input)
+        tool_input_obj = json.loads(tool_input)
     except json.JSONDecodeError:
         return content
-    tool_calls = [
-        {
-            "id": "call_{}".format(uuid.uuid4().hex),
-            "function": {"name": tool_name, "arguments": tool_input},
-        }
-    ]
+    tool_calls = []
+    tool_call = {
+        "index": 0,
+        "id": "call_{}".format(uuid.uuid4().hex),
+        "function": {"name": tool_name, "arguments": tool_input},
+    }
+    tool_calls.append(tool_call)
 
     return tool_calls
 
