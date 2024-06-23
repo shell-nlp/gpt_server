@@ -502,10 +502,16 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
             task_usage = UsageInfo.parse_obj(content["usage"])
             for usage_key, usage_value in task_usage.dict().items():
                 setattr(usage, usage_key, getattr(usage, usage_key) + usage_value)
-    print(666, choices[0].message.tool_calls, type(choices[0].message.tool_calls))
     return CustomChatCompletionResponse(
         model=request.model, choices=choices, usage=usage
     )
+
+
+from gpt_server.openai_api_protocol.custom_api_protocol import (
+    CustomChatCompletionStreamResponse,
+    CustomChatCompletionResponseStreamChoice,
+    CustomDeltaMessage,
+)
 
 
 async def chat_completion_stream_generator(
@@ -542,21 +548,28 @@ async def chat_completion_stream_generator(
                 if len(decoded_unicode) > len(previous_text)
                 else previous_text
             )
-
             if len(delta_text) == 0:
                 delta_text = None
-            choice_data = ChatCompletionResponseStreamChoice(
+            choice_data = CustomChatCompletionResponseStreamChoice(
                 index=i,
-                delta=DeltaMessage(content=delta_text),
+                delta=CustomDeltaMessage(
+                    role="assistant",
+                    content=delta_text,
+                    tool_calls=content.get("tool_calls", None),
+                ),
                 finish_reason=content.get("finish_reason", None),
             )
-            chunk = ChatCompletionStreamResponse(
-                id=id, choices=[choice_data], model=model_name
+
+            chunk = CustomChatCompletionStreamResponse(
+                id=id,
+                choices=[choice_data],
+                model=model_name,
+                usage=content.get("usage", None),
             )
-            if delta_text is None:
-                if content.get("finish_reason", None) is not None:
-                    finish_stream_events.append(chunk)
-                continue
+            # if delta_text is None:
+            #     if content.get("finish_reason", None) is not None:
+            #         finish_stream_events.append(chunk)
+            #     continue
             yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
     # There is not "content" field in the last delta message, so exclude_none to exclude field "content".
     for finish_chunk in finish_stream_events:
@@ -585,7 +598,6 @@ async def create_completion(request: CompletionRequest):
 
         if isinstance(max_tokens, int) and max_tokens < request.max_tokens:
             request.max_tokens = max_tokens
-
     if request.stream:
         generator = generate_completion_stream_generator(
             request, request.n, worker_addr
@@ -703,7 +715,6 @@ async def generate_completion_stream_generator(
 
 
 async def generate_completion_stream(payload: Dict[str, Any], worker_addr: str):
-    controller_address = app_settings.controller_address
     async with httpx.AsyncClient() as client:
         delimiter = b"\0"
         async with client.stream(
