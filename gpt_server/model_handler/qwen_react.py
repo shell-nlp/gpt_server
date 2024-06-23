@@ -70,6 +70,7 @@ def qwen_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
         return content
     tool_calls = []
     tool_call = {
+        "index": 0,
         "id": "call_{}".format(uuid.uuid4().hex),
         "function": {"name": tool_name, "arguments": tool_input},
     }

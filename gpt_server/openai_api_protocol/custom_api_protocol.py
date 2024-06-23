@@ -5,7 +5,12 @@ from fastchat.protocol.openai_api_protocol import (
     ChatCompletionResponse,
     ChatMessage,
     ChatCompletionResponseChoice,
+    ChatCompletionStreamResponse,
+    ChatCompletionResponseStreamChoice,
+    UsageInfo,
+    DeltaMessage,
 )
+from pydantic import Field
 
 
 class CustomEmbeddingsRequest(EmbeddingsRequest):
@@ -26,3 +31,17 @@ class CustomChatCompletionResponseChoice(ChatCompletionResponseChoice):
 
 class CustomChatCompletionResponse(ChatCompletionResponse):
     choices: List[CustomChatCompletionResponseChoice]
+
+
+# chat.completion.chunk
+class CustomDeltaMessage(DeltaMessage):
+    tool_calls: Optional[list] = None
+
+
+class CustomChatCompletionResponseStreamChoice(ChatCompletionResponseStreamChoice):
+    delta: CustomDeltaMessage
+
+
+class CustomChatCompletionStreamResponse(ChatCompletionStreamResponse):
+    usage: Optional[UsageInfo] = Field(default=None)
+    choices: List[CustomChatCompletionResponseStreamChoice]
