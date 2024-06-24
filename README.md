@@ -7,18 +7,19 @@
 3. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 4. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 5. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
-6. 支持了**function call (tools)** 能力
+6. 支持了**Function Calling (Tools)** 能力
 7. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
 <br>
 
-## 项目实时进展
+## 特色
 
-已经实现**LMDeploy**后端，其中包括lmdeploy的Pytorch后端和TurboMind后端。
-
-LMDeploy TurboMind 引擎拥有卓越的推理能力，在各种规模的模型上，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍。
+1. 支持多种推理后端引擎，vLLM和LMDeploy，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
+2. 全球唯一完美支持**Tools（Function Calling）**功能的开源框架。兼容**LangChain**的 **bind_tools**、**AgentExecutor**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
+3. 全球唯一扩展了**openai**库,实现Reranker模型。(代码样例见gpt_server/tests/test_openai_rerank.py)
+4. 与FastChat相同的分布式架构
 
 ## 更新信息
 
