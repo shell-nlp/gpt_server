@@ -1,8 +1,10 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Optional
 import json
 import uuid
 
-GLM4_TOOL_SUFFIX_PROMPT = "在调用上述函数时，请使用 Json 格式表示调用的参数。"
+GLM4_TOOL_SUFFIX_PROMPT = (
+    "在调用上述函数时，Action Input的值必须使用 Json 格式来表示调用的参数。"
+)
 
 GLM4_TOOL_PROMPT = """"你是一个名为 GLM-4 的人工智能助手。你是基于智谱AI训练的语言模型 GLM-4 模型开发的，你的任务是针对用户的问题和要求提供适当的答复和支持。
 
@@ -25,7 +27,9 @@ Question:
 """
 
 
-def glm4_tool_formatter(tools: List[Dict[str, Any]]) -> str:
+def glm4_tool_formatter(
+    tools: List[Dict[str, Any]], tool_choice_info: Optional[dict] = None
+) -> str:
     tool_text = "\n"
     tool_names = []
     for tool in tools:

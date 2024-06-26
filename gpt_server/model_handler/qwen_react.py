@@ -1,8 +1,12 @@
-import re
-from typing import Any, Dict, List, Tuple, Union
+from loguru import logger
+from typing import Any, Dict, List, Tuple, Union, Optional
 import json
 import uuid
 
+QWEN_TOOL_SUFFIX_PROMPT = (
+    "在调用上述函数时，Action Input的值必须使用 Json 格式来表示调用的参数。"
+)
+TOOL_CHOICE_SUFFIX_PROMPT = "\n注意：上述函数必须被调用！"
 # default
 TOOL_SYSTEM_PROMPT = """Answer the following questions as best you can. You have access to the following tools:
 
@@ -24,12 +28,25 @@ Begin!
 Question:"""
 
 
-def qwen_tool_formatter(tools: List[Dict[str, Any]]) -> str:
+def qwen_tool_formatter(
+    tools: List[Dict[str, Any]], tool_choice_info: Optional[dict] = None
+) -> str:
+    tool_chooce_suffix_prompt = ""
+    logger.info(f"tool_choice_info: {tool_choice_info}")
+    if tool_choice_info:
+        tool_chooce_suffix_prompt = TOOL_CHOICE_SUFFIX_PROMPT
+        tools = [tools[tool_choice_info["tool_choice_idx"]]]
+        logger.info(f"tools 已被替换为tool_choic: {tools}")
+
     tool_names = []
     param_text_list = []
     for tool in tools:
         tool = tool["function"]
-        param_text = """{tool_name}: Call this tool to interact with the {tool_name} API. What is the {tool_name} API useful for? {description} Parameters: {parameters} Format the arguments as a JSON object."""
+        param_text = (
+            """{tool_name}: Call this tool to interact with the {tool_name} API. What is the {tool_name} API useful for? {description} Parameters: {parameters} \n"""
+            + QWEN_TOOL_SUFFIX_PROMPT
+            + tool_chooce_suffix_prompt
+        )
         parameters = []
         for name, param in tool["parameters"]["properties"].items():
             parameters.append(

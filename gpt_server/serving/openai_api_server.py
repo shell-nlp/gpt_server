@@ -285,6 +285,7 @@ async def get_gen_params(
     best_of: Optional[int] = None,
     use_beam_search: Optional[bool] = None,
     tools: Optional[list] = None,
+    tool_choice=None,
 ) -> Dict[str, Any]:
     conv = await get_conv(model_name, worker_addr)
     conv = Conversation(
@@ -368,6 +369,7 @@ async def get_gen_params(
     # ------- TODO add messages tools -------
     gen_params["messages"] = messages
     gen_params["tools"] = tools
+    gen_params["tool_choice"] = tool_choice
     # ------- TODO add messages tools -------
 
     logger.debug(f"==== request ====\n{gen_params}")
@@ -451,6 +453,7 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         echo=False,
         stop=request.stop,
         tools=request.tools,
+        tool_choice=request.tool_choice,
     )
 
     max_new_tokens, error_check_ret = await check_length(

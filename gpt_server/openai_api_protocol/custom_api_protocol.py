@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional, Union
 from fastchat.protocol.openai_api_protocol import (
     EmbeddingsRequest,
     ChatCompletionRequest,
@@ -19,6 +19,7 @@ class CustomEmbeddingsRequest(EmbeddingsRequest):
 
 class CustomChatCompletionRequest(ChatCompletionRequest):
     tools: Optional[list] = None
+    tool_choice: Optional[dict] = None
 
 
 class CustomChatMessage(ChatMessage):
