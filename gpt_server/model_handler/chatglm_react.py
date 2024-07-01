@@ -5,8 +5,8 @@ import uuid
 GLM4_TOOL_SUFFIX_PROMPT = (
     "在调用上述函数时，Action Input的值必须使用 Json 格式来表示调用的参数。"
 )
-
-GLM4_TOOL_PROMPT = """"你是一个名为 GLM-4 的人工智能助手。你是基于智谱AI训练的语言模型 GLM-4 模型开发的，你的任务是针对用户的问题和要求提供适当的答复和支持。
+# 你的任务是针对用户的问题和要求提供适当的答复和支持
+GLM4_TOOL_PROMPT = """"你可以使用以下工具提供适当的答复和支持。
 
 # 可用工具
 {tool_text}

@@ -37,6 +37,6 @@ def add_tools2messages(params: dict, model_adapter: str = "default"):
             messages.insert(0, {"role": "system", "content": system_content})
 
         elif messages[0]["role"] == "system":
-            messages[0]["content"] = system_content
+            messages[0]["content"] = messages[0]["content"] + "\n\n" + system_content
 
     return messages
