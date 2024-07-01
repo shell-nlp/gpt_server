@@ -1589,21 +1589,21 @@ reference = "ustc"
 
 [[package]]
 name = "lmdeploy"
-version = "0.4.2"
+version = "0.5.0"
 description = "A toolset for compressing, deploying and serving LLM"
 optional = false
 python-versions = "*"
 files = [
-    {file = "lmdeploy-0.4.2-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:4104eb7f9da1f760d8506f31f8ee60f2595484bbb839ddf146cc8da62d226864"},
-    {file = "lmdeploy-0.4.2-cp310-cp310-win_amd64.whl", hash = "sha256:6ce0907b41452d1228a031cc3b5e5ee9457ede8ea1925a5ef16043557b2a6dfa"},
-    {file = "lmdeploy-0.4.2-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:c97288657d1788f4a005f27a7a5ce2e57825a2b087ce01ceb8a55f93cfb86cef"},
-    {file = "lmdeploy-0.4.2-cp311-cp311-win_amd64.whl", hash = "sha256:94cd1c2df488788a72915f2b7a4e563a70a0abf18e0fea7444108d51eccb7af1"},
-    {file = "lmdeploy-0.4.2-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:774968237db8fd220f1f5ce9575a8b3d90a3f5e02efe81cbae290e4e31374519"},
-    {file = "lmdeploy-0.4.2-cp312-cp312-win_amd64.whl", hash = "sha256:317953b41bfa9cca31e808d9a6955e358f856f0b522eadd620ceffe3b05013f9"},
-    {file = "lmdeploy-0.4.2-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:a52fb959f838594148b2cc556c6fb9f8a740a50d63da6008cb9817daf72a1f0f"},
-    {file = "lmdeploy-0.4.2-cp38-cp38-win_amd64.whl", hash = "sha256:fbe4e69b4976dcd1bceb5c57218905dcd0867c6821a0534c82d11419c8ae4428"},
-    {file = "lmdeploy-0.4.2-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:69c0cc8aeb11056825e9eca55b8fe9568f305c7201b1eb4ead2553375da998f9"},
-    {file = "lmdeploy-0.4.2-cp39-cp39-win_amd64.whl", hash = "sha256:b66981d38de34195ef46a487df1f79bdfd43d8c066ca593f9d974c2a7d937984"},
+    {file = "lmdeploy-0.5.0-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:6c8cdc914185b3def77ece2a3328f0f0298a9d0e092e43a2b6ffc077532bfe70"},
+    {file = "lmdeploy-0.5.0-cp310-cp310-win_amd64.whl", hash = "sha256:148eaaf6c392e6b0ba8bdcfbe3b1b9c28479c446b9c3ebf5914f89df12b0efd9"},
+    {file = "lmdeploy-0.5.0-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:adef8645a521fb8f6e469870f94b8bbcb76c2f5562b18754f784287370a0317c"},
+    {file = "lmdeploy-0.5.0-cp311-cp311-win_amd64.whl", hash = "sha256:f93940136e07a191fe79930387983253c8805faa19b6a4b32a82a47264d2cfd0"},
+    {file = "lmdeploy-0.5.0-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:a10b9c0e2fa261af7ce4b4718d94023b77f93ab602b427179c452828fd5757a9"},
+    {file = "lmdeploy-0.5.0-cp312-cp312-win_amd64.whl", hash = "sha256:0851bb1a1aa925f2c7ac1727d38160cd2c7c0e2b7306ee428a85d02665a7d9d1"},
+    {file = "lmdeploy-0.5.0-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:a8afa5948d408ff8f3ab7fa3b8d73f166919dc9c1811d50461e830efef735654"},
+    {file = "lmdeploy-0.5.0-cp38-cp38-win_amd64.whl", hash = "sha256:1c8a87cd4199383a2a66050d85556531e6a300e6b0f063cc0444bfc1743235a7"},
+    {file = "lmdeploy-0.5.0-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:3eb5350d8f1c1a21e4b3a8074f98a459d9985f0d5751700dcb6f125d22e3990f"},
+    {file = "lmdeploy-0.5.0-cp39-cp39-win_amd64.whl", hash = "sha256:4143193754f2f8f021962d483488316d5c73ea7d5da7aee559814457b9f553b5"},
 ]
 
 [package.dependencies]
@@ -1612,12 +1612,12 @@ einops = "*"
 fastapi = "*"
 fire = "*"
 mmengine-lite = "*"
-numpy = "*"
+numpy = "<2.0.0"
 nvidia-cublas-cu12 = "*"
 nvidia-cuda-runtime-cu12 = "*"
 nvidia-curand-cu12 = "*"
 nvidia-nccl-cu12 = "*"
-peft = "<=0.9.0"
+peft = "<=0.11.1"
 pillow = "*"
 protobuf = "*"
 pydantic = ">2.0.0"
@@ -1633,7 +1633,7 @@ triton = {version = ">=2.1.0,<=2.2.0", markers = "sys_platform == \"linux\""}
 uvicorn = "*"
 
 [package.extras]
-all = ["accelerate", "accelerate (>=0.29.3)", "datasets", "einops", "fastapi", "fire", "gradio (<4.0.0)", "mmengine-lite", "numpy", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "peft (<=0.9.0)", "pillow", "protobuf", "pybind11", "pydantic (>2.0.0)", "pynvml", "safetensors", "sentencepiece", "setuptools", "shortuuid", "tiktoken", "torch (>=2.0.0,<=2.2.2)", "torchvision (>=0.15.0,<=0.17.2)", "transformers", "transformers-stream-generator", "triton (>=2.1.0,<=2.2.0)", "tritonclient[grpc]", "uvicorn"]
+all = ["accelerate", "accelerate (>=0.29.3)", "datasets", "einops", "fastapi", "fire", "gradio (<4.0.0)", "mmengine-lite", "numpy (<2.0.0)", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "peft (<=0.11.1)", "pillow", "protobuf", "pybind11", "pydantic (>2.0.0)", "pynvml", "safetensors", "sentencepiece", "setuptools", "shortuuid", "tiktoken", "torch (>=2.0.0,<=2.2.2)", "torchvision (>=0.15.0,<=0.17.2)", "transformers", "transformers-stream-generator", "triton (>=2.1.0,<=2.2.0)", "tritonclient[grpc]", "uvicorn"]
 lite = ["accelerate", "datasets", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "transformers-stream-generator"]
 serve = ["gradio (<4.0.0)", "nvidia-cublas-cu12", "nvidia-cuda-runtime-cu12", "nvidia-curand-cu12", "nvidia-nccl-cu12", "protobuf", "tritonclient[grpc]"]
 
@@ -5299,4 +5299,4 @@ reference = "ustc"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "2349bdf5bef6b0d030e9613de0507139bd6a7f9c4d56a6274760242a7c56749b"
+content-hash = "7ecd0f304590832c073a00ea0d93c253f8163dadfb0f5ee6d8be61de4bc0aa79"

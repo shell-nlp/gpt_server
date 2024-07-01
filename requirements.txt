@@ -46,7 +46,7 @@ kiwisolver==1.4.5
 lark==1.1.9
 llvmlite==0.42.0
 lm-format-enforcer==0.9.8
-lmdeploy==0.4.2
+lmdeploy==0.5.0
 loguru==0.7.2
 markdown-it-py==3.0.0
 markdown2==2.4.13
