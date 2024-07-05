@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.copy
-    image: gpt_server:v0.2.2
+    image: gpt_server:v0.3.1
     shm_size: '4g' # 设置共享内存为4GB
     container_name: gpt_server
     restart: always

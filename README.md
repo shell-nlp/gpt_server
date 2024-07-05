@@ -48,7 +48,8 @@
 * [X] 支持vLLM后端
 * [X] 支持LMDeploy后端
 * [X] 支持 function call 功能 (tools)（Qwen系列、ChatGLM系列已经支持,后面有需求再继续扩展）
-* [ ] 支持Embedding模型动态组批（进行中...）
+* [ ] 支持多模态模型
+* [ ] 支持Embedding模型动态组批
 * [ ] 支持Reranker模型动态组批
 * [ ] 支持onnx/tensorrt加速推理
 
@@ -105,7 +106,11 @@ conda activate gpt_server
 
 # 3. 安装依赖
 pip install -r requirements.txt
+
+# 3.1 安装dev版本 [可选] (计划支持多模态模型的版本)
+pip install -r requirements-dev.txt --no-deps
 ```
+
 
 #### 2. 修改启动配置文件
 

@@ -1,9 +1,9 @@
-FROM gpt_server:v0.2
+FROM gpt_server:v0.3
 
 COPY ./ /gpt_server
 
 WORKDIR /gpt_server
 
-# RUN pip install -r requirements.txt && pip cache purge && ln -sf $(which python3.10) /usr/local/bin/python
+# RUN pip install -r requirements.txt --no-deps && pip cache purge && ln -sf $(which python3.10) /usr/local/bin/python
 
 CMD ["/bin/bash"]

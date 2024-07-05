@@ -4,11 +4,14 @@ from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
 from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
+import vllm
 
 # 解决vllm中 ray集群在 TP>1时死的Bug
 import ray
 
 ray.init(ignore_reinit_error=True, num_cpus=4)
+
+vllm_version = vllm.__version__
 
 
 class VllmBackend(ModelBackend):
@@ -60,12 +63,20 @@ class VllmBackend(ModelBackend):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
         )
-        results_generator = self.engine.generate(
-            prompt,
-            sampling_params=sampling,
-            request_id=request_id,
-            prompt_token_ids=prompt_token_ids,  # 这个是不同之处
-        )
+        inputs = {"prompt": prompt, "prompt_token_ids": prompt_token_ids}
+        
+        if vllm_version == "0.5.0":
+            results_generator = self.engine.generate(
+                inputs=inputs,
+                sampling_params=sampling,
+                request_id=request_id,
+            )
+        else:
+            results_generator = self.engine.generate(
+                **inputs,
+                sampling_params=sampling,
+                request_id=request_id,
+            )
         async for request_output in results_generator:
             text_outputs = request_output.outputs[0].text
             partial_stop = any(is_partial_stop(text_outputs, i) for i in stop)
