@@ -12,6 +12,7 @@ import asyncio
 import argparse
 import json
 import os
+import time
 from typing import Generator, Optional, Union, Dict, List, Any
 
 import aiohttp
@@ -568,6 +569,7 @@ async def chat_completion_stream_generator(
                 choices=[choice_data],
                 model=model_name,
                 usage=content.get("usage", None),
+                created=int(time.time())
             )
             # if delta_text is None:
             #     if content.get("finish_reason", None) is not None:

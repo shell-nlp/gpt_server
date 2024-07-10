@@ -64,7 +64,7 @@ class VllmBackend(ModelBackend):
             frequency_penalty=frequency_penalty,
         )
         inputs = {"prompt": prompt, "prompt_token_ids": prompt_token_ids}
-        
+
         if vllm_version == "0.5.0":
             results_generator = self.engine.generate(
                 inputs=inputs,
@@ -100,7 +100,13 @@ class VllmBackend(ModelBackend):
                 "completion_tokens": completion_tokens,
                 "total_tokens": prompt_tokens + completion_tokens,
             }
-            yield text_outputs, usage
+            ret = {
+                "text": text_outputs,
+                "error_code": 0,
+                "usage": usage,
+                "finish_reason": request_output.outputs[0].finish_reason,
+            }
+            yield ret
 
             if aborted:
                 break

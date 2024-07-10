@@ -85,6 +85,11 @@ class LMDeployBackend(ModelBackend):
                 "total_tokens": request_output.input_token_len
                 + request_output.generate_token_len,
             }
-            yield text_outputs, usage
+            ret = {
+                "text": text_outputs,
+                "error_code": 0,
+                "usage": usage,
+            }
+            yield ret
         logger.info(text_outputs)
         logger.info(usage)

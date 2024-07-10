@@ -87,7 +87,12 @@ class HFBackend(ModelBackend):
                     "completion_tokens": completion_tokens,
                     "total_tokens": prompt_tokens + completion_tokens,
                 }
-                yield generated_text, usage
+                ret = {
+                    "text": generated_text,
+                    "error_code": 0,
+                    "usage": usage,
+                }
+                yield ret
                 if stop_flag:
                     break
                 # 用来解决输出卡顿的问题

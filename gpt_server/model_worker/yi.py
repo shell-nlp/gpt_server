@@ -64,9 +64,8 @@ class YiWorker(ModelWorkerBase):
             params["stop_words_ids"] = self.stop_words_ids
             params["input_ids"] = input_ids
 
-            async for response, usage in self.backend.stream_chat(params=params):
-
-                ret = {"text": response, "error_code": 0, "usage": usage}
+            async for ret in self.backend.stream_chat(params=params):
+                response = ret["text"]
 
                 yield json.dumps(ret).encode() + b"\0"
 
