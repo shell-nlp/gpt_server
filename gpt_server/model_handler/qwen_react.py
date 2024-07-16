@@ -49,16 +49,22 @@ def qwen_tool_formatter(
         )
         parameters = []
         for name, param in tool["parameters"]["properties"].items():
-            parameters.append(
-                {
-                    "name": name,
-                    "description": param.get("description", ""),
-                    "required": (
-                        True if name in tool["parameters"]["required"] else False
-                    ),
-                    "schema": {"type": param["type"]},
-                }
-            )
+            try:
+                parameters.append(
+                    {
+                        "name": name,
+                        "description": param.get("description", ""),
+                        "required": (
+                            True
+                            if name in tool["parameters"].get("required", [])
+                            else False
+                        ),
+                        "schema": {"type": param["type"]},
+                    }
+                )
+            except KeyError as e:
+                print(f"KeyError in {tool}\ninfo:{e}")
+                raise KeyError(e)
         param_text_str = param_text.format(
             tool_name=tool["name"],
             description=tool["description"],
