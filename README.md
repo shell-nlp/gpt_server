@@ -81,13 +81,19 @@
 
 ### **VLM**
 
-|    Models / BackEnd    | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------------: | :-: | :--: | :----------------: | :--------------: |
-|      glm-4v-9b      | × |  ×  |         ×         |        √        |
+| Models / BackEnd | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
+| :--------------: | :-: | :--: | :----------------: | :--------------: |
+|    glm-4v-9b    | × |  ×  |         ×         |        √        |
 
+
+
+<br>
+
+### Embedding模型
 
 **原则上支持所有的Embedding/Rerank 模型**
-`<br>`
+
+
 以下模型经过测试：
 
 | Embedding/Rerank          | HF |
@@ -110,6 +116,7 @@
 #### 1. 配置python环境
 
 ```bash
+
 # 1. 创建conda 环境
 conda create -n gpt_server python=3.10
 
@@ -119,6 +126,7 @@ conda activate gpt_server
 # 3. 安装依赖
 pip install -r requirements.txt
 
+# 推荐安装dev版本体验最新功能
 # 3.1 安装dev版本 [可选] (计划支持多模态模型的版本)
 pip install -r requirements-dev.txt --no-deps
 ```
@@ -149,7 +157,7 @@ models:
       - gpus:
         # - 1
         - 0
-      
+    
   - qwen:  #自定义的模型名称
       alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
       enable: true  # false true

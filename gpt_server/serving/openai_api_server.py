@@ -288,57 +288,11 @@ async def get_gen_params(
     tools: Optional[list] = None,
     tool_choice=None,
 ) -> Dict[str, Any]:
-    conv = await get_conv(model_name, worker_addr)
-    conv = Conversation(
-        name=conv["name"],
-        system_template=conv["system_template"],
-        system_message=conv["system_message"],
-        roles=conv["roles"],
-        messages=list(conv["messages"]),  # prevent in-place modification
-        offset=conv["offset"],
-        sep_style=SeparatorStyle(conv["sep_style"]),
-        sep=conv["sep"],
-        sep2=conv["sep2"],
-        stop_str=conv["stop_str"],
-        stop_token_ids=conv["stop_token_ids"],
-    )
-
+    images = []
     if isinstance(messages, str):
         prompt = messages
         images = []
-    else:
-        for message in messages:
-            msg_role = message["role"]
-            if msg_role == "system":
-                conv.set_system_message(message["content"])
-            elif msg_role == "user":
-                if type(message["content"]) == list:
-                    image_list = [
-                        item["image_url"]["url"]
-                        for item in message["content"]
-                        if item["type"] == "image_url"
-                    ]
-                    text_list = [
-                        item["text"]
-                        for item in message["content"]
-                        if item["type"] == "text"
-                    ]
 
-                    text = "\n".join(text_list)
-                    conv.append_message(conv.roles[0], (text, image_list))
-                else:
-                    conv.append_message(conv.roles[0], message["content"])
-            elif msg_role == "assistant":
-                conv.append_message(conv.roles[1], message["content"])
-            else:
-                # TODO
-                pass
-                # raise ValueError(f"Unknown role: {msg_role}")
-
-        # Add a blank message for the assistant.
-        conv.append_message(conv.roles[1], None)
-        # prompt = conv.get_prompt()
-        images = conv.get_images()
     prompt = ""
     gen_params = {
         "model": model_name,
@@ -351,7 +305,6 @@ async def get_gen_params(
         "frequency_penalty": frequency_penalty,
         "max_new_tokens": max_tokens,
         "echo": echo,
-        "stop_token_ids": conv.stop_token_ids,
     }
 
     if len(images) > 0:
@@ -364,7 +317,6 @@ async def get_gen_params(
 
     new_stop = set()
     _add_to_set(stop, new_stop)
-    _add_to_set(conv.stop_str, new_stop)
 
     gen_params["stop"] = list(new_stop)
     # ------- TODO add messages tools -------
@@ -569,7 +521,7 @@ async def chat_completion_stream_generator(
                 choices=[choice_data],
                 model=model_name,
                 usage=content.get("usage", None),
-                created=int(time.time())
+                created=int(time.time()),
             )
             # if delta_text is None:
             #     if content.get("finish_reason", None) is not None:
