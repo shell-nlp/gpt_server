@@ -48,7 +48,7 @@ kiwisolver==1.4.5
 lark==1.1.9
 llvmlite==0.42.0
 lm-format-enforcer==0.10.1
-lmdeploy==0.5.0
+lmdeploy==0.5.1
 loguru==0.7.2
 markdown-it-py==3.0.0
 markdown2==2.4.13
@@ -137,9 +137,9 @@ tomli==2.0.1
 tomlkit==0.12.0
 toolz==0.12.1
 torch==2.3.0
-torchvision==0.17.1
+torchvision==0.18.1
 tqdm==4.66.4
-transformers==4.40.1
+transformers==4.40.2
 transformers-stream-generator==0.0.4
 triton==2.3.0
 typer==0.12.3

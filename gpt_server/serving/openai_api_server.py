@@ -337,9 +337,9 @@ async def get_gen_params(
 
         # Add a blank message for the assistant.
         conv.append_message(conv.roles[1], None)
-        prompt = conv.get_prompt()
+        # prompt = conv.get_prompt()
         images = conv.get_images()
-
+    prompt = ""
     gen_params = {
         "model": model_name,
         "prompt": prompt,

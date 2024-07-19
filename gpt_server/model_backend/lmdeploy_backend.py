@@ -6,6 +6,7 @@ from lmdeploy import (
 )
 from typing import Any, Dict, AsyncGenerator
 from lmdeploy.serve.async_engine import AsyncEngine
+from lmdeploy.archs import get_task
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
 
@@ -27,14 +28,15 @@ class LMDeployBackend(ModelBackend):
             backend_config = TurbomindEngineConfig(
                 model_name="", tp=int(os.getenv("num_gpus", "1")), thread_safe=True
             )
-        self.async_engine = AsyncEngine(
+        pipeline_type, pipeline_class = get_task(model_path)
+        logger.info(f"模型架构：{pipeline_type}")
+        self.async_engine = pipeline_class(
             model_path=model_path,
             backend=backend,
             backend_config=backend_config,
         )
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        prompt = params.pop("prompt")
         messages = params["messages"]
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
@@ -53,8 +55,8 @@ class LMDeployBackend(ModelBackend):
             stop.add(stop_str)
         elif isinstance(stop_str, list) and stop_str != []:
             stop.update(stop_str)
-        input_ids = params.get("input_ids")
-        prompt_token_ids = input_ids.tolist()[0]
+        # input_ids = params.get("input_ids")
+        # prompt_token_ids = input_ids.tolist()[0]
         # make sampling params in vllm
         top_p = max(top_p, 1e-5)
         if temperature <= 1e-5:

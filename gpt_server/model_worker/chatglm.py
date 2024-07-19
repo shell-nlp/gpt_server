@@ -6,6 +6,7 @@ from loguru import logger
 from gpt_server.model_worker.base import ModelWorkerBase
 from gpt_server.model_handler.chatglm_react import glm4_tool_extractor
 from gpt_server.model_handler.utils import add_tools2messages
+from transformers import AutoConfig
 
 
 class ChatGLMWorker(ModelWorkerBase):
@@ -39,7 +40,8 @@ class ChatGLMWorker(ModelWorkerBase):
                 self.stop_words_ids.append(self.tokenizer.convert_tokens_to_ids(i))
             except Exception as e:
                 pass
-
+        config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+        self.vision_config = getattr(config, "vision_config", None)
         logger.info(f"chatglm停用词: {self.stop}")
 
     def build_chat_input(self, query, history=None, role="user"):
@@ -73,38 +75,39 @@ class ChatGLMWorker(ModelWorkerBase):
         try:
             # ----------------添加对工具的支持-----------------------------------
             messages = add_tools2messages(params=params, model_adapter="chatglm4")
-            if isinstance(messages, list):
-                task = "chat"
-                for msg in messages:
-                    if msg["role"] == "function" or msg["role"] == "tool":
-                        msg["role"] = "observation"
+            if not self.vision_config:
+                if isinstance(messages, list):
+                    task = "chat"
+                    for msg in messages:
+                        if msg["role"] == "function" or msg["role"] == "tool":
+                            msg["role"] = "observation"
 
-                if messages[-1]["role"] == "user":
-                    last_message = messages.pop()
-                    query = last_message["content"]
-                    role = "user"  # 下一个角色是什么
-                elif messages[-1]["role"] == "observation":
-                    query = ""
-                    role = "assistant"  # 下一个角色是什么
-                elif messages[-1]["role"] == "assistant":
-                    query = ""
-                    role = "user"
-                input_ids = self.build_chat_input(query, history=messages, role=role)[
-                    "input_ids"
-                ]
-            elif isinstance(messages, str):
-                task = "completion"
-                text = messages
-                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+                    if messages[-1]["role"] == "user":
+                        last_message = messages.pop()
+                        query = last_message["content"]
+                        role = "user"  # 下一个角色是什么
+                    elif messages[-1]["role"] == "observation":
+                        query = ""
+                        role = "assistant"  # 下一个角色是什么
+                    elif messages[-1]["role"] == "assistant":
+                        query = ""
+                        role = "user"
+                    input_ids = self.build_chat_input(
+                        query, history=messages, role=role
+                    )["input_ids"]
+                elif isinstance(messages, str):
+                    task = "completion"
+                    text = messages
+                    input_ids = self.tokenizer([text], return_tensors="pt").input_ids
 
-            text = self.tokenizer.decode(input_ids.tolist()[0])
-            logger.info(text)
+                text = self.tokenizer.decode(input_ids.tolist()[0])
+                logger.info(text)
+                params["prompt"] = text
+                params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
-            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
