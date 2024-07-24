@@ -1,0 +1,11 @@
+torch==2.3.1
+torchvision==0.18.1
+fschat==0.2.36
+sentence-transformers==2.7.0
+transformers==4.42.4
+accelerate
+vllm==0.5.3
+git+https://gitee.com/liuyu_1997/lmdeploy#egg=lmdeploy # lmdeploy==0.5.1
+openai==1.14.2
+loguru
+fastapi==0.110.2

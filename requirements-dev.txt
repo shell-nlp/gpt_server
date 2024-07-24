@@ -150,7 +150,6 @@ uvicorn==0.29.0
 uvloop==0.19.0
 vllm==0.5.0
 vllm-flash-attn==2.5.9
-vllm_nccl_cu12==2.18.1.0.3.0
 watchfiles==0.21.0
 wavedrom==2.0.3.post3
 wcwidth==0.2.13

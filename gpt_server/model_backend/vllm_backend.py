@@ -65,7 +65,7 @@ class VllmBackend(ModelBackend):
         )
         inputs = {"prompt": prompt, "prompt_token_ids": prompt_token_ids}
 
-        if vllm_version == "0.5.0":
+        if "0.5" in vllm_version:
             results_generator = self.engine.generate(
                 inputs=inputs,
                 sampling_params=sampling,

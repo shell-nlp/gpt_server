@@ -17,7 +17,7 @@ output = client.chat.completions.create(
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": "https://raw.githubusercontent.com/open-mmlab/mmdeploy/main/tests/data/tiger.jpeg",
+                        "url": "https://opencompass.oss-cn-shanghai.aliyuncs.com/image/compass-hub/botchat_banner.png",
                     },
                 },
             ],
