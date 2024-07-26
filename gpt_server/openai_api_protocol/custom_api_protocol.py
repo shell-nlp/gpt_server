@@ -9,8 +9,13 @@ from fastchat.protocol.openai_api_protocol import (
     ChatCompletionResponseStreamChoice,
     UsageInfo,
     DeltaMessage,
+    ModelCard,
 )
 from pydantic import Field
+
+
+class CustomModelCard(ModelCard):
+    owned_by: str = "gpt_server"
 
 
 class CustomEmbeddingsRequest(EmbeddingsRequest):

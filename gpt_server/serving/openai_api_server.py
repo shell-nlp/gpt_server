@@ -359,6 +359,9 @@ async def get_conv(model_name: str, worker_addr: str):
     return conv_template
 
 
+from gpt_server.openai_api_protocol.custom_api_protocol import CustomModelCard
+
+
 @app.get("/v1/models", dependencies=[Depends(check_api_key)])
 async def show_available_models():
     controller_address = app_settings.controller_address
@@ -369,7 +372,9 @@ async def show_available_models():
     # TODO: return real model permission details
     model_cards = []
     for m in models:
-        model_cards.append(ModelCard(id=m, root=m, permission=[ModelPermission()]))
+        model_cards.append(
+            CustomModelCard(id=m, root=m, permission=[ModelPermission()])
+        )
     return ModelList(data=model_cards)
 
 
