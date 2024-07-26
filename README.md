@@ -1,9 +1,10 @@
 <div align="center">
 
 <a href="https://github.com/shell-nlp/gpt_server"><img src="assets/logo.png" width="252" height="116" alt="gpt_server logo"></a>
-# GPT Server
-</div>
 
+# GPT Server
+
+</div>
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
@@ -156,7 +157,6 @@ cd gpt_server/script
 sh start.sh
 ```
 
-
 ## 支持的模型以及推理后端
 
 **推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
@@ -176,9 +176,6 @@ sh start.sh
 |        Deepseek        | √ |  √  |         √         |        √        |
 |        Llama-3        | √ |  √  |         √         |        √        |
 
----
-
-<br>
 
 ### **VLM**
 
@@ -209,9 +206,8 @@ sh start.sh
 
 #### 4. 使用 openai 库 进行调用
 
-**见 gpt_server/tests 目录 样例测试代码**
-`<br>`
-https://github.com/shell-nlp/gpt_server/tree/main/tests
+**见 gpt_server/tests 目录 样例测试代码: 
+https://github.com/shell-nlp/gpt_server/tree/main/tests**
 
 #### 5. 使用WebUI
 
@@ -226,7 +222,17 @@ WebUI界面:
 
 ### Docker安装
 
-待填充
+#### 1. 构建镜像
+
+```bash
+docker build --rm -f "Dockerfile" -t gpt_server:latest "." 
+```
+
+#### 2. Docker Compose启动
+
+```bash
+docker-compose  -f "docker-compose.yml" up -d --build gpt_server
+```
 
 ## 致谢
 
