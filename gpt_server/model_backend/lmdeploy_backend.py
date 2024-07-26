@@ -1,15 +1,23 @@
 import os
+import sys
 from lmdeploy import (
     GenerationConfig,
     TurbomindEngineConfig,
     PytorchEngineConfig,
 )
 from typing import Any, Dict, AsyncGenerator
-from lmdeploy.serve.async_engine import AsyncEngine
 from lmdeploy.archs import get_task
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
 
+if sys.platform == "linux":
+    # 防止Python c库没有加载导致lmdeploy pytorch后端报错
+    os.environ["C_INCLUDE_PATH"] = "/usr/include/python3.8:" + (
+        os.environ.get("C_INCLUDE_PATH", "")
+    )
+    os.environ["LUS_INCLUDE_PATH"] = "/usr/include/python3.8:" + (
+        os.environ.get("LUS_INCLUDE_PATH", "")
+    )
 backend_map = {
     "lmdeploy-pytorch": "pytorch",  # pytorch后端
     "lmdeploy-turbomind": "turbomind",  # turbomind后端

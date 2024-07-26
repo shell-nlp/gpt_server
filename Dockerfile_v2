@@ -13,8 +13,8 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
     ln -sf $(which python3.10) /usr/local/bin/python 
 
-ENV C_INCLUDE_PATH=/usr/include/python3.8 LUS_INCLUDE_PATH=/usr/include/python3.8
+# ENV C_INCLUDE_PATH=/usr/include/python3.8 LUS_INCLUDE_PATH=/usr/include/python3.8
 
-RUN pip install -r requirements_v2.txt && pip install --force-reinstall lmdeploy==0.5.1 --no-deps && pip cache purge
+RUN sh install.sh && pip cache purge
 
 CMD ["/bin/bash"]
