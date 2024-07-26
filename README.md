@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://github.com/shell-nlp/gpt_server"><img src="assets/logo.png" width="126" height="58" alt="gpt_server logo"></a>
+<a href="https://github.com/shell-nlp/gpt_server"><img src="assets/logo.png" width="252" height="116" alt="gpt_server logo"></a>
 
 # gpt_server
 
