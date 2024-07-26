@@ -1,3 +1,7 @@
+<div align="center">
+
+<a href="https://github.com/shell-nlp/gpt_server"><img src="assets/logo.png" width="126" height="58" alt="gpt_server logo"></a>
+
 # gpt_server
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
