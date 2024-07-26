@@ -56,56 +56,6 @@
 * [ ] 支持Reranker模型动态组批
 * [ ] 支持onnx/tensorrt加速推理
 
-## 支持的模型以及推理后端
-
-**推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
-
-### **LLM**
-
-|    Models / BackEnd    | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------------: | :-: | :--: | :----------------: | :--------------: |
-|      chatglm4-9b      | √ |  √  |         √         |        √        |
-|      chatglm3-6b      | √ |  √  |         ×         |        √        |
-| Qwen (7B, 14B, etc.)) | √ |  √  |         √         |        √        |
-|  Qwen-1.5 (0.5B--72B)  | √ |  √  |         √         |        √        |
-|         Qwen-2         | √ |  √  |         √         |        √        |
-|         Yi-34B         | √ |  √  |         √         |        √        |
-|      Internlm-1.0      | √ |  √  |         √         |        √        |
-|      Internlm-2.0      | √ |  √  |         √         |        √        |
-|        Deepseek        | √ |  √  |         √         |        √        |
-|        Llama-3        | √ |  √  |         √         |        √        |
-
----
-
-<br>
-
-### **VLM**
-
-| Models / BackEnd | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------: | :-: | :--: | :----------------: | :--------------: |
-|    glm-4v-9b    | × |  ×  |         ×         |        √        |
-
-<br>
-
-### Embedding模型
-
-**原则上支持所有的Embedding/Rerank 模型**
-
-以下模型经过测试：
-
-| Embedding/Rerank          | HF |
-| ------------------------- | -- |
-| bge-reranker              | √ |
-| bce-reranker              | √ |
-| bge-embedding             | √ |
-| bce-embedding             | √ |
-| piccolo-base-zh-embedding | √ |
-| acge_text_embedding       | √ |
-| Yinka                     | √ |
-| zpoint_large_embedding_zh | √ |
-
-目前 **zpoint_large_embedding_z** MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
-
 ## 启用方式
 
 ### Python启动
@@ -120,12 +70,12 @@ conda create -n gpt_server python=3.10
 # 2. 激活conda 环境
 conda activate gpt_server
 
-# 3. 安装依赖
+# 3. 安装依赖(推荐安装 3.1 dev版本)
 pip install -r requirements.txt
 
-# 推荐安装dev版本体验最新功能
-# 3.1 安装dev版本 [可选] (计划支持多模态模型的版本)
-pip install -r requirements-dev.txt --no-deps
+# ※推荐安装dev版本体验最新功能
+# 3.1 安装dev版本 [可选] (支持多模态模型的版本)
+sh install.sh
 ```
 
 #### 2. 修改启动配置文件
@@ -200,6 +150,57 @@ models:
 cd gpt_server/script
 sh start.sh
 ```
+
+
+## 支持的模型以及推理后端
+
+**推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
+
+### **LLM**
+
+|    Models / BackEnd    | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
+| :--------------------: | :-: | :--: | :----------------: | :--------------: |
+|      chatglm4-9b      | √ |  √  |         √         |        √        |
+|      chatglm3-6b      | √ |  √  |         ×         |        √        |
+| Qwen (7B, 14B, etc.)) | √ |  √  |         √         |        √        |
+|  Qwen-1.5 (0.5B--72B)  | √ |  √  |         √         |        √        |
+|         Qwen-2         | √ |  √  |         √         |        √        |
+|         Yi-34B         | √ |  √  |         √         |        √        |
+|      Internlm-1.0      | √ |  √  |         √         |        √        |
+|      Internlm-2.0      | √ |  √  |         √         |        √        |
+|        Deepseek        | √ |  √  |         √         |        √        |
+|        Llama-3        | √ |  √  |         √         |        √        |
+
+---
+
+<br>
+
+### **VLM**
+
+| Models / BackEnd | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
+| :--------------: | :-: | :--: | :----------------: | :--------------: |
+|    glm-4v-9b    | × |  ×  |         ×         |        √        |
+
+<br>
+
+### Embedding模型
+
+**原则上支持所有的Embedding/Rerank 模型**
+
+以下模型经过测试：
+
+| Embedding/Rerank          | HF |
+| ------------------------- | -- |
+| bge-reranker              | √ |
+| bce-reranker              | √ |
+| bge-embedding             | √ |
+| bce-embedding             | √ |
+| piccolo-base-zh-embedding | √ |
+| acge_text_embedding       | √ |
+| Yinka                     | √ |
+| zpoint_large_embedding_zh | √ |
+
+目前 **zpoint_large_embedding_z** MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
 #### 4. 使用 openai 库 进行调用
 
