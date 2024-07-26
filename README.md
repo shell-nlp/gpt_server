@@ -65,7 +65,7 @@
 |    Models / BackEnd    | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
 | :--------------------: | :-: | :--: | :----------------: | :--------------: |
 |      chatglm4-9b      | √ |  √  |         √         |        √        |
-|      chatglm3-6b      | √ |  √  |         √         |        √        |
+|      chatglm3-6b      | √ |  √  |         ×         |        √        |
 | Qwen (7B, 14B, etc.)) | √ |  √  |         √         |        √        |
 |  Qwen-1.5 (0.5B--72B)  | √ |  √  |         √         |        √        |
 |         Qwen-2         | √ |  √  |         √         |        √        |
@@ -85,14 +85,11 @@
 | :--------------: | :-: | :--: | :----------------: | :--------------: |
 |    glm-4v-9b    | × |  ×  |         ×         |        √        |
 
-
-
 <br>
 
 ### Embedding模型
 
 **原则上支持所有的Embedding/Rerank 模型**
-
 
 以下模型经过测试：
 
@@ -157,7 +154,7 @@ models:
       - gpus:
         # - 1
         - 0
-    
+  
   - qwen:  #自定义的模型名称
       alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
       enable: true  # false true

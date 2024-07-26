@@ -21,6 +21,7 @@ class VllmBackend(ModelBackend):
             tensor_parallel_size=int(os.getenv("num_gpus", "1")),
             trust_remote_code=True,
             gpu_memory_utilization=0.8,
+            enable_chunked_prefill=False,
         )
         self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
