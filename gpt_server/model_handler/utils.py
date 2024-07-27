@@ -1,5 +1,5 @@
-from gpt_server.model_handler.qwen_react import qwen_tool_formatter
-from gpt_server.model_handler.chatglm_react import glm4_tool_formatter
+from gpt_server.model_handler.react.qwen_react import qwen_tool_formatter
+from gpt_server.model_handler.react.chatglm_react import glm4_tool_formatter
 from loguru import logger
 
 

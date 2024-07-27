@@ -3,29 +3,11 @@ from typing import Any, Dict, List, Tuple, Union, Optional
 import json
 import uuid
 
-QWEN_TOOL_SUFFIX_PROMPT = (
-    "在调用上述函数时，Action Input的值必须使用 Json 格式来表示调用的参数。"
+from gpt_server.model_handler.react.prompt import (
+    TOOL_SUFFIX_PROMPT,
+    TOOL_CHOICE_SUFFIX_PROMPT,
+    TOOL_SYSTEM_PROMPT,
 )
-TOOL_CHOICE_SUFFIX_PROMPT = "\n注意：上述函数必须被调用！"
-# default
-TOOL_SYSTEM_PROMPT = """Answer the following questions as best you can. You have access to the following tools:
-
-{tool_text}
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
-
-Question:"""
 
 
 def qwen_tool_formatter(
@@ -44,7 +26,7 @@ def qwen_tool_formatter(
         tool = tool["function"]
         param_text = (
             """{tool_name}: Call this tool to interact with the {tool_name} API. What is the {tool_name} API useful for? {description} Parameters: {parameters} \n"""
-            + QWEN_TOOL_SUFFIX_PROMPT
+            + TOOL_SUFFIX_PROMPT
             + tool_chooce_suffix_prompt
         )
         parameters = []

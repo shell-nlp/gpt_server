@@ -2,29 +2,10 @@ from typing import Any, Dict, List, Tuple, Union, Optional
 import json
 import uuid
 
-GLM4_TOOL_SUFFIX_PROMPT = (
-    "在调用上述函数时，Action Input的值必须使用 Json 格式来表示调用的参数。"
+from gpt_server.model_handler.react.prompt import (
+    GLM4_TOOL_PROMPT,
+    TOOL_SUFFIX_PROMPT,
 )
-# 你的任务是针对用户的问题和要求提供适当的答复和支持
-GLM4_TOOL_PROMPT = """"你可以使用以下工具提供适当的答复和支持。
-
-# 可用工具
-{tool_text}
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
-
-Question:
-"""
 
 
 def glm4_tool_formatter(
@@ -35,7 +16,7 @@ def glm4_tool_formatter(
     for tool in tools:
         tool = tool["function"]
         tool_name = tool["name"]
-        tool_text += f"## {tool_name}\n\n{json.dumps(tool, ensure_ascii=False, indent=4)}\n{GLM4_TOOL_SUFFIX_PROMPT}\n\n"
+        tool_text += f"## {tool_name}\n\n{json.dumps(tool, ensure_ascii=False, indent=4)}\n{TOOL_SUFFIX_PROMPT}\n\n"
         tool_names.append(tool_name)
     return GLM4_TOOL_PROMPT.format(
         tool_text=tool_text, tool_names=", ".join(tool_names)
