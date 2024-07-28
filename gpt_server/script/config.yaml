@@ -104,7 +104,7 @@ models:
       alias: null # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -115,7 +115,7 @@ models:
       alias: text-embedding-ada-002 # 别名   
       enable: false  # false true
       model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -126,7 +126,7 @@ models:
       alias: null # 别名   
       enable: false  # false true
       model_name_or_path: /home/dev/model/maidalun1020/bce-reranker-base_v1/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -136,7 +136,7 @@ models:
       alias: null # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -146,7 +146,7 @@ models:
       alias: null # 别名   
       enable: false  # false true
       model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -157,7 +157,7 @@ models:
       alias: text-embedding-ada-002 # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/aspire/acge_text_embedding
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -167,7 +167,7 @@ models:
       alias: null # 别名   
       enable: false  # false true
       model_name_or_path: /home/dev/model/Classical/Yinka/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -177,7 +177,7 @@ models:
       alias: null # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/iampanda/zpoint_large_embedding_zh/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:

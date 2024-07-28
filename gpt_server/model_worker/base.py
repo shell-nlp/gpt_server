@@ -4,7 +4,6 @@ import json
 from abc import ABC, abstractmethod
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
-from fastchat.serve.base_model_worker import BaseModelWorker
 from fastchat.utils import get_context_length as get_context_length_
 
 from loguru import logger
@@ -16,10 +15,9 @@ from transformers import (
     LlamaForCausalLM,
     AutoConfig,
 )
-import torch
 import uuid
 from gpt_server.utils import get_free_tcp_port
-
+from gpt_server.model_worker.base_model_worker import BaseModelWorker
 worker = None
 app = FastAPI()
 

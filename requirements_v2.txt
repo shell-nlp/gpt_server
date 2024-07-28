@@ -1,12 +1,12 @@
-gradio==4.33.0
+gradio==4.26.0
 torch==2.3.1
 torchvision==0.18.1
 fschat==0.2.36
-sentence-transformers==2.7.0
 transformers==4.42.4
 accelerate
 vllm==0.5.3
-git+https://gitee.com/liuyu_1997/lmdeploy#egg=lmdeploy # lmdeploy==0.5.1
+git+https://gitee.com/liuyu_1997/lmdeploy.git#egg=lmdeploy # lmdeploy==0.5.1
 openai==1.14.2
 loguru
 fastapi==0.110.2
+infinity-emb[all]==0.0.53

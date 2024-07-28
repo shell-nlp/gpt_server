@@ -32,6 +32,7 @@
 ## 更新信息
 
 ```plaintext
+7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比如onnx/tensorrt）
 7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
 6-22  支持了 Qwen系列、ChatGLM系列 function call (tools) 能力
 6-12  支持了 qwen-2
@@ -58,8 +59,8 @@
 * [X] 支持LMDeploy后端
 * [X] 支持 function call 功能 (tools)（Qwen系列、ChatGLM系列已经支持,后面有需求再继续扩展）
 * [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
-* [ ] 支持Embedding模型动态组批
-* [ ] 支持Reranker模型动态组批
+* [X] 支持Embedding模型动态组批(实现方式：infinity后端)
+* [X] 支持Reranker模型动态组批(实现方式：infinity后端)
 * [ ] 支持onnx/tensorrt加速推理
 
 ## 启用方式
@@ -129,7 +130,7 @@ models:
       alias: null # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
-      model_type: embedding
+      model_type: embedding # embedding_infinity 
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -140,7 +141,7 @@ models:
       alias: null # 别名   
       enable: true  # false true
       model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
-      model_type: embedding
+      model_type: embedding # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -176,7 +177,6 @@ sh start.sh
 |        Deepseek        | √ |  √  |         √         |        √        |
 |        Llama-3        | √ |  √  |         √         |        √        |
 
-
 ### **VLM**
 
 | Models / BackEnd | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
@@ -189,24 +189,26 @@ sh start.sh
 
 **原则上支持所有的Embedding/Rerank 模型**
 
+**推理速度：** Infinity >> HF
+
 以下模型经过测试：
 
-| Embedding/Rerank          | HF |
-| ------------------------- | -- |
-| bge-reranker              | √ |
-| bce-reranker              | √ |
-| bge-embedding             | √ |
-| bce-embedding             | √ |
-| piccolo-base-zh-embedding | √ |
-| acge_text_embedding       | √ |
-| Yinka                     | √ |
-| zpoint_large_embedding_zh | √ |
+| Embedding/Rerank          | HF | Infinity |
+| ------------------------- | -- | -------- |
+| bge-reranker              | √ | √       |
+| bce-reranker              | √ | √       |
+| bge-embedding             | √ | √       |
+| bce-embedding             | √ | √       |
+| piccolo-base-zh-embedding | √ | √       |
+| acge_text_embedding       | √ | √       |
+| Yinka                     | √ | √       |
+| zpoint_large_embedding_zh | √ | √       |
 
 目前 **zpoint_large_embedding_z** MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
 #### 4. 使用 openai 库 进行调用
 
-**见 gpt_server/tests 目录 样例测试代码: 
+**见 gpt_server/tests 目录 样例测试代码:
 https://github.com/shell-nlp/gpt_server/tree/main/tests**
 
 #### 5. 使用WebUI
@@ -236,11 +238,13 @@ docker-compose  -f "docker-compose.yml" up -d --build gpt_server
 
 ## 致谢
 
-    FastChat : https://github.com/lm-sys/FastChat
+ [FastChat](https://github.com/lm-sys/FastChat) : https://github.com/lm-sys/FastChat
 
-    vLLM   : https://github.com/vllm-project/vllm
+ [vLLM](https://github.com/vllm-project/vllm)   : https://github.com/vllm-project/vllm
 
-    LMDeploy ： https://github.com/InternLM/lmdeploy
+[LMDeploy ](https://github.com/InternLM/lmdeploy)： https://github.com/InternLM/lmdeploy
+
+[infinity](https://github.com/michaelfeil/infinity) ： https://github.com/michaelfeil/infinity
 
 ## Star History
 
