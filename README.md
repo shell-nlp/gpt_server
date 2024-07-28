@@ -12,10 +12,11 @@
 2. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
 3. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 4. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
-5. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
-6. 支持了**Function Calling (Tools)** 能力
-7. 支持多模态大模型
-8. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
+5. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
+6. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
+7. 支持了**Function Calling (Tools)** 能力（React方式）
+8. 支持多模态大模型
+9. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
@@ -24,10 +25,11 @@
 ## 特色
 
 1. 支持多种推理后端引擎，vLLM和LMDeploy，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
-2. 全球唯一完美支持**Tools（Function Calling）**功能的开源框架。兼容**LangChain**的 **bind_tools**、**AgentExecutor**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
-3. 全球唯一扩展了**openai**库,实现Reranker模型。(代码样例见gpt_server/tests/test_openai_rerank.py)
-4. 支持多模态大模型
-5. 与FastChat相同的分布式架构
+2. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
+3. 全球唯一完美支持**Tools（Function Calling）**功能的开源框架。兼容**LangChain**的 **bind_tools**、**AgentExecutor**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
+4. 全球唯一扩展了**openai**库,实现Reranker模型。(代码样例见gpt_server/tests/test_openai_rerank.py)
+5. 支持多模态大模型
+6. 与FastChat相同的分布式架构
 
 ## 更新信息
 
@@ -86,6 +88,22 @@ sh install.sh
 ```
 
 #### 2. 修改启动配置文件
+
+修改模型后端方式（vllm,lmdeploy等）
+
+config.yaml中：
+
+```bash
+work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+```
+
+修改embedding/reranker后端方式（vllm,lmdeploy等）
+
+config.yaml中：
+
+```bash
+model_type: embedding # embedding 或 embedding_infinity  embedding_infinity后端速度远远大于 embedding
+```
 
 [config.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml "配置文件")
 
