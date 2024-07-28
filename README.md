@@ -97,7 +97,7 @@ config.yaml中：
 work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
 ```
 
-修改embedding/reranker后端方式（vllm,lmdeploy等）
+修改embedding/reranker后端方式（embedding或embedding_infinity）
 
 config.yaml中：
 
