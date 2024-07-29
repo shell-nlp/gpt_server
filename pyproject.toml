@@ -1,28 +1,33 @@
 [tool.poetry]
 name = "gpt-server"
-version = "0.0.1"
-description = ""
+version = "0.3"
+description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
 authors = ["liuyu <506610466@qq.com>"]
 license = "Apache 2.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-sentence-transformers = "^2.2.2"
+setuptools = "69.5.1"
+torch = "2.3.1"
+torchvision = "0.18.1"
 fschat = "0.2.36"
-loguru = "^0.7.2"
-distribute = "^0.7.3"
-transformers-stream-generator = "^0.0.4"
+transformers = "4.42.4"
+accelerate = "^0.33.0"
+vllm = "0.5.3"
 openai = "1.14.2"
-vllm = "0.4.1"
-ray = "^2.9.0"
-accelerate = "^0.29.3"
-lmdeploy = "0.5.0"
-gradio = "^4.33.0"
+loguru = "^0.7.2"
+fastapi = "0.110.2"
+infinity-emb = {version = "0.0.53", extras = ["all"]}
+lmdeploy = {git = "https://gitee.com/liuyu_1997/lmdeploy.git"}
+ffmpy = {git = "https://gitee.com/liuyu_1997/ffmpy.git"}
+gradio = "4.26.0"
+
+
 
 [[tool.poetry.source]]
-name = "ustc"
-url = "https://mirrors.ustc.edu.cn/pypi/web/simple"
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 priority = "primary"
 
 [build-system]
