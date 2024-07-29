@@ -7,6 +7,7 @@ from gpt_server.model_handler.react.prompt import (
     TOOL_SUFFIX_PROMPT,
     TOOL_CHOICE_SUFFIX_PROMPT,
     TOOL_SYSTEM_PROMPT,
+    TOOl_CHOICE_SYSTEM_PROMPT,
 )
 
 
@@ -15,10 +16,12 @@ def qwen_tool_formatter(
 ) -> str:
     tool_chooce_suffix_prompt = ""
     logger.info(f"tool_choice_info: {tool_choice_info}")
+    tool_system_prompt = TOOL_SYSTEM_PROMPT
     if tool_choice_info:
         tool_chooce_suffix_prompt = TOOL_CHOICE_SUFFIX_PROMPT
         tools = [tools[tool_choice_info["tool_choice_idx"]]]
         logger.info(f"tools 已被替换为tool_choic: {tools}")
+        tool_system_prompt = TOOl_CHOICE_SYSTEM_PROMPT
 
     tool_names = []
     param_text_list = []
@@ -57,7 +60,7 @@ def qwen_tool_formatter(
         tool_names.append(tool["name"])
 
     tool_text = "\n\n".join(param_text_list).strip()
-    return TOOL_SYSTEM_PROMPT.format(
+    return tool_system_prompt.format(
         tool_text=tool_text,
         tool_names=", ".join(tool_names),
     )

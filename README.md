@@ -79,11 +79,7 @@ conda create -n gpt_server python=3.10
 # 2. 激活conda 环境
 conda activate gpt_server
 
-# 3. 安装依赖(推荐安装 3.1 dev版本)
-pip install -r requirements.txt
-
-# ※推荐安装dev版本体验最新功能
-# 3.1 安装dev版本 [可选] (支持多模态模型的版本)
+# 3. 安装仓库（一定要使用 install.sh 安装,否则无法解决依赖冲突）
 sh install.sh
 ```
 

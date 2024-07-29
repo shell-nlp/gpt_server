@@ -23,7 +23,24 @@ Begin!
 
 Question:"""
 
+TOOl_CHOICE_SYSTEM_PROMPT = """You must use the following tools:
 
+{tool_text}
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: I have to execute tool {tool_names}
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin!
+
+Question:"""
 # 你的任务是针对用户的问题和要求提供适当的答复和支持
 GLM4_TOOL_PROMPT = """"你可以使用以下工具提供适当的答复和支持。
 
