@@ -3,7 +3,7 @@ from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
 from loguru import logger
-from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 
 
 class LlamaWorker(ModelWorkerBase):
@@ -53,7 +53,6 @@ class LlamaWorker(ModelWorkerBase):
             text = self.tokenizer.apply_chat_template(
                 conversation=messages, tokenize=False, add_generation_prompt=True
             )
-            logger.info(text)
             input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             # ---------------添加额外的参数------------------------
             params["messages"] = messages

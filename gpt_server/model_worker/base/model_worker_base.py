@@ -17,7 +17,8 @@ from transformers import (
 )
 import uuid
 from gpt_server.utils import get_free_tcp_port
-from gpt_server.model_worker.base_model_worker import BaseModelWorker
+from gpt_server.model_worker.base.base_model_worker import BaseModelWorker
+
 worker = None
 app = FastAPI()
 

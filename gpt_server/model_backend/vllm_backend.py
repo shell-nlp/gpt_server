@@ -27,6 +27,7 @@ class VllmBackend(ModelBackend):
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.pop("prompt")
+        logger.info(prompt)
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))

@@ -3,7 +3,7 @@ from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
 from loguru import logger
-from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 
 
 class YiWorker(ModelWorkerBase):
@@ -56,7 +56,6 @@ class YiWorker(ModelWorkerBase):
             elif task == "completion":
                 text = messages
 
-            logger.info(text)
             input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             params["messages"] = messages
             params["prompt"] = text

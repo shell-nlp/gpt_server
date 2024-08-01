@@ -1,6 +1,6 @@
 import os
 from typing import List
-from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 import sentence_transformers
 import asyncio
 from asyncio import Queue

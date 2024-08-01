@@ -3,7 +3,7 @@ from typing import List
 
 import sentence_transformers
 from loguru import logger
-from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 
 
 class EmbeddingWorker(ModelWorkerBase):

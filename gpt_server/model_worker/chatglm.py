@@ -3,7 +3,7 @@ from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
 from loguru import logger
-from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_handler.react.chatglm_react import glm4_tool_extractor
 from gpt_server.model_handler.utils import add_tools2messages
 from transformers import AutoConfig
@@ -101,7 +101,6 @@ class ChatGLMWorker(ModelWorkerBase):
                     input_ids = self.tokenizer([text], return_tensors="pt").input_ids
 
                 text = self.tokenizer.decode(input_ids.tolist()[0])
-                logger.info(text)
                 params["prompt"] = text
                 params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------

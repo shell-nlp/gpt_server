@@ -4,7 +4,7 @@ from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 from loguru import logger
 import torch
 
-from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 
 
 class MixtralWorker(ModelWorkerBase):
@@ -62,7 +62,6 @@ class MixtralWorker(ModelWorkerBase):
             elif task == "completion":
                 text = messages
 
-            logger.info(text)
             input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             # ---------------添加额外的参数------------------------
             params["messages"] = messages

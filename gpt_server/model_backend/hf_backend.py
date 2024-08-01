@@ -10,6 +10,7 @@ from gpt_server.model_backend.utils import (
     StopAtSpecificTokenCriteria,
 )
 import asyncio
+from loguru import logger
 
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
@@ -20,7 +21,8 @@ class HFBackend(ModelBackend):
         self.tokenizer = tokenizer
 
     async def stream_chat(self, params: Dict[str, Any]):
-        # context = params.pop("prompt")
+        prompt = params.pop("prompt")
+        logger.info(prompt)
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
         max_new_tokens = int(params.get("max_new_tokens", 512))
@@ -97,5 +99,6 @@ class HFBackend(ModelBackend):
                     break
                 # 用来解决输出卡顿的问题
                 await asyncio.sleep(0.02)
+            logger.info(generated_text)
         except asyncio.CancelledError as e:
             stop_specific_token_criteria.stop = True

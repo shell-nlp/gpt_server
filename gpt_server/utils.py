@@ -4,6 +4,8 @@ from multiprocessing import Process
 import subprocess
 from loguru import logger
 
+logger.add("logs/gpt_server.log", rotation="100 MB", level="INFO")
+
 
 def run_cmd(cmd: str, *args, **kwargs):
     logger.info(f"执行命令如下：\n{cmd}\n")

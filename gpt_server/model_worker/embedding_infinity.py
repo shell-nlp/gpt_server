@@ -4,7 +4,7 @@ import asyncio
 from loguru import logger
 
 from infinity_emb import AsyncEngineArray, EngineArgs, AsyncEmbeddingEngine
-from gpt_server.model_worker.base import ModelWorkerBase
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 
 
 class EmbeddingWorker(ModelWorkerBase):
