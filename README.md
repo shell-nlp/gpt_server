@@ -63,7 +63,8 @@
 * [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
-* [ ] 支持onnx/tensorrt加速推理
+* [ ] 内置部分 tools (image_gen,code_interpreter,weather等)
+* [ ] 并行的function call功能（tools）
 
 ## 启用方式
 
@@ -217,8 +218,9 @@ sh start.sh
 | acge_text_embedding       | √ | √       |
 | Yinka                     | √ | √       |
 | zpoint_large_embedding_zh | √ | √       |
+| xiaobu-embedding          | √ | √       |
 
-目前 **zpoint_large_embedding_z** MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
+目前 **xiaobu-embedding** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
 #### 4. 使用 openai 库 进行调用
 

@@ -173,10 +173,10 @@ models:
       workers:
       - gpus:
         - 2
-  - zpoint:
+  - xiaobu-embedding:
       alias: null # 别名   
       enable: true  # false true
-      model_name_or_path: /home/dev/model/iampanda/zpoint_large_embedding_zh/
+      model_name_or_path: /home/dev/model/lier007/xiaobu-embedding-v2/
       model_type: embedding_infinity # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
