@@ -13,8 +13,8 @@
 3. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 4. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 5. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
-6. Chat模板支持了**function**角色，使其完美支持了**LangGraph Agent**框架
-7. 支持了**Function Calling (Tools)** 能力（React方式）
+6. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
+7. 支持了**Function Calling (Tools)** 能力（现阶段支持Qwen/ChatGLM，对Qwen支持更好）
 8. 支持多模态大模型
 9. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
@@ -34,7 +34,7 @@
 ## 更新信息
 
 ```plaintext
-7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比如onnx/tensorrt）
+7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
 7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
 6-22  支持了 Qwen系列、ChatGLM系列 function call (tools) 能力
 6-12  支持了 qwen-2

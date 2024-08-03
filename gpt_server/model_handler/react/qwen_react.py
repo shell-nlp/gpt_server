@@ -30,7 +30,7 @@ def qwen_tool_formatter(
     for tool in tools:
         tool = tool["function"]
         param_text = (
-            """{tool_name}: Call this tool to interact with the {tool_name} API. What is the {tool_name} API useful for? {description} Parameters: {parameters} \n"""
+            """### {tool_name}\n\n{tool_name}: {description} 输入参数： {parameters} \n"""
             + TOOL_SUFFIX_PROMPT
             + tool_chooce_suffix_prompt
         )
@@ -73,7 +73,7 @@ def qwen_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
     i = content.rfind("Action:")
     j = content.rfind("Action Input:")
     tool_name = content[i + len("Action:") : j].strip().strip(".")
-    tool_input = content[j + len("Action Input:") :].strip()
+    tool_input = content[j + len("Action Input:") :].strip().split("\n")[0]
     try:
         json.loads(tool_input)
     except json.JSONDecodeError:
@@ -92,12 +92,16 @@ def qwen_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
 if __name__ == "__main__":
     import json
 
-    tools_str = """[{'type': 'function', 'function': {'name': 'track', 'description': '追踪指定股票的实时价格', 'parameters': {'type': 'object', 'properties': {'symbol': {'description': '需要追踪的股票代码', 'type': 'integer'}}, 'required': ['symbol']}}}, {'type': 'function', 'function': {'name': 'text-to-speech', 'description': '将文本转换为语音', 'parameters': {'type': 'object', 'properties': {'text': {'description': '需要转换成语音的文本', 'type': 'string'}, 'voice': {'description': '要使用的语音类型（男声、女声等', 'default': '男声', 'type': 'string'}, 'speed': {'description': '语音的速度（快、中等、慢等', 'default': '中等', 'type': 'string'}}, 'required': ['text']}}}]"""
-    tools_str = tools_str.replace("'", '"')
-    tools = json.loads(tools_str)
-    res = qwen_tool_formatter(tools=tools)
-    print(res)
+    # tools_str = """[{'type': 'function', 'function': {'name': 'track', 'description': '追踪指定股票的实时价格', 'parameters': {'type': 'object', 'properties': {'symbol': {'description': '需要追踪的股票代码', 'type': 'integer'}}, 'required': ['symbol']}}}, {'type': 'function', 'function': {'name': 'text-to-speech', 'description': '将文本转换为语音', 'parameters': {'type': 'object', 'properties': {'text': {'description': '需要转换成语音的文本', 'type': 'string'}, 'voice': {'description': '要使用的语音类型（男声、女声等', 'default': '男声', 'type': 'string'}, 'speed': {'description': '语音的速度（快、中等、慢等', 'default': '中等', 'type': 'string'}}, 'required': ['text']}}}]"""
+    # tools_str = tools_str.replace("'", '"')
+    # tools = json.loads(tools_str)
+    # res = qwen_tool_formatter(tools=tools)
+    # print(res)
+
     out = 'Action: multiply.\nAction Input: {"first_int": 8, "second_int": 9}\n'
+    out = """Action: myself
+Action Input: {"question": "你是谁"}
+✿Retrun✿: 我是通义千问，由阿里云开发的AI助手。我被设计用来回答各种问题、提供信息和与用户进行对话。有什么我可以帮助你的吗？"""
     r = qwen_tool_extractor(out)
     print("\n\n")
     print(r)

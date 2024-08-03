@@ -13,7 +13,7 @@ TOOL_SYSTEM_PROMPT_CN = """# 工具
 ## 如果使用工具，你可以在回复中插入零次、一次或多次以下命令以调用工具：
 
 Action: 工具名称，必须是 [{tool_names}] 之一
-Action Input: 工具输入, 值必须使用 json 格式
+Action Input: 工具输入, 值必须使用 json 格式,且必须在一行输出,不能进行换行。
 Observation: 调用工具后的结果
 ✿Retrun✿: 根据工具结果进行回复，需将图片用![](url)渲染出来"""
 
@@ -27,6 +27,6 @@ TOOl_CHOICE_SYSTEM_PROMPT_CN = """你是一个工具的执行助手，提供的�
 
 Thought: 我必须强制执行 {tool_names} 工具 
 Action: 工具名称必须是 {tool_names}
-Action Input: 工具输入, 值必须使用 json 格式
+Action Input: 工具输入, 值必须使用 json 格式,且必须在一行输出,不能进行换行。
 Observation: 调用工具后的结果
 ✿Retrun✿: 根据工具结果进行回复，需将图片用![](url)渲染出来"""
