@@ -22,7 +22,7 @@ Final Answer: the final answer to the original input question
 Begin!
 
 Question:"""
-TOOL_SYSTEM_PROMPT_CN = """你是一个可以调用外部工具的助手，只有你认为需要使用工具才能回答用户问题的时候才使用工具，可以使用的工具包括：
+TOOL_SYSTEM_PROMPT_CN = """尽可能回答用户问题，你有权使用以下工具：
 
 {tool_text}
 

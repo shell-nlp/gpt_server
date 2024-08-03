@@ -5,11 +5,11 @@ import uuid
 
 from gpt_server.model_handler.react.prompt import (
     TOOL_SUFFIX_PROMPT,
-    TOOL_CHOICE_SUFFIX_PROMPT,
-    TOOL_SYSTEM_PROMPT,
+)
+from gpt_server.model_handler.react.prompts.qwen_prompt import (
     TOOL_SYSTEM_PROMPT_CN,
-    TOOl_CHOICE_SYSTEM_PROMPT,
     TOOl_CHOICE_SYSTEM_PROMPT_CN,
+    TOOL_CHOICE_SUFFIX_PROMPT,
 )
 
 
