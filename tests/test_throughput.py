@@ -26,6 +26,7 @@ def main(args):
             max_tokens=args.max_new_tokens,
         )
         text = ""
+        token_num = 0
         i_ = 0
         for chunk in output:
             token = chunk.choices[0].delta.content
@@ -36,11 +37,12 @@ def main(args):
                     prefill_times[i] = prefill_time
                     print(f"线程 {i} - Prefill Time: {prefill_time:.2f}s")
                 text += token
+                token_num += 1
         # print(f"完成 Threads {i}")
         response_new_words = text
         # print(f"=== Thread {i} ===, words: {1}, error code: {error_code}")
         # results[i] = len(response_new_words) - len(content)
-        results[i] = len(response_new_words)
+        results[i] = (len(response_new_words), token_num)
         return prefill_time
 
     # use N threads to prompt the backend
@@ -57,12 +59,15 @@ def main(args):
     for t in threads:
         t.join()
     QPS = len([i for i in prefill_times if i <= 1])
-    n_words = sum(results)
+    # n_words = sum(results)
+    n_words = sum([i[0] for i in results])
+    token_num = sum([i[1] for i in results])
     time_seconds = time.time() - tik
     print("*" * 60)
     print(
         f"Threads: {args.n_thread}\n" f"Time (POST): {time_seconds:.2f}\n",
-        f"Throughput: {n_words / time_seconds:.2f} words/s\n",
+        f"Throughput (character): {n_words / time_seconds:.2f} character/s\n",
+        f"Throughput (token): {token_num / time_seconds:.2f} token/s\n",
         f"RPS: {args.n_thread / time_seconds:.2f} req/s\n",
         f"QPS: {QPS}\n",
         sep="",
@@ -73,7 +78,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--server-address", type=str, default="http://localhost:8082")
 
-    parser.add_argument("--model-name", type=str, default="qwen")
+    parser.add_argument("--model-name", type=str, default="chatglm4")
     parser.add_argument("--max-new-tokens", type=int, default=2048)
     parser.add_argument("--n-thread", type=int, default=16)
     parser.add_argument("--test-dispatch", action="store_true")

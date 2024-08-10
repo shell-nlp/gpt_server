@@ -88,10 +88,10 @@ models:
         - 2
         # - 0
 
-  - internlm:  #自定义的模型名称
+  - internlm2:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
-      model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2-chat-7b/
+      model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2_5-7b-chat/
       model_type: internlm  # qwen  chatglm3 yi internlm
       work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
