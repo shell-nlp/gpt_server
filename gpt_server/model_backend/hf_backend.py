@@ -21,7 +21,7 @@ class HFBackend(ModelBackend):
         self.tokenizer = tokenizer
 
     async def stream_chat(self, params: Dict[str, Any]):
-        prompt = params.pop("prompt")
+        prompt = params.get("prompt","")
         logger.info(prompt)
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))

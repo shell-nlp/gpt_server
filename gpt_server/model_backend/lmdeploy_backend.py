@@ -45,7 +45,7 @@ class LMDeployBackend(ModelBackend):
         )
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        prompt = params.pop("prompt")
+        prompt = params.get("prompt","")
         logger.info(prompt)
         messages = params["messages"]
         request_id = params.get("request_id", "0")

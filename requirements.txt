@@ -1,10 +1,10 @@
 setuptools==69.5.1
-torch==2.3.1
-torchvision==0.18.1
+torch==2.4.0
+torchvision==0.19
 fschat==0.2.36
-transformers==4.42.4
+transformers==4.43.2
 accelerate
-vllm==0.5.3
+vllm==0.5.4
 git+https://gitee.com/liuyu_1997/lmdeploy.git#egg=lmdeploy # lmdeploy==0.5.1
 openai==1.14.2
 loguru
