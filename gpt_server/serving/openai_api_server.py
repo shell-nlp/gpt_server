@@ -486,15 +486,15 @@ async def chat_completion_stream_generator(
     finish_stream_events = []
     for i in range(n):
         # First chunk with role
-        choice_data = ChatCompletionResponseStreamChoice(
-            index=i,
-            delta=DeltaMessage(role="assistant"),
-            finish_reason=None,
-        )
-        chunk = ChatCompletionStreamResponse(
-            id=id, choices=[choice_data], model=model_name
-        )
-        yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
+        # choice_data = ChatCompletionResponseStreamChoice(
+        #     index=i,
+        #     delta=DeltaMessage(role="assistant"),
+        #     finish_reason=None,
+        # )
+        # chunk = ChatCompletionStreamResponse(
+        #     id=id, choices=[choice_data], model=model_name
+        # )
+        # yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
 
         previous_text = ""
         async for content in generate_completion_stream(gen_params, worker_addr):
@@ -515,10 +515,10 @@ async def chat_completion_stream_generator(
                 index=i,
                 delta=CustomDeltaMessage(
                     role="assistant",
-                    content=delta_text,
+                    content=delta_text if delta_text else "",
                     tool_calls=content.get("tool_calls", None),
                 ),
-                finish_reason=content.get("finish_reason", None),
+                finish_reason=content.get("finish_reason", "stop"),
             )
 
             chunk = CustomChatCompletionStreamResponse(
@@ -527,11 +527,12 @@ async def chat_completion_stream_generator(
                 model=model_name,
                 usage=content.get("usage", None),
                 created=int(time.time()),
+                object="chat.completion.chunk",
             )
-            # if delta_text is None:
-            #     if content.get("finish_reason", None) is not None:
-            #         finish_stream_events.append(chunk)
-            #     continue
+            if delta_text is None:
+                if content.get("finish_reason", None) is not None:
+                    finish_stream_events.append(chunk)
+                continue
             yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
     # There is not "content" field in the last delta message, so exclude_none to exclude field "content".
     for finish_chunk in finish_stream_events:

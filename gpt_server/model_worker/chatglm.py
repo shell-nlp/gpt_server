@@ -50,12 +50,6 @@ class ChatGLMWorker(ModelWorkerBase):
         input_ids = []
         for item in history:
             content = item["content"]
-            if item["role"] == "system" and "tools" in item:
-                content = (
-                    content
-                    + "\n"
-                    + json.dumps(item["tools"], indent=4, ensure_ascii=False)
-                )
             input_ids.extend(
                 self.tokenizer.build_single_message(
                     item["role"], item.get("metadata", ""), content
