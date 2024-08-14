@@ -34,6 +34,7 @@
 ## 更新信息
 
 ```plaintext
+8-14  支持了 InternVL2 系列多模态模型
 7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
 7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
 6-22  支持了 Qwen系列、ChatGLM系列 function call (tools) 能力
@@ -192,11 +193,12 @@ sh start.sh
 |        Deepseek        | √ |  √  |         √         |        √        |
 |        Llama-3        | √ |  √  |         √         |        √        |
 
-### **VLM**
+### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
 | Models / BackEnd | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
 | :--------------: | :-: | :--: | :----------------: | :--------------: |
 |    glm-4v-9b    | × |  ×  |         ×         |        √        |
+|    InternVL2    | × |  ×  |         √         |        √        |
 
 <br>
 

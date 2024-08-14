@@ -6,10 +6,21 @@ serve_args:
 models:
   - glm-4v:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/THUDM/glm-4v-9b/
       model_type: chatglm  # qwen  chatglm3 yi internlm
       work_mode: lmdeploy-pytorch  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      device: gpu  # gpu / cpu
+      workers:
+      - gpus:
+        # - 1
+        - 0
+  - internvl2:  #自定义的模型名称
+      alias: null # 别名     例如  gpt4,gpt3
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
+      model_type: internvl2  # qwen  chatglm3 yi internlm
+      work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
@@ -20,7 +31,7 @@ models:
   - chatglm4:  #自定义的模型名称
       alias: chatglm3 # 别名     例如  gpt4,gpt3
       enable: false  # false true
-      model_name_or_path: /home/dev/model/THUDM/glm-4-9b-chat/
+      model_name_or_path: /home/dev/model/ZhipuAI/glm-4-9b-chat
       model_type: chatglm  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
