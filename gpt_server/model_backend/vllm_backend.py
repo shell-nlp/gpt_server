@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Any, Dict, AsyncGenerator
 from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
@@ -5,6 +6,7 @@ from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 import vllm
+from vllm.lora.request import LoRARequest
 
 # 解决vllm中 ray集群在 TP>1时死的Bug
 import ray
@@ -16,17 +18,37 @@ vllm_version = vllm.__version__
 
 class VllmBackend(ModelBackend):
     def __init__(self, model_path) -> None:
+        lora = os.getenv("lora", None)
+        tensor_parallel_size = int(os.getenv("num_gpus", "1"))
+        max_loras = 1
+        enable_lora = False
+        self.lora_requests = []
+        if lora:
+            enable_lora = True
+            lora_dict: dict = json.loads(lora)
+            max_loras = len(lora_dict)
+            for i, (lora_name, lora_path) in enumerate(lora_dict.items()):
+                self.lora_requests.append(
+                    LoRARequest(
+                        lora_name=lora_name,
+                        lora_int_id=i,
+                        lora_local_path=lora_path,
+                    )
+                )
+
         engine_args = AsyncEngineArgs(
             model_path,
-            tensor_parallel_size=int(os.getenv("num_gpus", "1")),
+            tensor_parallel_size=tensor_parallel_size,
             trust_remote_code=True,
             gpu_memory_utilization=0.8,
             enable_chunked_prefill=False,
+            enable_lora=enable_lora,
+            max_loras=max_loras,
         )
         self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        prompt = params.get("prompt","")
+        prompt = params.get("prompt", "")
         logger.info(prompt)
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
@@ -66,19 +88,19 @@ class VllmBackend(ModelBackend):
             frequency_penalty=frequency_penalty,
         )
         inputs = {"prompt": prompt, "prompt_token_ids": prompt_token_ids}
+        lora_request = None
+        for lora in self.lora_requests:
+            if params["model"] == lora.lora_name:
+                lora_request = lora
+                break
 
-        if "0.5" in vllm_version:
-            results_generator = self.engine.generate(
-                inputs=inputs,
-                sampling_params=sampling,
-                request_id=request_id,
-            )
-        else:
-            results_generator = self.engine.generate(
-                **inputs,
-                sampling_params=sampling,
-                request_id=request_id,
-            )
+        results_generator = self.engine.generate(
+            inputs=inputs,
+            sampling_params=sampling,
+            request_id=request_id,
+            lora_request=lora_request,
+        )
+
         async for request_output in results_generator:
             text_outputs = request_output.outputs[0].text
             partial_stop = any(is_partial_stop(text_outputs, i) for i in stop)
@@ -112,5 +134,6 @@ class VllmBackend(ModelBackend):
 
             if aborted:
                 break
+        logger.info(f"Lora: {request_output.lora_request}")
         logger.info(text_outputs)
         logger.info(usage)

@@ -175,6 +175,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument(
             "--model_names", type=lambda s: s.split(","), default="model_names"
         )
+        parser.add_argument("--lora", type=str, default=None)
 
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
@@ -186,6 +187,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["backend"] = "lmdeploy-pytorch"
         elif args.backend == "lmdeploy-turbomind":
             os.environ["backend"] = "lmdeploy-turbomind"
+        if args.lora:
+            os.environ["lora"] = args.lora
 
         host = "localhost"
         port = get_free_tcp_port()

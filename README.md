@@ -9,12 +9,12 @@
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
 1. **在此基础上完美适配了更多的模型**，**优化了fastchat兼容较差的模型**
-2. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
-3. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
-4. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
-5. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
-6. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
-7. 支持了**Function Calling (Tools)** 能力（现阶段支持Qwen/ChatGLM，对Qwen支持更好）
+2. 支持了**Function Calling (Tools)** 能力（现阶段支持Qwen/ChatGLM，对Qwen支持更好）
+3. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
+4. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
+5. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
+6. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
+7. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
 8. 支持多模态大模型
 9. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
@@ -34,6 +34,7 @@
 ## 更新信息
 
 ```plaintext
+8-17  支持了 vllm 后端的 lora 部署
 8-14  支持了 InternVL2 系列多模态模型
 7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
 7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
@@ -122,6 +123,8 @@ models:
       model_name_or_path: /home/dev/model/THUDM/glm-4-9b-chat/
       model_type: chatglm  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      # lora:  # lora 配置
+      #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
       device: gpu  # gpu / cpu
       workers:
       - gpus:

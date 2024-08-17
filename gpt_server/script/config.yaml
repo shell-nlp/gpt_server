@@ -56,6 +56,9 @@ models:
       model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
       model_type: qwen  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      # lora:
+      #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
+        
       device: gpu  # gpu / cpu
       workers:
       - gpus:

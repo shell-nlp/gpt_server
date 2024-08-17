@@ -3,6 +3,7 @@ import os
 import sys
 from multiprocessing import Process
 import signal
+import json
 import ray
 import torch
 
@@ -55,6 +56,7 @@ for model_config_ in config["models"]:
             model_name_or_path = model_config["model_name_or_path"]
             # 模型类型
             model_type = model_config["model_type"]
+            lora = model_config.get("lora", None)
 
             # model type 校验
             # py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
@@ -63,11 +65,12 @@ for model_config_ in config["models"]:
             model_names = model_name
             if model_config["alias"]:
                 model_names = model_name + "," + model_config["alias"]
+                if lora:  # 如果使用lora,将lora的name添加到 model_names 中
+                    lora_names = list(lora.keys())
+                    model_names += "," + ",".join(lora_names)
 
             # 获取 worker 数目 并获取每个 worker 的资源
             workers = model_config["workers"]
-            # if model_config["work_mode"] == "deepspeed":
-            # 设置使用 deepspeed
 
             # process = []
             for worker in workers:
@@ -98,6 +101,8 @@ for model_config_ in config["models"]:
                     + f" --model_names {model_names}"
                     + f" --backend {backend}"
                 )
+                if lora:
+                    cmd += f" --lora '{json.dumps(lora)}'"
 
                 p = Process(target=run_cmd, args=(cmd,))
                 p.start()
