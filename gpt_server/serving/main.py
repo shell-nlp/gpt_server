@@ -6,7 +6,9 @@ import signal
 import ray
 import torch
 
-os.environ['OPENBLAS_NUM_THREADS'] = '1' # 解决线程不足时，OpenBLAS blas_thread_init报错
+os.environ["OPENBLAS_NUM_THREADS"] = (
+    "1"  # 解决线程不足时，OpenBLAS blas_thread_init报错
+)
 ray.shutdown()
 
 # 配置根目录
@@ -40,9 +42,7 @@ with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 # print(config)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
-host = config["serve_args"]["host"]
-port = config["serve_args"]["port"]
-start_api_server(host, port)
+start_api_server(config)
 # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
 process = []
 for model_config_ in config["models"]:

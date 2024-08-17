@@ -1,4 +1,5 @@
 import socket
+from typing import List, Optional
 import os
 from multiprocessing import Process
 import subprocess
@@ -12,34 +13,59 @@ def run_cmd(cmd: str, *args, **kwargs):
     subprocess.run(cmd, shell=True)
 
 
-def start_controller():
+def start_controller(controller_host, controller_port, dispatch_method):
     """启动fastchat控制器"""
-    cmd = "python -m fastchat.serve.controller"
+    cmd = f"python -m fastchat.serve.controller --host {controller_host} --port {controller_port} --dispatch-method {dispatch_method} "
     controller_process = Process(target=run_cmd, args=(cmd,))
     controller_process.start()
 
 
-def start_openai_server(host, port):
+def start_openai_server(host, port, controller_address, api_keys=None):
     """启动openai api 服务"""
     os.environ["FASTCHAT_WORKER_API_EMBEDDING_BATCH_SIZE"] = "100000"
 
-    cmd = f"python -m gpt_server.serving.openai_api_server --host {host} --port {port}"
+    cmd = f"python -m gpt_server.serving.openai_api_server --host {host} --port {port} --controller-address {controller_address}"
+    if api_keys:
+        cmd += f" --api-keys {api_keys}"
     openai_server_process = Process(target=run_cmd, args=(cmd,))
     openai_server_process.start()
 
 
-def start_api_server(host: str = "0.0.0.0", port: int = 8081):
-    cmd = f"python -m gpt_server.serving.start_api_server --host {host} --port {port}"
-    start_server_process = Process(target=run_cmd, args=(cmd,))
-    start_server_process.start()
+def start_api_server(config: dict):
+    host = config["serve_args"]["host"]
+    port = config["serve_args"]["port"]
+    controller_address = config["serve_args"]["controller_address"]
+    api_keys = config["serve_args"].get("api_keys", None)
+
+    controller_host = config["controller_args"]["host"]
+    controller_port = config["controller_args"]["port"]
+    dispatch_method = config["controller_args"].get("dispatch_method", "shortest_queue")
+
+    start_server(
+        host=host,
+        port=port,
+        controller_address=controller_address,
+        api_keys=api_keys,
+        controller_host=controller_host,
+        controller_port=controller_port,
+        dispatch_method=dispatch_method,
+    )
 
 
-def start_server(host: str = "0.0.0.0", port: int = 8081):
+def start_server(
+    host: str = "0.0.0.0",
+    port: int = 8081,
+    controller_address: str = "http://localhost:21001",
+    api_keys: Optional[List[str]] = None,
+    controller_host: str = "localhost",
+    controller_port: int = 21001,
+    dispatch_method: str = "shortest_queue",
+):
     """启动服务"""
     # 判断端口是否被占用
     used_ports = []
-    if is_port_in_use(21001):
-        used_ports.append(21001)
+    if is_port_in_use(controller_port):
+        used_ports.append(controller_port)
     if is_port_in_use(port):
         used_ports.append(port)
     if len(used_ports) > 0:
@@ -48,10 +74,10 @@ def start_server(host: str = "0.0.0.0", port: int = 8081):
         )
     if 21001 not in used_ports:
         # 启动控制器
-        start_controller()
+        start_controller(controller_host, controller_port, dispatch_method)
     if port not in used_ports:
         # 启动openai_api服务
-        start_openai_server(host, port)
+        start_openai_server(host, port, controller_address, api_keys)
 
 
 def stop_server():

@@ -1,8 +1,18 @@
 # 后台启动 nohup sh start.sh > gptserver.log &
+# openai_api_server
 serve_args:
   host: 0.0.0.0
   port: 8082
+  controller_address: http://localhost:21001
+  # api_keys: 111,222
 
+# controller
+controller_args:
+  host: localhost
+  port: 21001
+  dispatch_method: shortest_queue # lottery shortest_queue
+
+# model worker
 models:
   - glm-4v:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
