@@ -29,13 +29,9 @@ class LMDeployBackend(ModelBackend):
         backend = backend_map[os.getenv("backend")]
         logger.info(f"后端 {backend}")
         if backend == "pytorch":
-            backend_config = PytorchEngineConfig(
-                model_name="", tp=int(os.getenv("num_gpus", "1")), thread_safe=False
-            )
+            backend_config = PytorchEngineConfig(tp=int(os.getenv("num_gpus", "1")))
         if backend == "turbomind":
-            backend_config = TurbomindEngineConfig(
-                model_name="", tp=int(os.getenv("num_gpus", "1")), thread_safe=True
-            )
+            backend_config = TurbomindEngineConfig(tp=int(os.getenv("num_gpus", "1")))
         pipeline_type, pipeline_class = get_task(model_path)
         logger.info(f"模型架构：{pipeline_type}")
         self.async_engine = pipeline_class(
@@ -45,7 +41,7 @@ class LMDeployBackend(ModelBackend):
         )
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        prompt = params.get("prompt","")
+        prompt = params.get("prompt", "")
         logger.info(prompt)
         messages = params["messages"]
         request_id = params.get("request_id", "0")
