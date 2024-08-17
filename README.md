@@ -195,6 +195,7 @@ sh start.sh
 |      Internlm-2.0      | √ |  √  |         √         |        √        |
 |        Deepseek        | √ |  √  |         √         |        √        |
 |        Llama-3        | √ |  √  |         √         |        √        |
+|        Baichuan-2        | √ |  √  |         √         |        √        |
 
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
