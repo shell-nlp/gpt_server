@@ -1,5 +1,8 @@
 from typing import Any, Dict
 import torch
+import os
+import json
+from peft import PeftModel
 from transformers import TextIteratorStreamer
 from transformers.generation.logits_process import LogitsProcessorList
 from threading import Thread
@@ -15,13 +18,41 @@ from loguru import logger
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
+class NoneContextManager:
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return True
+
+
 class HFBackend(ModelBackend):
     def __init__(self, tokenizer, model: torch.nn.Module) -> None:
         self.model = model
         self.tokenizer = tokenizer
+        self.lora_requests = []
+        lora = os.getenv("lora", None)
+        if lora:
+            lora_dict: dict = json.loads(lora)
+            for i, (lora_name, lora_path) in enumerate(lora_dict.items()):
+                self.lora_requests.append(
+                    dict(
+                        lora_name=lora_name,
+                        lora_int_id=i,
+                        lora_local_path=lora_path,
+                    )
+                )
+                if i == 0:
+                    self.model = PeftModel.from_pretrained(
+                        model=model,
+                        model_id=lora_path,
+                        adapter_name=lora_name,
+                    )
+                    continue
+                self.model.load_adapter(model_id=lora_path, adapter_name=lora_name)
 
     async def stream_chat(self, params: Dict[str, Any]):
-        prompt = params.get("prompt","")
+        prompt = params.get("prompt", "")
         logger.info(prompt)
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
@@ -61,8 +92,18 @@ class HFBackend(ModelBackend):
             # presence_penalty=presence_penalty,
             # frequency_penalty=frequency_penalty,
         )
-        thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
-        thread.start()
+        use_lora = False
+        for lora in self.lora_requests:
+            if params["model"] == lora["lora_name"]:
+                self.model.set_adapter(lora["lora_name"])
+                use_lora = True
+                break
+        context_manager = NoneContextManager()
+        if not use_lora and self.lora_requests:
+            context_manager = self.model.disable_adapter()
+        with context_manager:
+            thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
+            thread.start()
         generated_text = ""
         prompt_tokens = len(input_ids.tolist()[0])
         completion_tokens = 0

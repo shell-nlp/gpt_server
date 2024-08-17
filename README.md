@@ -34,7 +34,7 @@
 ## 更新信息
 
 ```plaintext
-8-17  支持了 vllm 后端的 lora 部署
+8-17  支持了 vllm/hf 后端的 lora 部署
 8-14  支持了 InternVL2 系列多模态模型
 7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
 7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
