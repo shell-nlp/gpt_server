@@ -1,11 +1,8 @@
 import yaml
 import os
 import sys
-from multiprocessing import Process
 import signal
-import json
 import ray
-import torch
 
 os.environ["OPENBLAS_NUM_THREADS"] = (
     "1"  # 解决线程不足时，OpenBLAS blas_thread_init报错
@@ -21,9 +18,8 @@ os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
 sys.path.append(root_dir)
 os.environ["LOGDIR"] = os.path.join(root_dir, "logs")
 from gpt_server.utils import (
-    start_server,
     start_api_server,
-    run_cmd,
+    start_model_worker,
     stop_server,
     delete_log,
 )
@@ -38,74 +34,13 @@ def signal_handler(signum, frame):
 
 
 signal.signal(signal.SIGINT, signal_handler)
+
 config_path = os.path.join(root_dir, "gpt_server/script/config.yaml")
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 # print(config)
-# ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
-start_api_server(config)
-# ----------------------------启动 Controller 和 Openai API 服务----------------------------------------------------
-process = []
-for model_config_ in config["models"]:
-    for model_name, model_config in model_config_.items():
-        # 启用的模型
-        if model_config["enable"]:
-            # pprint(model_config)
-            print()
-            # 模型地址
-            model_name_or_path = model_config["model_name_or_path"]
-            # 模型类型
-            model_type = model_config["model_type"]
-            lora = model_config.get("lora", None)
-
-            # model type 校验
-            # py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
-            py_path = f"-m gpt_server.model_worker.{model_type}"
-
-            model_names = model_name
-            if model_config["alias"]:
-                model_names = model_name + "," + model_config["alias"]
-                if lora:  # 如果使用lora,将lora的name添加到 model_names 中
-                    lora_names = list(lora.keys())
-                    model_names += "," + ",".join(lora_names)
-
-            # 获取 worker 数目 并获取每个 worker 的资源
-            workers = model_config["workers"]
-
-            # process = []
-            for worker in workers:
-                gpus = worker["gpus"]
-                # 将gpus int ---> str
-                gpus = [str(i) for i in gpus]
-                gpus_str = ",".join(gpus)
-                num_gpus = len(gpus)
-                run_mode = "python "
-                CUDA_VISIBLE_DEVICES = ""
-                if (
-                    torch.cuda.is_available()
-                    and model_config["device"].lower() == "gpu"
-                ):
-                    CUDA_VISIBLE_DEVICES = f"CUDA_VISIBLE_DEVICES={gpus_str} "
-                elif model_config["device"].lower() == "cpu":
-                    CUDA_VISIBLE_DEVICES = ""
-                else:
-                    raise Exception("目前仅支持 CPU/GPU设备!")
-                backend = model_config["work_mode"]
-
-                cmd = (
-                    CUDA_VISIBLE_DEVICES
-                    + run_mode
-                    + py_path
-                    + f" --num_gpus {num_gpus}"
-                    + f" --model_name_or_path {model_name_or_path}"
-                    + f" --model_names {model_names}"
-                    + f" --backend {backend}"
-                )
-                if lora:
-                    cmd += f" --lora '{json.dumps(lora)}'"
-
-                p = Process(target=run_cmd, args=(cmd,))
-                p.start()
-                process.append(p)
-for p in process:
-    p.join()
+if __name__ == "__main__":
+    # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------
+    start_api_server(config=config)
+    # ----------------------------启动 Model Worker 服务----------------------------------------------------
+    start_model_worker(config=config)
