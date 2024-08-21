@@ -141,7 +141,7 @@ def start_server(
         logger.warning(
             f"端口：{used_ports} 已被占用!为了系统的正常运行,请确保是被已启动的gpt_server服务占用。"
         )
-    if 21001 not in used_ports:
+    if controller_port not in used_ports:
         # 启动控制器
         start_controller(controller_host, controller_port, dispatch_method)
     if port not in used_ports:
