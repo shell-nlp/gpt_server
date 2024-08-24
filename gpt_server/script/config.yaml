@@ -8,11 +8,15 @@ serve_args:
 
 # controller
 controller_args:
-  host: localhost
+  host: 0.0.0.0
   port: 21001
   dispatch_method: shortest_queue # lottery shortest_queue
 
 # model worker
+model_worker_args:
+  host: 0.0.0.0
+  controller_address: http://localhost:21001
+
 models:
   - glm-4v:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
@@ -52,7 +56,7 @@ models:
   
   - qwen:  #自定义的模型名称
       alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
       model_type: qwen  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
@@ -66,7 +70,7 @@ models:
       # - gpus:
       #   - 3
   - qwen-72b:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
+      alias: qwen # 别名     例如  gpt4,gpt3
       enable: true  # false true
       model_name_or_path: /home/dev/model/qwen/Qwen2-72B-Instruct-AWQ/
       model_type: qwen  # qwen  chatglm3 yi internlm

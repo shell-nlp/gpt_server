@@ -56,6 +56,14 @@ def start_api_server(config: dict):
 
 def start_model_worker(config: dict):
     process = []
+    try:
+        host = config["model_worker_args"]["host"]
+        controller_address = config["model_worker_args"]["controller_address"]
+    except KeyError as e:
+        error_msg = f"请参照 https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml 设置正确的 model_worker_args"
+        logger.error(error_msg)
+        raise KeyError(error_msg)
+
     for model_config_ in config["models"]:
         for model_name, model_config in model_config_.items():
             # 启用的模型
@@ -110,6 +118,8 @@ def start_model_worker(config: dict):
                         + f" --model_name_or_path {model_name_or_path}"
                         + f" --model_names {model_names}"
                         + f" --backend {backend}"
+                        + f" --host {host}"
+                        + f" --controller_address {controller_address}"
                     )
                     if lora:
                         cmd += f" --lora '{json.dumps(lora)}'"

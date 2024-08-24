@@ -176,6 +176,10 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             "--model_names", type=lambda s: s.split(","), default="model_names"
         )
         parser.add_argument("--lora", type=str, default=None)
+        parser.add_argument("--host", type=str, default="localhost")
+        parser.add_argument(
+            "--controller_address", type=str, default="http://localhost:21001"
+        )
 
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
@@ -189,8 +193,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["backend"] = "lmdeploy-turbomind"
         if args.lora:
             os.environ["lora"] = args.lora
+        host = args.host
+        controller_address = args.controller_address
 
-        host = "localhost"
         port = get_free_tcp_port()
         worker_addr = f"http://{host}:{port}"
 
@@ -203,6 +208,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
                 model_path=args.model_name_or_path,
                 model_names=args.model_names,
                 conv_template="chatglm3",  # TODO 默认是chatglm3用于统一处理
+                controller_addr=controller_address,
             )
 
         uvicorn.run(app, host=host, port=port)
