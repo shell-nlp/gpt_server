@@ -112,14 +112,27 @@ vim config.yaml
 ```
 
 ```yaml
-serve_args:
+serve_args:  # openai 服务的 host 和 pot
   host: 0.0.0.0
   port: 8082
+  controller_address: http://localhost:21001 # 控制器的ip地址
+  # api_keys: 111,222  # 用来设置 openai 密钥
+
+# controller
+controller_args: # 控制器的配置参数
+  host: 0.0.0.0
+  port: 21001
+  dispatch_method: shortest_queue # lottery、shortest_queue # 现有两种请求分发策略，随机（lottery） 和 最短队列（shortest_queue），最短队列方法更推荐。
+
+# model worker
+model_worker_args: # 模型的配置参数，这里port 不能设置，程序自动分配，并注册到 控制器中。
+  host: 0.0.0.0
+  controller_address: http://localhost:21001 # 将模型注册到 控制器的 地址
 
 models:
   - chatglm4:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
-      enable: true  # false true
+      enable: true  # false true 控制是否启动模型worker
       model_name_or_path: /home/dev/model/THUDM/glm-4-9b-chat/
       model_type: chatglm  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
@@ -130,10 +143,20 @@ models:
       - gpus:
         # - 1
         - 0
-  
+
+# - gpus:  表示 模型使用 gpu[0,1]，默认使用的 TP(张量并行)
+#   - 0
+#   - 1
+
+# - gpus:  表示启动两个模型，模型副本1加载到 0卡， 模型副本2 加载到 1卡
+#   - 0
+# - gpus:
+#   - 1
+
+
   - qwen:  #自定义的模型名称
       alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
-      enable: true  # false true
+      enable: true  # false true 控制是否启动模型worker
       model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
       model_type: qwen  # qwen  chatglm3 yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
@@ -158,7 +181,7 @@ models:
  # reranker 模型
   - bge-reranker-base:
       alias: null # 别名   
-      enable: true  # false true
+      enable: true  # false true  控制是否启动模型worker
       model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
       model_type: embedding # embedding_infinity
       work_mode: hf

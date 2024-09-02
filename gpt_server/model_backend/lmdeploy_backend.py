@@ -97,6 +97,7 @@ class LMDeployBackend(ModelBackend):
                 "text": text_outputs,
                 "error_code": 0,
                 "usage": usage,
+                "finish_reason": request_output.finish_reason,
             }
             yield ret
         logger.info(text_outputs)
