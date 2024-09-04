@@ -6,7 +6,6 @@ from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_handler.react.chatglm_react import glm4_tool_extractor
 from gpt_server.model_handler.utils import add_tools2messages
-from transformers import AutoConfig
 
 
 class ChatGLMWorker(ModelWorkerBase):
@@ -40,8 +39,7 @@ class ChatGLMWorker(ModelWorkerBase):
                 self.stop_words_ids.append(self.tokenizer.convert_tokens_to_ids(i))
             except Exception as e:
                 pass
-        config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
-        self.vision_config = getattr(config, "vision_config", None)
+        self.vision_config = getattr(self.model_config, "vision_config", None)
         logger.info(f"chatglm停用词: {self.stop}")
 
     def build_chat_input(self, query, history=None, role="user"):

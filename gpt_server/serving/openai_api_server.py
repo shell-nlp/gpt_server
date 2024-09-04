@@ -106,7 +106,7 @@ class AppSettings(BaseSettings):
 
 
 app_settings = AppSettings()
-app = fastapi.FastAPI()
+app = fastapi.FastAPI(docs_url="/")
 headers = {"User-Agent": "FastChat API Server"}
 get_bearer_token = HTTPBearer(auto_error=False)
 

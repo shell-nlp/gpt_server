@@ -46,6 +46,7 @@ class QwenWorker(ModelWorkerBase):
         self.other_config = {
             "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content']}}{% if (loop.last and add_generation_prompt) or not loop.last %}{{ '<|im_end|>' + '\n'}}{% endif %}{% endfor %}{% if add_generation_prompt and messages[-1]['role'] != 'assistant' %}{{ '<|im_start|>assistant\n' }}{% endif %}"
         }
+        self.vision_config = getattr(self.model_config, "vision_config", None)
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
@@ -54,42 +55,38 @@ class QwenWorker(ModelWorkerBase):
         try:
             model_type = getattr(self.model_config, "model_type", "qwen")
             messages = add_tools2messages(params=params, model_adapter="qwen")
+            if not self.vision_config:
+                if isinstance(messages, list):
+                    task = "chat"
+                elif isinstance(messages, str):
+                    task = "completion"
+                if task == "chat":
+                    # 暂时保留，用于特殊情况的处理
+                    if model_type == "qwen":
+                        logger.info("正在使用qwen-1.0 !")
+                        text = self.tokenizer.apply_chat_template(
+                            conversation=messages,
+                            tokenize=False,
+                            add_generation_prompt=True,
+                            chat_template=self.other_config["chat_template"],
+                        )
+                    elif model_type == "qwen2":
+                        logger.info("正在使用qwen-2.0 !")
+                        text = self.tokenizer.apply_chat_template(
+                            conversation=messages,
+                            tokenize=False,
+                            add_generation_prompt=True,
+                        )
+                elif task == "completion":
+                    text = messages
 
-            if isinstance(messages, list):
-                task = "chat"
-                for msg in messages:
-                    if msg["role"] == "function":
-                        msg["role"] = "Observation:"
-            elif isinstance(messages, str):
-                task = "completion"
-
-            if task == "chat":
-                # 暂时保留，用于特殊情况的处理
-                if model_type == "qwen":
-                    logger.info("正在使用qwen-1.0 !")
-                    text = self.tokenizer.apply_chat_template(
-                        conversation=messages,
-                        tokenize=False,
-                        add_generation_prompt=True,
-                        chat_template=self.other_config["chat_template"],
-                    )
-                elif model_type == "qwen2":
-                    logger.info("正在使用qwen-2.0 !")
-                    text = self.tokenizer.apply_chat_template(
-                        conversation=messages,
-                        tokenize=False,
-                        add_generation_prompt=True,
-                    )
-            elif task == "completion":
-                text = messages
-
-            input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+                params["input_ids"] = input_ids
+                params["prompt"] = text
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
-            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
