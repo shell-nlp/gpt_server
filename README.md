@@ -235,7 +235,7 @@ sh start.sh
 
 **推理速度：** Infinity >> HF
 
-以下模型经过测试：
+以下模型经过测试可放心使用：
 
 | Embedding/Rerank          | HF | Infinity |
 | ------------------------- | -- | -------- |
@@ -248,8 +248,9 @@ sh start.sh
 | Yinka                     | √ | √       |
 | zpoint_large_embedding_zh | √ | √       |
 | xiaobu-embedding          | √ | √       |
+|Conan-embedding-v1          | √ | √       |
 
-目前 **xiaobu-embedding** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
+目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
 #### 4. 使用 openai 库 进行调用
 
