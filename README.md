@@ -101,7 +101,7 @@ work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
 config.yaml中：
 
 ```bash
-model_type: embedding # embedding 或 embedding_infinity  embedding_infinity后端速度远远大于 embedding
+model_type: embedding_infinity # embedding 或 embedding_infinity  embedding_infinity后端速度远远大于 embedding
 ```
 
 [config.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml "配置文件")
@@ -243,6 +243,7 @@ sh start.sh
 | bce-reranker              | √ | √       |
 | bge-embedding             | √ | √       |
 | bce-embedding             | √ | √       |
+|puff             | √ | √       |
 | piccolo-base-zh-embedding | √ | √       |
 | acge_text_embedding       | √ | √       |
 | Yinka                     | √ | √       |
