@@ -18,12 +18,12 @@ model_worker_args:
   controller_address: http://localhost:21001
 
 models:
-  - glm-4v:  #自定义的模型名称
+  - qwen2-vl:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
-      model_name_or_path: /home/dev/model/THUDM/glm-4v-9b/
-      model_type: chatglm  # qwen  chatglm3 yi internlm
-      work_mode: lmdeploy-pytorch  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      model_name_or_path: /home/dev/model/qwen/Qwen2-VL-7B-Instruct/
+      model_type: qwen  # qwen  chatglm3 yi internlm
+      work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
@@ -33,7 +33,7 @@ models:
       alias: null # 别名     例如  gpt4,gpt3
       enable: true  # false true
       model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
-      model_type: internvl2  # qwen  chatglm3 yi internlm
+      model_type: internvl2  # qwen  yi internlm
       work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -46,7 +46,7 @@ models:
       alias: chatglm3 # 别名     例如  gpt4,gpt3
       enable: false  # false true
       model_name_or_path: /home/dev/model/ZhipuAI/glm-4-9b-chat
-      model_type: chatglm  # qwen  chatglm3 yi internlm
+      model_type: chatglm  # qwen yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -57,8 +57,8 @@ models:
   - qwen:  #自定义的模型名称
       alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
       enable: false  # false true
-      model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
-      model_type: qwen  # qwen  chatglm3 yi internlm
+      model_name_or_path: /home/dev/model/qwen/Qwen2-72B-Instruct-AWQ/
+      model_type: qwen  # qwen  yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       # lora:
       #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
@@ -73,18 +73,21 @@ models:
       alias: qwen # 别名     例如  gpt4,gpt3
       enable: true  # false true
       model_name_or_path: /home/dev/model/qwen/Qwen2-72B-Instruct-AWQ/
-      model_type: qwen  # qwen  chatglm3 yi internlm
-      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      model_type: qwen  # qwen yi internlm
+      work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 3
+        # - 1
+      - gpus:
+        - 1
 
   - mixtral:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
       model_name_or_path: /home/dev/model/NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT/
-      model_type: qwen  # qwen  chatglm3 yi internlm
+      model_type: qwen  # qwen yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -97,7 +100,7 @@ models:
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
       model_name_or_path: /home/dev/model/unsloth/unsloth/llama-3-8b-Instruct/
-      model_type: llama  # qwen  chatglm3 yi internlm
+      model_type: llama  # qwen yi internlm
       work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -108,7 +111,7 @@ models:
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
       model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
-      model_type: yi  # qwen  chatglm3 yi internlm
+      model_type: yi  # qwen yi internlm
       work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -120,7 +123,7 @@ models:
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
       model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2_5-7b-chat/
-      model_type: internlm  # qwen  chatglm3 yi internlm
+      model_type: internlm  # qwen yi internlm
       work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -141,25 +144,26 @@ models:
 
   - bce-embedding-base_v1:
       alias: text-embedding-ada-002 # 别名   
-      enable: false  # false true
+      enable: true  # false true
       model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
-      model_type: embedding # embedding_infinity
+      model_type: embedding_infinity # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 2
 
-  - bce-reranker-base_v1:
+  - conan:
       alias: null # 别名   
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/maidalun1020/bce-reranker-base_v1/
-      model_type: embedding # embedding_infinity
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/model1001/Conan/
+      model_type: embedding_infinity # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
       - gpus:
-        - 0
+        - 2
+        
   - bge-reranker-base:
       alias: null # 别名   
       enable: true  # false true
@@ -170,11 +174,11 @@ models:
       workers:
       - gpus:
         - 2
-  - bge-base-zh:
+  - puff:
       alias: null # 别名   
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
-      model_type: embedding # embedding_infinity
+      enable: true  # false true
+      model_name_or_path: /home/dev/model/infgrad/puff-large-v1/
+      model_type: embedding_infinity # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:
@@ -195,7 +199,7 @@ models:
       alias: null # 别名   
       enable: false  # false true
       model_name_or_path: /home/dev/model/Classical/Yinka/
-      model_type: embedding # embedding_infinity
+      model_type: embedding_infinity # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu
       workers:

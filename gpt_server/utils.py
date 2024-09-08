@@ -204,5 +204,34 @@ def is_port_in_use(port):
             return True
 
 
+model_type_mapping = {
+    "yi": "yi",
+    "qwen": "qwen",
+    "glm4": "chatglm",
+    "chatglm3": "chatglm",
+    "internvl2-internlm2": "internvl2",
+    "internlm2": "internlm",
+    "internlm": "internlm",
+    "baichuan2": "baichuan",
+    "llama3": "llama",
+    "mistral": "mistral",
+    "deepseek": "deepseek",
+}
+
+
+def infer_model_type(model_path: str) -> str:
+    """自动推测模型类型，未使用此代码"""
+    from lmdeploy.model import best_match_model
+    from transformers import AutoConfig
+
+    match_model_type = best_match_model(model_path)
+    model_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+    config_model_type = model_config.get("model_type", False)
+    return model_type_mapping[match_model_type]
+
+
 if __name__ == "__main__":
-    print(is_port_in_use(21001))
+    # ckpt = "deepseek-ai/deepseek-moe-16b-base"  # internlm2
+    # model_type = best_match_model(ckpt)
+    # print(model_type)
+    pass
