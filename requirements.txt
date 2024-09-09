@@ -4,9 +4,9 @@ torchvision==0.19
 fschat==0.2.36
 transformers==4.43.2
 accelerate
-vllm==0.5.4
+vllm==0.6.0
 git+https://gitee.com/liuyu_1997/lmdeploy.git#egg=lmdeploy # lmdeploy==0.5.1
-openai==1.14.2
+openai==1.44.0
 loguru
 fastapi==0.110.2
 infinity-emb[all]==0.0.53
