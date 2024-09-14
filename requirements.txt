@@ -5,7 +5,7 @@ fschat==0.2.36
 transformers==4.43.2
 accelerate
 vllm==0.6.0
-git+https://gitee.com/liuyu_1997/lmdeploy.git#egg=lmdeploy # lmdeploy==0.5.1
+git+https://gitee.com/liuyu_1997/lmdeploy.git#egg=lmdeploy # lmdeploy==0.6.0
 openai==1.44.0
 loguru
 fastapi==0.110.2
