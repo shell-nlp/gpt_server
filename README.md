@@ -34,26 +34,27 @@
 ## 更新信息
 
 ```plaintext
-8-17  支持了 vllm/hf 后端的 lora 部署
-8-14  支持了 InternVL2 系列多模态模型
-7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
-7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
-6-22  支持了 Qwen系列、ChatGLM系列 function call (tools) 能力
-6-12  支持了 qwen-2
-6-5   支持了 Yinka、zpoint_large_embedding_zh 嵌入模型
-6-5   支持了 glm4-9b系列（hf和vllm）
-4-27  支持了 LMDeploy 加速推理后端
-4-20  支持了 llama-3
-4-13  支持了 deepseek
-4-4   支持了 embedding模型 acge_text_embedding
-3-9   支持了 reranker 模型 （ bge-reranker，bce-reranker-base_v1）
-3-3   支持了 internlm-1.0 ,internlm-2.0
-3-2   支持了 qwen-1.5 0.5B, 1.8B, 4B, 7B, 14B, and 72B
-2-4   支持了 vllm 实现
-1-6   支持了 Yi-34B
-12-31 支持了 qwen-7b, qwen-14b
-12-30 支持了 all-embedding(理论上支持所有的词嵌入模型)
-12-24 支持了 chatglm3-6b 
+2024-9-19  支持了 minicpmv 模型
+2024-8-17  支持了 vllm/hf 后端的 lora 部署
+2024-8-14  支持了 InternVL2 系列多模态模型
+2024-7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
+2024-7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
+2024-6-22  支持了 Qwen系列、ChatGLM系列 function call (tools) 能力
+2024-6-12  支持了 qwen-2
+2024-6-5   支持了 Yinka、zpoint_large_embedding_zh 嵌入模型
+2024-6-5   支持了 glm4-9b系列（hf和vllm）
+2024-4-27  支持了 LMDeploy 加速推理后端
+2024-4-20  支持了 llama-3
+2024-4-13  支持了 deepseek
+2024-4-4   支持了 embedding模型 acge_text_embedding
+2024-3-9   支持了 reranker 模型 （ bge-reranker，bce-reranker-base_v1）
+2024-3-3   支持了 internlm-1.0 ,internlm-2.0
+2024-3-2   支持了 qwen-1.5 0.5B, 1.8B, 4B, 7B, 14B, and 72B
+2024-2-4   支持了 vllm 实现
+2024-1-6   支持了 Yi-34B
+2023-12-31 支持了 qwen-7b, qwen-14b
+2023-12-30 支持了 all-embedding(理论上支持所有的词嵌入模型)
+2023-12-24 支持了 chatglm3-6b 
 ```
 
 ## 路线
@@ -206,26 +207,27 @@ sh start.sh
 
 ### **LLM**
 
-|    Models / BackEnd    | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------------: | :-: | :--: | :----------------: | :--------------: |
-|      chatglm4-9b      | √ |  √  |         √         |        √        |
-|      chatglm3-6b      | √ |  √  |         ×         |        √        |
-| Qwen (7B, 14B, etc.)) | √ |  √  |         √         |        √        |
-|  Qwen-1.5 (0.5B--72B)  | √ |  √  |         √         |        √        |
-|         Qwen-2         | √ |  √  |         √         |        √        |
-|         Yi-34B         | √ |  √  |         √         |        √        |
-|      Internlm-1.0      | √ |  √  |         √         |        √        |
-|      Internlm-2.0      | √ |  √  |         √         |        √        |
-|        Deepseek        | √ |  √  |         √         |        √        |
-|        Llama-3        | √ |  √  |         √         |        √        |
-|        Baichuan-2        | √ |  √  |         √         |        √        |
+|    Models / BackEnd   |model_type | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
+| :--------------------: |:-: | :-: | :--: | :----------------: | :--------------: |
+|      chatglm4-9b    |chatglm  | √ |  √  |         √         |        √        |
+|      chatglm3-6b     |chatglm | √ |  √  |         ×         |        √        |
+| Qwen (7B, 14B, etc.)) |qwen | √ |  √  |         √         |        √        |
+|  Qwen-1.5 (0.5B--72B)  |qwen| √ |  √  |         √         |        √        |
+|         Qwen-2         |qwen| √ |  √  |         √         |        √        |
+|         Yi-34B         |yi| √ |  √  |         √         |        √        |
+|      Internlm-1.0      |internlm| √ |  √  |         √         |        √        |
+|      Internlm-2.0      |internlm| √ |  √  |         √         |        √        |
+|        Deepseek        |deepseek| √ |  √  |         √         |        √        |
+|        Llama-3        |llama| √ |  √  |         √         |        √        |
+|        Baichuan-2        |baichuan| √ |  √  |         √         |        √        |
 
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
-| Models / BackEnd | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------: | :-: | :--: | :----------------: | :--------------: |
-|    glm-4v-9b    | × |  ×  |         ×         |        √        |
-|    InternVL2    | × |  ×  |         √         |        √        |
+| Models / BackEnd |model_type| HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
+| :--------------: | :-: | :-: | :--: | :----------------: | :--------------: |
+|    glm-4v-9b    |chatglm| × |  ×  |         ×         |        √        |
+|    InternVL2    |internvl2| × |  ×  |         √         |        √        |
+|    MiniCPM-V-2_6   |minicpmv | × |  ×  |         √         |        ×        |
 
 <br>
 

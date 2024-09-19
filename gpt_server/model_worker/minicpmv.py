@@ -47,20 +47,21 @@ class MiniCPMVWorker(ModelWorkerBase):
             elif isinstance(messages, str):
                 task = "completion"
             if task == "chat":
-                text = self.tokenizer.apply_chat_template(
-                    conversation=messages,
-                    tokenize=True,
-                    add_generation_prompt=True,
-                )
+                # text = self.tokenizer.apply_chat_template(
+                #     conversation=messages,
+                #     tokenize=True,
+                #     add_generation_prompt=True,
+                # )
+                pass
             elif task == "completion":
                 text = messages
 
-            input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+            # input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             params["messages"] = messages
-            params["prompt"] = text
+            # params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            params["input_ids"] = input_ids
+            # params["input_ids"] = input_ids
 
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
