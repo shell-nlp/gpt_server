@@ -28,8 +28,9 @@ class ChatGLMWorker(ModelWorkerBase):
             limit_worker_concurrency,
             conv_template,
             model_type="AutoModel",
+            multimodal=False,
         )
-
+        self.vision_config = getattr(self.model_config, "vision_config", None)
         self.stop = ["<|user|>", "<|observation|>", "<|endoftext|>"]
         # 拓展额外的stop
         self.stop.extend(["Observation:"])
@@ -39,7 +40,6 @@ class ChatGLMWorker(ModelWorkerBase):
                 self.stop_words_ids.append(self.tokenizer.convert_tokens_to_ids(i))
             except Exception as e:
                 pass
-        self.vision_config = getattr(self.model_config, "vision_config", None)
         logger.info(f"chatglm停用词: {self.stop}")
 
     def build_chat_input(self, query, history=None, role="user"):

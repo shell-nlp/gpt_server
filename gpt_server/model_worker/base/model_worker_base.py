@@ -34,6 +34,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         limit_worker_concurrency: int,
         conv_template: str = None,  # type: ignore
         model_type: str = "AutoModel",
+        multimodal: bool = False,
     ):
         super().__init__(
             controller_addr,
@@ -43,6 +44,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             model_names,
             limit_worker_concurrency,
             conv_template,
+            multimodal,
         )
         os.environ["WORKER_NAME"] = self.__class__.__name__
         self.worker_name = self.__class__.__name__

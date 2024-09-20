@@ -26,6 +26,7 @@ class InternVL2Worker(ModelWorkerBase):
             limit_worker_concurrency,
             conv_template,
             model_type="AutoModel",
+            multimodal=True,
         )
         self.stop_words_ids = [
             2,  # <|endoftext|>
