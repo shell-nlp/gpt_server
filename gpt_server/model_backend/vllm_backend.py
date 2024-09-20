@@ -7,6 +7,12 @@ from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 import vllm
 from vllm.lora.request import LoRARequest
+from vllm.entrypoints.chat_utils import (
+    ConversationMessage,
+    apply_hf_chat_template,
+    load_chat_template,
+    parse_chat_messages_futures,
+)
 
 # 解决vllm中 ray集群在 TP>1时死的Bug
 import ray
@@ -49,6 +55,7 @@ class VllmBackend(ModelBackend):
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
+        messages = params["messages"]
         logger.info(prompt)
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
@@ -67,9 +74,26 @@ class VllmBackend(ModelBackend):
         elif isinstance(stop_str, list) and stop_str != []:
             stop.update(stop_str)
 
+        input_ids = params.get("input_ids", None)
+        if input_ids is None:  # 多模态模型
+            # ----------------------------------------------------------------
+            tokenizer = await self.engine.get_tokenizer()
+            model_config = await self.engine.get_model_config()
+            conversation, mm_data_future = parse_chat_messages_futures(
+                messages, model_config, tokenizer
+            )
+            prompt = apply_hf_chat_template(
+                tokenizer,
+                conversation=conversation,
+                chat_template=tokenizer.get_chat_template(),
+                add_generation_prompt=True,
+            )
+            mm_data = await mm_data_future
+            inputs = {"multi_modal_data": mm_data, "prompt": prompt}
+        else:
+            prompt_token_ids = input_ids.tolist()[0]
+            inputs = {"prompt": prompt, "prompt_token_ids": prompt_token_ids}
         # ----------------------------------------------------------------
-        input_ids = params.get("input_ids")
-        prompt_token_ids = input_ids.tolist()[0]
         # make sampling params in vllm
         top_p = max(top_p, 1e-5)
         if temperature <= 1e-5:
@@ -87,7 +111,6 @@ class VllmBackend(ModelBackend):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
         )
-        inputs = {"prompt": prompt, "prompt_token_ids": prompt_token_ids}
         lora_request = None
         for lora in self.lora_requests:
             if params["model"] == lora.lora_name:
