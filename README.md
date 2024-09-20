@@ -214,6 +214,7 @@ sh start.sh
 | Qwen (7B, 14B, etc.)) |qwen | √ |  √  |         √         |        √        |
 |  Qwen-1.5 (0.5B--72B)  |qwen| √ |  √  |         √         |        √        |
 |         Qwen-2         |qwen| √ |  √  |         √         |        √        |
+|         Qwen-2.5       |qwen| √ |  √  |         √         |        √        |
 |         Yi-34B         |yi| √ |  √  |         √         |        √        |
 |      Internlm-1.0      |internlm| √ |  √  |         √         |        √        |
 |      Internlm-2.0      |internlm| √ |  √  |         √         |        √        |

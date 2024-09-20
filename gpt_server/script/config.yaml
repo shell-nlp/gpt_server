@@ -18,11 +18,11 @@ model_worker_args:
   controller_address: http://localhost:21001
 
 models:
-  - qwen2-vl:  #自定义的模型名称
+  - minicpm:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
       enable: false  # false true
-      model_name_or_path: /home/dev/model/qwen/Qwen2-VL-7B-Instruct/
-      model_type: qwen  # qwen  chatglm3 yi internlm
+      model_name_or_path: /home/dev/model/OpenBMB/MiniCPM-V-2_6/
+      model_type: minicpmv  # qwen  chatglm3 yi internlm
       work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
@@ -31,7 +31,7 @@ models:
         - 0
   - internvl2:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
-      enable: true  # false true
+      enable: false  # false true
       model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
       model_type: internvl2  # qwen  yi internlm
       work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
@@ -44,7 +44,7 @@ models:
       #   - 0
   - chatglm4:  #自定义的模型名称
       alias: chatglm3 # 别名     例如  gpt4,gpt3
-      enable: false  # false true
+      enable: true  # false true
       model_name_or_path: /home/dev/model/ZhipuAI/glm-4-9b-chat
       model_type: chatglm  # qwen yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
@@ -74,14 +74,14 @@ models:
       enable: true  # false true
       model_name_or_path: /home/dev/model/qwen/Qwen2-72B-Instruct-AWQ/
       model_type: qwen  # qwen yi internlm
-      work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
       workers:
       - gpus:
         - 3
-        # - 1
-      - gpus:
         - 1
+      # - gpus:
+      #   - 1
 
   - mixtral:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
