@@ -30,7 +30,6 @@ class ChatGLMWorker(ModelWorkerBase):
             model_type="AutoModel",
             multimodal=False,
         )
-        self.vision_config = getattr(self.model_config, "vision_config", None)
         self.stop = ["<|user|>", "<|observation|>", "<|endoftext|>"]
         # 拓展额外的stop
         self.stop.extend(["Observation:"])

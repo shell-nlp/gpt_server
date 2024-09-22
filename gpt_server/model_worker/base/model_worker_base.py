@@ -36,6 +36,12 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         model_type: str = "AutoModel",
         multimodal: bool = False,
     ):
+        self.model_config = AutoConfig.from_pretrained(
+            model_path, trust_remote_code=True
+        )
+        logger.info(f"模型配置：{self.model_config}")
+        self.vision_config = getattr(self.model_config, "vision_config", None)
+        is_vision = self.vision_config is not None
         super().__init__(
             controller_addr,
             worker_addr,
@@ -44,7 +50,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             model_names,
             limit_worker_concurrency,
             conv_template,
-            multimodal,
+            multimodal=multimodal or is_vision,
         )
         os.environ["WORKER_NAME"] = self.__class__.__name__
         self.worker_name = self.__class__.__name__
@@ -68,10 +74,6 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         """ "支持的最大 token 长度"""
         if self.model is None and self.backend is None:
             return 512
-        self.model_config = AutoConfig.from_pretrained(
-            self.model_path, trust_remote_code=True
-        )
-        logger.info("模型配置：", self.model_config)
         return get_context_length_(self.model_config)
 
     def get_model_class(self):
