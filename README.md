@@ -274,13 +274,23 @@ WebUI界面:
 
 ### Docker安装
 
-#### 1. 构建镜像
+#### 0. 使用Docker Hub镜像
+```bash
+docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的方式
+
+
+# 如果国内无法拉取docker镜像，可以尝试下面的国内镜像拉取的方式（不保证国内镜像源一直可用）
+docker pull docker.rainbond.cc/506610466/gpt_server:latest 
+
+```
+
+#### 1. 手动构建镜像（可选）
+##### 1.1 构建镜像
 
 ```bash
 docker build --rm -f "Dockerfile" -t gpt_server:latest "." 
 ```
-
-#### 2. Docker Compose启动
+##### 1.2 Docker Compose启动
 
 ```bash
 docker-compose  -f "docker-compose.yml" up -d --build gpt_server
