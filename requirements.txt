@@ -12,3 +12,4 @@ fastapi==0.114.1
 infinity-emb[all]==0.0.53
 git+https://gitee.com/liuyu_1997/ffmpy.git # 解决setuptools最新版本导致的重大事故
 gradio==4.26.0
+streamlit==1.38.0

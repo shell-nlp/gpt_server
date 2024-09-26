@@ -27,11 +27,16 @@ backend_map = {
 class LMDeployBackend(ModelBackend):
     def __init__(self, model_path) -> None:
         backend = backend_map[os.getenv("backend")]
+        enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
+
         logger.info(f"后端 {backend}")
         if backend == "pytorch":
             backend_config = PytorchEngineConfig(tp=int(os.getenv("num_gpus", "1")))
         if backend == "turbomind":
-            backend_config = TurbomindEngineConfig(tp=int(os.getenv("num_gpus", "1")))
+            backend_config = TurbomindEngineConfig(
+                tp=int(os.getenv("num_gpus", "1")),
+                enable_prefix_caching=enable_prefix_caching,
+            )
         pipeline_type, pipeline_class = get_task(model_path)
         logger.info(f"模型架构：{pipeline_type}")
         self.async_engine = pipeline_class(

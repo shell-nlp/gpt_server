@@ -184,6 +184,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument(
             "--controller_address", type=str, default="http://localhost:21001"
         )
+        parser.add_argument("--enable_prefix_caching", type=str, default=None)
 
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
@@ -197,6 +198,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["backend"] = "lmdeploy-turbomind"
         if args.lora:
             os.environ["lora"] = args.lora
+        if args.enable_prefix_caching:
+            os.environ["enable_prefix_caching"] = args.enable_prefix_caching
+
         host = args.host
         controller_address = args.controller_address
 

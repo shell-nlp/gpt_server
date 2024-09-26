@@ -75,6 +75,7 @@ models:
       model_name_or_path: /home/dev/model/qwen/Qwen2-72B-Instruct-AWQ/
       model_type: qwen  # qwen yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+      enable_prefix_caching: false # false true
       device: gpu  # gpu / cpu
       workers:
       - gpus:

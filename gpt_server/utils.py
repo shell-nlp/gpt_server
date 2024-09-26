@@ -75,7 +75,7 @@ def start_model_worker(config: dict):
                 # 模型类型
                 model_type = model_config["model_type"]
                 lora = model_config.get("lora", None)
-
+                enable_prefix_caching = model_config.get("enable_prefix_caching", False)
                 # model type 校验
                 # py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
                 py_path = f"-m gpt_server.model_worker.{model_type}"
@@ -123,6 +123,8 @@ def start_model_worker(config: dict):
                     )
                     if lora:
                         cmd += f" --lora '{json.dumps(lora)}'"
+                    if enable_prefix_caching:  # 是否开启 prefix cache
+                        cmd += f" --enable_prefix_caching {enable_prefix_caching}"
 
                     p = Process(target=run_cmd, args=(cmd,))
                     p.start()
