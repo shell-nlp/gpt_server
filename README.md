@@ -4,6 +4,7 @@
 
 # GPT Server
 
+![Docker pulls](https://img.shields.io/docker/pulls/506610466/gpt_server)
 </div>
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
