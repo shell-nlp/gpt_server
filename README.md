@@ -3,8 +3,7 @@
 <a href="https://github.com/shell-nlp/gpt_server"><img src="assets/logo.png" width="252" height="116" alt="gpt_server logo"></a>
 
 # GPT Server
-
-![Docker pulls](https://img.shields.io/docker/pulls/506610466/gpt_server)
+[![License](https://img.shields.io/github/license/shell-nlp/gpt_server)](https://github.com/shell-nlp/gpt_server/blob/main/LICENSE) ![Stars](https://img.shields.io/github/stars/shell-nlp/gpt_server?color=yellow)  ![Forks](https://img.shields.io/github/forks/shell-nlp/gpt_server?color=9cf) ![Docker pulls](https://img.shields.io/docker/pulls/506610466/gpt_server)
 </div>
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
@@ -67,6 +66,7 @@
 * [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
+* [ ] 可视化启动界面
 * [ ] 内置部分 tools (image_gen,code_interpreter,weather等)
 * [ ] 并行的function call功能（tools）
 
