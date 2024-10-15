@@ -413,19 +413,9 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         tools=request.tools,
         tool_choice=request.tool_choice,
     )
-
-    max_new_tokens, error_check_ret = await check_length(
-        request,
-        gen_params["prompt"],
-        gen_params["max_new_tokens"],
-        worker_addr,
-    )
-
-    if error_check_ret is not None:
-        return error_check_ret
-
-    gen_params["max_new_tokens"] = max_new_tokens
-
+    if gen_params["max_new_tokens"] is None:
+        gen_params["max_new_tokens"] = 1024 * 16
+   
     if request.stream:
         generator = chat_completion_stream_generator(
             request.model, gen_params, request.n, worker_addr

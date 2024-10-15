@@ -103,7 +103,6 @@ class VllmBackend(ModelBackend):
             temperature = 0.01
 
         sampling = SamplingParams(
-            use_beam_search=False,
             top_p=top_p,
             top_k=top_k,
             temperature=temperature,
@@ -120,7 +119,7 @@ class VllmBackend(ModelBackend):
                 break
 
         results_generator = self.engine.generate(
-            inputs=inputs,
+            prompt=inputs,
             sampling_params=sampling,
             request_id=request_id,
             lora_request=lora_request,
