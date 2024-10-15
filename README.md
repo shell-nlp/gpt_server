@@ -34,6 +34,7 @@
 ## 更新信息
 
 ```plaintext
+2024-10-15 支持了 Qwen2-VL
 2024-9-19  支持了 minicpmv 模型
 2024-8-17  支持了 vllm/hf 后端的 lora 部署
 2024-8-14  支持了 InternVL2 系列多模态模型
@@ -230,7 +231,7 @@ sh start.sh
 |    glm-4v-9b    |chatglm| × |  ×  |         ×         |        √        |
 |    InternVL2    |internvl2| × |  ×  |         √         |        √        |
 |    MiniCPM-V-2_6   |minicpmv | × |  ×  |         √         |        ×        |
-
+|    Qwen2-VL   |qwen | × |  √  |         ×         |        ×        |
 <br>
 
 ### Embedding模型
