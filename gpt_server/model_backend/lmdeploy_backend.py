@@ -52,7 +52,7 @@ class LMDeployBackend(ModelBackend):
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
-        top_k = params.get("top_k", 1)
+        top_k = params.get("top_k", 50)
 
         max_new_tokens = min(int(params.get("max_new_tokens", 1024 * 8)), 1024 * 4)
         stop_str = params.get("stop", None)
@@ -70,14 +70,12 @@ class LMDeployBackend(ModelBackend):
         # prompt_token_ids = input_ids.tolist()[0]
         # make sampling params in vllm
         top_p = max(top_p, 1e-5)
-        if temperature <= 1e-5:
-            top_p = 1.0
-            temperature = 0.01
         gen_config = GenerationConfig(
+            do_sample=True,
             top_p=top_p,
             temperature=temperature,
             max_new_tokens=max_new_tokens,  # 存在问题
-            top_k=1 if top_k == -1 else top_k,
+            top_k=50 if top_k == -1 else top_k,
             stop_words=list(stop),
             skip_special_tokens=True,
         )
