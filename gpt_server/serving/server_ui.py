@@ -7,9 +7,9 @@ from copy import deepcopy
 
 if "config" not in st.session_state:
     # 配置根目录
-    root_dir = os.path.dirname(os.path.dirname(__file__))
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     root_dir = os.path.abspath(root_dir)
-
+    sys.path.append(root_dir)
     original_pythonpath = os.environ.get("PYTHONPATH", "")
     os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
     sys.path.append(root_dir)
@@ -136,12 +136,25 @@ def model_worker_args():
                         }
                         del_model = st.session_state[f"del_model_{i}"]
                         new_model = st.session_state[f"new_model_{i}"]
+
+                        start_server = st.session_state[f"start_server_{i}"]
+                        stop_server = st.session_state[f"stop_server_{i}"]
+                        if start_server:
+                            from gpt_server.utils import run_cmd
+
+                            start_server_cmd = "nohup python -m gpt_server.serving.main > gpt_server.log &"
+                            run_cmd(start_server_cmd)
+                        if stop_server:
+                            from gpt_server.utils import stop_server
+
+                            stop_server()
+                            logger.warning("服务已停止成功！")
                         if new_model:
                             new_config["models"].append(
                                 {
                                     "new_model_name": {
                                         "alias": st.session_state[f"alias_{i}"],
-                                        "enable": st.session_state[f"enable_{i}"],
+                                        "enable": False,
                                         "model_name_or_path": st.session_state[
                                             f"model_name_or_path_{i}"
                                         ],

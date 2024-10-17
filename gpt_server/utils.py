@@ -161,16 +161,27 @@ def start_server(
         start_openai_server(host, port, controller_address, api_keys)
 
 
+def stop_controller():
+    cmd = "ps -ef | grep fastchat.serve | awk '{print $2}' |xargs -I{} kill -9 {}"
+    run_cmd(cmd=cmd)
+
+
+def stop_openai_server():
+    cmd = "ps -ef | grep gpt_server |grep serving | awk '{print $2}' |xargs -I{} kill -9 {}"
+    run_cmd(cmd=cmd)
+
+
+def stop_all_model_worker():
+    cmd = "ps -ef | grep gpt_server |grep model_worker | awk '{print $2}' |xargs -I{} kill -9 {}"
+    run_cmd(cmd=cmd)
+
+
 def stop_server():
     """停止服务"""
-    stop_fastchat = (
-        "ps -ef | grep fastchat.serve | awk '{print $2}' |xargs -I{} kill -9 {}"
-    )
-    stop_gpt_server = (
-        "ps -ef | grep gpt_server | awk '{print $2}' |xargs -I{} kill -9 {}"
-    )
-    run_cmd(stop_fastchat)
-    run_cmd(stop_gpt_server)
+    stop_all_model_worker()
+    stop_controller()
+    stop_openai_server()
+
     logger.info("停止服务成功！")
 
 
