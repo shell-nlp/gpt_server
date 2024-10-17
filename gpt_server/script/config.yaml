@@ -1,226 +1,169 @@
-# 后台启动 nohup sh start.sh > gptserver.log &
-# openai_api_server
 serve_args:
   host: 0.0.0.0
   port: 8082
   controller_address: http://localhost:21001
-  # api_keys: 111,222
-
-# controller
 controller_args:
   host: 0.0.0.0
   port: 21001
-  dispatch_method: shortest_queue # lottery shortest_queue
-
-# model worker
+  dispatch_method: shortest_queue
 model_worker_args:
   host: 0.0.0.0
   controller_address: http://localhost:21001
-
 models:
-  - minicpm:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/OpenBMB/MiniCPM-V-2_6/
-      model_type: minicpmv  # qwen  chatglm3 yi internlm
-      work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        # - 1
-        - 0
-  - internvl2:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
-      model_type: internvl2  # qwen  yi internlm
-      work_mode: lmdeploy-turbomind  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        # - 1
-        - 0
-      # - gpus:
-      #   - 0
-  - chatglm4:  #自定义的模型名称
-      alias: chatglm3 # 别名     例如  gpt4,gpt3
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/ZhipuAI/glm-4-9b-chat
-      model_type: chatglm  # qwen yi internlm
-      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        # - 1
-        - 0
-  
-  - qwen:  #自定义的模型名称
-      alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/qwen/Qwen2-72B-Instruct-AWQ/
-      model_type: qwen  # qwen  yi internlm
-      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      # lora:
-      #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
-        
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 1
-      # - gpus:
-      #   - 3
-  - qwen-72b:  #自定义的模型名称
-      alias: qwen # 别名     例如  gpt4,gpt3
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/qwen/Qwen2-72B-Instruct-AWQ/
-      model_type: qwen  # qwen yi internlm
-      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      enable_prefix_caching: false # false true
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 3
-        - 1
-      # - gpus:
-      #   - 1
-
-  - mixtral:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT/
-      model_type: qwen  # qwen yi internlm
-      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 3
-        - 0
-    
-
-  - llama3:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/unsloth/unsloth/llama-3-8b-Instruct/
-      model_type: llama  # qwen yi internlm
-      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 0
-
-  - yi:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
-      model_type: yi  # qwen yi internlm
-      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-        # - 0
-
-  - internlm2:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2_5-7b-chat/
-      model_type: internlm  # qwen yi internlm
-      work_mode: hf  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 0
-    
-  # Embedding 模型
-  - piccolo-base-zh:
-      alias: null # 别名   
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-
-  - bce-embedding-base_v1:
-      alias: text-embedding-ada-002 # 别名   
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-
-  - conan:
-      alias: null # 别名   
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/model1001/Conan/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-        
-  - bge-reranker-base:
-      alias: null # 别名   
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-  - puff:
-      alias: null # 别名   
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/infgrad/puff-large-v1/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-  
-  - acge_text_embedding:
-      alias: text-embedding-ada-002 # 别名   
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/aspire/acge_text_embedding
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-  - yinka:
-      alias: null # 别名   
-      enable: false  # false true
-      model_name_or_path: /home/dev/model/Classical/Yinka/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-  - xiaobu-embedding:
-      alias: null # 别名   
-      enable: true  # false true
-      model_name_or_path: /home/dev/model/lier007/xiaobu-embedding-v2/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-
-
-
-
-
-
-
-
+- qwenvl:
+    alias: null
+    enable: false
+    model_name_or_path: /home/dev/model/qwen/Qwen2-VL-7B-Instruct/
+    model_type: qwen
+    work_mode: lmdeploy-turbomind
+    enable_prefix_caching: false
+    device: gpu
+    workers:
+    - gpus:
+      - 0
+- internvl2:
+    alias: null
+    enable: false
+    model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
+    model_type: internvl2
+    work_mode: lmdeploy-turbomind
+    enable_prefix_caching: false
+    device: gpu
+    workers:
+    - gpus:
+      - 0
+- chatglm4:
+    alias: chatglm3
+    enable: true
+    model_name_or_path: /home/dev/model/ZhipuAI/glm-4-9b-chat
+    model_type: chatglm
+    work_mode: vllm
+    enable_prefix_caching: false
+    device: gpu
+    workers:
+    - gpus:
+      - 0
+- qwen:
+    alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k
+    enable: false
+    model_name_or_path: /home/dev/model/qwen/Qwen2___5-7B-Instruct/
+    model_type: qwen
+    work_mode: lmdeploy-turbomind
+    enable_prefix_caching: false
+    device: gpu
+    workers:
+    - gpus:
+      - 1
+- qwen-72b:
+    alias: qwen,gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k
+    enable: true
+    model_name_or_path: /home/dev/model/qwen/Qwen2___5-72B-Instruct-AWQ/
+    model_type: qwen
+    work_mode: lmdeploy-turbomind
+    enable_prefix_caching: true
+    device: gpu
+    workers:
+    - gpus:
+      - 3
+      - 1
+- mixtral:
+    alias: null
+    enable: false
+    model_name_or_path: /home/dev/model/NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT/
+    model_type: qwen
+    work_mode: vllm
+    device: gpu
+    workers:
+    - gpus:
+      - 3
+      - 0
+- llama3:
+    alias: null
+    enable: false
+    model_name_or_path: /home/dev/model/unsloth/unsloth/llama-3-8b-Instruct/
+    model_type: llama
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 0
+- yi:
+    alias: null
+    enable: false
+    model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
+    model_type: yi
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
+- internlm2:
+    alias: null
+    enable: false
+    model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2_5-7b-chat/
+    model_type: internlm
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 0
+- piccolo-base-zh:
+    alias: null
+    enable: true
+    model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
+    model_type: embedding_infinity
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
+- bce-embedding-base_v1:
+    alias: text-embedding-ada-002
+    enable: true
+    model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
+    model_type: embedding_infinity
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
+- conan:
+    alias: null
+    enable: true
+    model_name_or_path: /home/dev/model/model1001/Conan/
+    model_type: embedding_infinity
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
+- bge-reranker-base:
+    alias: null
+    enable: true
+    model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
+    model_type: embedding_infinity
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
+- acge_text_embedding:
+    alias: text-embedding-ada-002
+    enable: true
+    model_name_or_path: /home/dev/model/aspire/acge_text_embedding
+    model_type: embedding_infinity
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
+- xiaobu-embedding:
+    alias: null
+    enable: true
+    model_name_or_path: /home/dev/model/lier007/xiaobu-embedding-v2/
+    model_type: embedding_infinity
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2

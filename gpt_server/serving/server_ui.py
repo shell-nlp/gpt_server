@@ -4,6 +4,7 @@ import os
 import sys
 from loguru import logger
 from copy import deepcopy
+import subprocess
 
 if "config" not in st.session_state:
     # 配置根目录
@@ -13,12 +14,24 @@ if "config" not in st.session_state:
     original_pythonpath = os.environ.get("PYTHONPATH", "")
     os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
     sys.path.append(root_dir)
-    config_path = os.path.join(root_dir, "gpt_server/script/config2.yaml")
+    config_path = os.path.join(root_dir, "gpt_server/script/config.yaml")
     st.session_state["config_path"] = config_path
+    st.session_state["server_state"] = "未启动"
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
         st.session_state["config"] = config
         st.session_state["init_config"] = deepcopy(config)
+
+
+def get_process_num():
+    cmd = "ps -ef | grep gpt_server | grep -v grep | wc -l"
+    result = subprocess.run(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+
+    # 获取输出，并去掉末尾的换行符
+    count = int(result.stdout.decode("utf-8").strip())
+    return count
 
 
 def update_config(config: dict):
@@ -30,7 +43,11 @@ def update_config(config: dict):
     st.session_state["config"] = config
 
 
-st.title("GPT_SERVER")
+if get_process_num() > 6:
+    st.session_state["server_state"] = "已启动"
+
+server_state = st.session_state["server_state"]
+st.title(f"GPT_SERVER - {server_state}")
 
 tab = st.sidebar.radio(
     "配置选项卡", ("OpenAI 服务配置", "Controller 配置", "Model_worker 配置")
@@ -52,7 +69,7 @@ def serve_args():
         config["serve_args"]["controller_address"],
         key="serve_controller_address",
     )
-    return serve_host, serve_port, serve_controller_address
+    return serve_host, int(serve_port), serve_controller_address
 
 
 # Function for Controller Args
@@ -71,7 +88,7 @@ def controller_args():
         index=options.index(config["controller_args"]["dispatch_method"]),
         key="dispatch_method",
     )
-    return controller_host, controller_port, dispatch_method
+    return controller_host, int(controller_port), dispatch_method
 
 
 # Function for Model Worker Args
@@ -80,15 +97,13 @@ def model_worker_args():
     new_config = st.session_state["config"]
     config = deepcopy(st.session_state["config"])
     st.header("Model_worker 配置")
-    config["model_worker_args"]["host"] = model_worker_host = st.text_input(
+    config["model_worker_args"]["host"] = st.text_input(
         "host", init_config["model_worker_args"]["host"], key="model_worker_host"
     )
-    config["model_worker_args"]["controller_address"] = model_controller_address = (
-        st.text_input(
-            "controller_address",
-            init_config["model_worker_args"]["controller_address"],
-            key="model_controller_address",
-        )
+    config["model_worker_args"]["controller_address"] = st.text_input(
+        "controller_address",
+        init_config["model_worker_args"]["controller_address"],
+        key="model_controller_address",
     )
     # --------------------------------
     model_tab_dict = {}
@@ -139,16 +154,19 @@ def model_worker_args():
 
                         start_server = st.session_state[f"start_server_{i}"]
                         stop_server = st.session_state[f"stop_server_{i}"]
+                        global server_state
                         if start_server:
                             from gpt_server.utils import run_cmd
 
                             start_server_cmd = "nohup python -m gpt_server.serving.main > gpt_server.log &"
                             run_cmd(start_server_cmd)
+                            st.session_state["server_state"] = "已启动"
                         if stop_server:
                             from gpt_server.utils import stop_server
 
                             stop_server()
                             logger.warning("服务已停止成功！")
+                            st.session_state["server_state"] = "未启动"
                         if new_model:
                             new_config["models"].append(
                                 {
