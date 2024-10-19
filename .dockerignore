@@ -3,4 +3,5 @@ tests/
 .venv/
 __pycache__/
 *.log*
+*.egg-info
 logs/
