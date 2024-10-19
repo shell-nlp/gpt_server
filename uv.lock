@@ -27,6 +27,13 @@ resolution-markers = [
     "(python_full_version >= '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')",
 ]
 
+[manifest]
+overrides = [
+    { name = "torch", specifier = "==2.4.0" },
+    { name = "torchvision", specifier = "==0.19" },
+    { name = "triton", specifier = ">=2.2.0,<=3.0.0" },
+]
+
 [[package]]
 name = "accelerate"
 version = "1.0.1"
@@ -829,6 +836,7 @@ dependencies = [
     { name = "lmdeploy" },
     { name = "loguru" },
     { name = "openai" },
+    { name = "pyproject-toml" },
     { name = "setuptools" },
     { name = "streamlit" },
     { name = "torch" },
@@ -845,9 +853,10 @@ requires-dist = [
     { name = "fschat", specifier = "==0.2.36" },
     { name = "gradio", specifier = "==4.26.0" },
     { name = "infinity-emb", extras = ["all"], specifier = "==0.0.53" },
-    { name = "lmdeploy", git = "https://gitee.com/liuyu_1997/lmdeploy.git" },
-    { name = "loguru" },
+    { name = "lmdeploy", specifier = "==0.6.0" },
+    { name = "loguru", specifier = ">=0.7.2" },
     { name = "openai", specifier = "==1.44.0" },
+    { name = "pyproject-toml", specifier = ">=0.0.10" },
     { name = "setuptools", specifier = "==75.2.0" },
     { name = "streamlit", specifier = "==1.39.0" },
     { name = "torch", specifier = "==2.4.0" },
@@ -1089,6 +1098,7 @@ dependencies = [
     { name = "hf-transfer" },
     { name = "huggingface-hub" },
     { name = "numpy" },
+    { name = "torch" },
 ]
 sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/37/92/fea5d798e278cb243c0b046b027212e5a28048694daaefae194afe9506e7/infinity_emb-0.0.53.tar.gz", hash = "sha256:a02262d7ba347206e73ca594a4235f82d4ece603775b87fd11d735d04acc0a2e", size = 57969 }
 wheels = [
@@ -1109,7 +1119,6 @@ all = [
     { name = "rich" },
     { name = "sentence-transformers" },
     { name = "timm" },
-    { name = "torch" },
     { name = "typer", extra = ["all"] },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -1364,7 +1373,7 @@ wheels = [
 [[package]]
 name = "lmdeploy"
 version = "0.6.0"
-source = { git = "https://gitee.com/liuyu_1997/lmdeploy.git#bec412e4885b9ed619642c5e333c61ce899ed029" }
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "accelerate" },
     { name = "einops" },
@@ -1372,6 +1381,10 @@ dependencies = [
     { name = "fire" },
     { name = "mmengine-lite" },
     { name = "numpy" },
+    { name = "nvidia-cublas-cu12" },
+    { name = "nvidia-cuda-runtime-cu12" },
+    { name = "nvidia-curand-cu12" },
+    { name = "nvidia-nccl-cu12" },
     { name = "openai" },
     { name = "outlines" },
     { name = "peft" },
@@ -1386,8 +1399,17 @@ dependencies = [
     { name = "torch" },
     { name = "torchvision" },
     { name = "transformers" },
-    { name = "triton" },
+    { name = "triton", version = "2.3.1", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "(platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'emscripten') or (platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'emscripten') or platform_system == 'Darwin' or (platform_machine == 'aarch64' and platform_system == 'Linux') or python_full_version >= '3.13'" },
+    { name = "triton", version = "3.0.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version < '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')" },
     { name = "uvicorn" },
+]
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6c/fb/72e65d052ca28e073d34d5d3b53d89991161b3ccaf284231fb82eaab0c33/lmdeploy-0.6.0-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:4503d1ed1a04914f89cbdd3d8995ad54b6d14f0ef2c681e6e52000993fb8da14", size = 78002623 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/c2/1b/58dc612a0af73abd737eddd1f0215781694e744b7789bcd27b9471278c95/lmdeploy-0.6.0-cp310-cp310-win_amd64.whl", hash = "sha256:95247b1c5ecd24db9a88b0db7fedef9dc890329b66039fba1bf14fc4ee222074", size = 32080445 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/45/5f/24e4e44e8102f588affd173efdd1802c61c0bf3ad5be9aa6b00740def2cf/lmdeploy-0.6.0-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:b0634c8cf061221cbc8da48ed3bb14d0d5f93dbfba17c1df3261197a7451c0f9", size = 78014379 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ff/84/218e79e785d73387fd3a4522b912629e269cf6e95977a0943da21dcd12fe/lmdeploy-0.6.0-cp311-cp311-win_amd64.whl", hash = "sha256:0379c1793578dfedb64d7ee07244b8852ff3406bc812f09894f218b4b068dd47", size = 32081434 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/46/8f/95e930463393d850450f710b5fe007deb5fd7b81d2933c18e6a5b21434bf/lmdeploy-0.6.0-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:8a2e3aa7f46f7e2c3f5556eb3f009dbb315da575032c9e6195049a00d04bb8c1", size = 78032250 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/69/79/c7151b386f8d084deb1085a65d65b062f46245b430964bcf8cec463ad1a0/lmdeploy-0.6.0-cp312-cp312-win_amd64.whl", hash = "sha256:bc17a7e182330fdaa02ca6b015b5ee53b6ac432fb3508854e88f7d5e60515366", size = 32084355 },
 ]
 
 [[package]]
@@ -1862,6 +1884,7 @@ version = "12.1.3.1"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/37/6d/121efd7382d5b0284239f4ab1fc1590d86d34ed4a4a2fdb13b30ca8e5740/nvidia_cublas_cu12-12.1.3.1-py3-none-manylinux1_x86_64.whl", hash = "sha256:ee53ccca76a6fc08fb9701aa95b6ceb242cdaab118c3bb152af4e579af792728", size = 410594774 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/c5/ef/32a375b74bea706c93deea5613552f7c9104f961b21df423f5887eca713b/nvidia_cublas_cu12-12.1.3.1-py3-none-win_amd64.whl", hash = "sha256:2b964d60e8cf11b5e1073d179d85fa340c120e99b3067558f3cf98dd69d02906", size = 439918445 },
 ]
 
 [[package]]
@@ -1886,6 +1909,7 @@ version = "12.1.105"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/eb/d5/c68b1d2cdfcc59e72e8a5949a37ddb22ae6cade80cd4a57a84d4c8b55472/nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl", hash = "sha256:6e258468ddf5796e25f1dc591a31029fa317d97a0a94ed93468fc86301d61e40", size = 823596 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/9f/e2/7a2b4b5064af56ea8ea2d8b2776c0f2960d95c88716138806121ae52a9c9/nvidia_cuda_runtime_cu12-12.1.105-py3-none-win_amd64.whl", hash = "sha256:dfb46ef84d73fababab44cf03e3b83f80700d27ca300e537f85f636fac474344", size = 821226 },
 ]
 
 [[package]]
@@ -1913,6 +1937,7 @@ version = "10.3.2.106"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/44/31/4890b1c9abc496303412947fc7dcea3d14861720642b49e8ceed89636705/nvidia_curand_cu12-10.3.2.106-py3-none-manylinux1_x86_64.whl", hash = "sha256:9d264c5036dde4e64f1de8c50ae753237c12e0b1348738169cd0f8a536c0e1e0", size = 56467784 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5c/97/4c9c7c79efcdf5b70374241d48cf03b94ef6707fd18ea0c0f53684931d0b/nvidia_curand_cu12-10.3.2.106-py3-none-win_amd64.whl", hash = "sha256:75b6b0c574c0037839121317e17fd01f8a69fd2ef8e25853d826fec30bdba74a", size = 55995813 },
 ]
 
 [[package]]
@@ -2655,6 +2680,21 @@ source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/8c/d5/e5aeee5387091148a19e1145f63606619cb5f20b83fccb63efae6474e7b2/pyparsing-3.2.0.tar.gz", hash = "sha256:cbf74e27246d595d9a74b186b810f6fbb86726dbf3b9532efb343f6d7294fe9c", size = 920984 }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/be/ec/2eb3cd785efd67806c46c13a17339708ddc346cbb684eade7a6e6f79536a/pyparsing-3.2.0-py3-none-any.whl", hash = "sha256:93d9577b88da0bbea8cc8334ee8b918ed014968fd2ec383e868fb8afb1ccef84", size = 106921 },
+]
+
+[[package]]
+name = "pyproject-toml"
+version = "0.0.10"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "jsonschema" },
+    { name = "setuptools" },
+    { name = "toml" },
+    { name = "wheel" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/05/82/f2ab4c65c33103e62fdb2db8fce0db5d5061b8fab15e266a08fe387418f4/pyproject-toml-0.0.10.tar.gz", hash = "sha256:f0ce0e9934ecb00c0e529b4a1c380edd3034c4be65516769c5f080bdb23dfcb3", size = 5454 }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/3b/56/95d700e725946200ec9b2aeee4479fcf3ca24cf6fbf0aa548160980787a5/pyproject_toml-0.0.10-py3-none-any.whl", hash = "sha256:257a7070617e1a0bcfd8f790817b30bd9193876023a9b9e7a6b4fc976acf4c3e", size = 6887 },
 ]
 
 [[package]]
@@ -3556,7 +3596,8 @@ dependencies = [
     { name = "nvidia-nccl-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
     { name = "nvidia-nvtx-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
     { name = "sympy" },
-    { name = "triton", marker = "python_full_version < '3.13' and platform_machine == 'x86_64' and platform_system == 'Linux'" },
+    { name = "triton", version = "2.3.1", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "(platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'emscripten') or (platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'emscripten') or platform_system == 'Darwin' or (platform_machine == 'aarch64' and platform_system == 'Linux') or python_full_version >= '3.13'" },
+    { name = "triton", version = "3.0.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version < '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')" },
     { name = "typing-extensions" },
 ]
 wheels = [
@@ -3660,15 +3701,51 @@ sentencepiece = [
 
 [[package]]
 name = "triton"
-version = "3.0.0"
+version = "2.3.1"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+resolution-markers = [
+    "python_full_version < '3.11' and platform_system == 'Darwin' and sys_platform != 'emscripten'",
+    "python_full_version < '3.11' and platform_system == 'Darwin' and sys_platform == 'emscripten'",
+    "python_full_version < '3.11' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform != 'emscripten'",
+    "python_full_version < '3.11' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform == 'emscripten'",
+    "(python_full_version < '3.11' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'emscripten') or (python_full_version < '3.11' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'emscripten')",
+    "python_full_version == '3.11.*' and platform_system == 'Darwin' and sys_platform != 'emscripten'",
+    "python_full_version == '3.11.*' and platform_system == 'Darwin' and sys_platform == 'emscripten'",
+    "python_full_version == '3.11.*' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform != 'emscripten'",
+    "python_full_version == '3.11.*' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform == 'emscripten'",
+    "(python_full_version == '3.11.*' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'emscripten') or (python_full_version == '3.11.*' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'emscripten')",
+    "python_full_version == '3.12.*' and platform_system == 'Darwin' and sys_platform != 'emscripten'",
+    "python_full_version == '3.12.*' and platform_system == 'Darwin' and sys_platform == 'emscripten'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform != 'emscripten'",
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform == 'emscripten'",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'emscripten') or (python_full_version == '3.12.*' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'emscripten')",
+    "python_full_version >= '3.13' and platform_system == 'Darwin' and sys_platform != 'emscripten'",
+    "python_full_version >= '3.13' and platform_system == 'Darwin' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform != 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine == 'aarch64' and platform_system == 'Linux' and sys_platform == 'emscripten'",
+    "(python_full_version >= '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'emscripten') or (python_full_version >= '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'emscripten')",
+    "(python_full_version >= '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')",
+]
 dependencies = [
-    { name = "filelock" },
+    { name = "filelock", marker = "(platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'emscripten') or (platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'emscripten') or platform_system == 'Darwin' or (platform_machine == 'aarch64' and platform_system == 'Linux') or python_full_version >= '3.13'" },
 ]
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/45/27/14cc3101409b9b4b9241d2ba7deaa93535a217a211c86c4cc7151fb12181/triton-3.0.0-1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:e1efef76935b2febc365bfadf74bcb65a6f959a9872e5bddf44cc9e0adce1e1a", size = 209376304 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/33/3e/a2f59384587eff6aeb7d37b6780de7fedd2214935e27520430ca9f5b7975/triton-3.0.0-1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5ce8520437c602fb633f1324cc3871c47bee3b67acf9756c1a66309b60e3216c", size = 209438883 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/fe/7b/7757205dee3628f75e7991021d15cd1bd0c9b044ca9affe99b50879fc0e1/triton-3.0.0-1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:34e509deb77f1c067d8640725ef00c5cbfcb2052a1a3cb6a6d343841f92624eb", size = 209464695 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/d7/69/8a9fde07d2d27a90e16488cdfe9878e985a247b2496a4b5b1a2126042528/triton-2.3.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3c84595cbe5e546b1b290d2a58b1494df5a2ef066dd890655e5b8a8a92205c33", size = 168055249 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/64/16/956b7b9d2ed3a437a1a06792b2ae2e3c49147296ba2f4d59fcee376ded8f/triton-2.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c9d64ae33bcb3a7a18081e3a746e8cf87ca8623ca13d2c362413ce7a486f893e", size = 168079264 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ea/a4/e66cbd7befaf44a84cfb367b00a0331735cd56d4b2076533dec9b0b255fe/triton-2.3.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:eaf80e8761a9e3498aa92e7bf83a085b31959c61f5e8ac14eedd018df6fccd10", size = 168090656 },
+]
+
+[[package]]
+name = "triton"
+version = "3.0.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+resolution-markers = [
+    "(python_full_version < '3.11' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version < '3.11' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')",
+    "(python_full_version == '3.11.*' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version == '3.11.*' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version == '3.12.*' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')",
+]
+dependencies = [
+    { name = "filelock", marker = "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform == 'emscripten') or (python_full_version < '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform == 'emscripten')" },
 ]
 
 [[package]]
@@ -3955,6 +4032,15 @@ wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b5/94/ac47552208583d5dbcce468430c1eb2ae18962f6b3a694a2b7727cc60d4a/websockets-11.0.3-cp311-cp311-win32.whl", hash = "sha256:e1459677e5d12be8bbc7584c35b992eea142911a6236a3278b9b5ce3326f282c", size = 124149 },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e1/7c/0ad6e7ef0a054d73092f616d20d3d9bd3e1b837554cb20a52d8dd9f5b049/websockets-11.0.3-cp311-cp311-win_amd64.whl", hash = "sha256:e7837cb169eca3b3ae94cc5787c4fed99eef74c0ab9506756eea335e0d6f3ed8", size = 124670 },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/47/96/9d5749106ff57629b54360664ae7eb9afd8302fad1680ead385383e33746/websockets-11.0.3-py3-none-any.whl", hash = "sha256:6681ba9e7f8f3b19440921e99efbb40fc89f26cd71bf539e45d8c8a25c976dc6", size = 118056 },
+]
+
+[[package]]
+name = "wheel"
+version = "0.44.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b7/a0/95e9e962c5fd9da11c1e28aa4c0d8210ab277b1ada951d2aee336b505813/wheel-0.44.0.tar.gz", hash = "sha256:a29c3f2817e95ab89aa4660681ad547c0e9547f20e75b0562fe7723c9a2a9d49", size = 100733 }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/1b/d1/9babe2ccaecff775992753d8686970b1e2755d21c8a63be73aba7a4e7d77/wheel-0.44.0-py3-none-any.whl", hash = "sha256:2376a90c98cc337d18623527a97c31797bd02bad0033d41547043a1cbfbe448f", size = 67059 },
 ]
 
 [[package]]
