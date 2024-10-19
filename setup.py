@@ -45,6 +45,7 @@ def get_version():
 setup(
     name="gpt_server",
     version=get_version(),
+    license="Apache 2.0",
     description="gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。",
     long_description=readme(),
     long_description_content_type="text/markdown",

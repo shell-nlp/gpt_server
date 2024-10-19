@@ -1,35 +1,27 @@
-[tool.poetry]
-name = "gpt-server"
-version = "0.3"
+[project]
+name = "gpt_server"
+version = "0.3.2"
 description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
-authors = ["liuyu <506610466@qq.com>"]
-license = "Apache 2.0"
 readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "accelerate>=1.0.1",
+    "fastapi==0.114.1",
+    "ffmpy",
+    "fschat==0.2.36",
+    "gradio==4.26.0",
+    "infinity-emb[all]==0.0.53",
+    "lmdeploy",
+    "loguru>=0.7.2",
+    "openai==1.44.0",
+    "setuptools==75.2.0",
+    "streamlit==1.39.0",
+    "torch==2.4.0",
+    "torchvision==0.19",
+    "transformers==4.45.2",
+    "vllm==0.6.3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-setuptools = "69.5.1"
-torch = "2.4.0"
-torchvision = "0.19"
-fschat = "0.2.36"
-transformers = "4.43.2"
-accelerate = "^0.33.0"
-vllm = "0.6.0"
-openai = "1.44.0"
-loguru = "^0.7.2"
-fastapi = "0.110.2"
-infinity-emb = {version = "0.0.53", extras = ["all"]}
-lmdeploy = {git = "https://gitee.com/liuyu_1997/lmdeploy.git"}
-ffmpy = {git = "https://gitee.com/liuyu_1997/ffmpy.git"}
-gradio = "4.26.0"
-
-
-
-[[tool.poetry.source]]
-name = "tsinghua"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-priority = "primary"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv.sources]
+lmdeploy = { git = "https://gitee.com/liuyu_1997/lmdeploy.git" }
+ffmpy = { git = "https://gitee.com/liuyu_1997/ffmpy.git" }

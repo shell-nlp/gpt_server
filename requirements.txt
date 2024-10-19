@@ -1,4 +1,4 @@
-setuptools==69.5.1
+setuptools==75.2.0
 torch==2.4.0
 torchvision==0.19
 fschat==0.2.36
