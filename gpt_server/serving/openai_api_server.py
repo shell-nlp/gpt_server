@@ -287,6 +287,7 @@ async def get_gen_params(
     use_beam_search: Optional[bool] = None,
     tools: Optional[list] = None,
     tool_choice=None,
+    response_format=None,
 ) -> Dict[str, Any]:
     images = []
     if isinstance(messages, str):
@@ -324,7 +325,7 @@ async def get_gen_params(
     gen_params["tools"] = tools
     gen_params["tool_choice"] = tool_choice
     # ------- TODO add messages tools -------
-
+    gen_params["response_format"] = response_format
     logger.debug(f"==== request ====\n{gen_params}")
     return gen_params
 
@@ -412,10 +413,11 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         stop=request.stop,
         tools=request.tools,
         tool_choice=request.tool_choice,
+        response_format=request.response_format,
     )
     if gen_params["max_new_tokens"] is None:
         gen_params["max_new_tokens"] = 1024 * 16
-   
+
     if request.stream:
         generator = chat_completion_stream_generator(
             request.model, gen_params, request.n, worker_addr

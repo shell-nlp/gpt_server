@@ -2,6 +2,7 @@ import json
 import os
 from typing import Any, Dict, AsyncGenerator
 from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
+from vllm.sampling_params import GuidedDecodingParams
 from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
@@ -43,7 +44,7 @@ class VllmBackend(ModelBackend):
                     )
                 )
 
-        engine_args = AsyncEngineArgs(
+        self.engine_args = AsyncEngineArgs(
             model_path,
             tensor_parallel_size=tensor_parallel_size,
             trust_remote_code=True,
@@ -53,7 +54,7 @@ class VllmBackend(ModelBackend):
             max_loras=max_loras,
             enable_prefix_caching=enable_prefix_caching,
         )
-        self.engine = AsyncLLMEngine.from_engine_args(engine_args)
+        self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -101,7 +102,33 @@ class VllmBackend(ModelBackend):
         if temperature <= 1e-5:
             top_p = 1.0
             temperature = 0.01
+        response_format = params["response_format"]
+        guided_json_object = None
+        guided_decoding = None
+        guided_json = None
+        # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
+        # if response_format is not None:
+        #     if response_format["type"] == "json_object":
+        #         guided_json_object = True
+        #     if response_format["type"] == "json_schema":
+        #         json_schema = response_format["json_schema"]
+        #         assert json_schema is not None
+        #         guided_json = json_schema["schema"]
 
+        #     guided_decoding = GuidedDecodingParams.from_optional(
+        #         json=guided_json,
+        #         regex=None,
+        #         choice=None,
+        #         grammar=None,
+        #         json_object=guided_json_object,
+        #         backend=(
+        #             self.engine_args.guided_decoding_backend
+        #             if self.engine_args.guided_decoding_backend
+        #             else "lm-format-enforcer"
+        #         ),
+        #         whitespace_pattern=None,
+        #     )
+        # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
         sampling = SamplingParams(
             top_p=top_p,
             top_k=top_k,
@@ -111,6 +138,7 @@ class VllmBackend(ModelBackend):
             stop_token_ids=stop_token_ids,
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
+            guided_decoding=guided_decoding,
         )
         lora_request = None
         for lora in self.lora_requests:
