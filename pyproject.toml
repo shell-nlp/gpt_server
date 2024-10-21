@@ -3,34 +3,23 @@ name = "gpt_server"
 version = "0.3.2"
 description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
 readme = "README.md"
-license = {text = "Apache 2.0"}
+license = { text = "Apache 2.0" }
 authors = [{ name = "Yu Liu", email = "506610466@qq.com" }]
 requires-python = ">=3.10"
 dependencies = [
     "accelerate>=1.0.1",
     "fastapi==0.114.1",
-    "ffmpy",
+    "ffmpy @ git+https://gitee.com/liuyu_1997/ffmpy.git",
     "fschat==0.2.36",
     "gradio==4.26.0",
     "infinity-emb[all]==0.0.53",
-    "lmdeploy==0.6.0",
+    "lmdeploy @ git+https://gitee.com/liuyu_1997/lmdeploy.git",
     "loguru>=0.7.2",
     "openai==1.44.0",
-    "pyproject-toml>=0.0.10",
     "setuptools==75.2.0",
     "streamlit==1.39.0",
     "torch==2.4.0",
     "torchvision==0.19",
     "transformers==4.45.2",
     "vllm==0.6.3",
-]
-
-[tool.uv.sources]
-ffmpy = { git = "https://gitee.com/liuyu_1997/ffmpy.git" }
-
-[tool.uv]
-override-dependencies = [
-    "torchvision==0.19",
-    "torch==2.4.0",
-    "triton>=2.2.0,<=3.0.0",
 ]
