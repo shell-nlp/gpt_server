@@ -23,3 +23,6 @@ dependencies = [
     "transformers==4.45.2",
     "vllm==0.6.3",
 ]
+
+[project.scripts]
+gpt_server = "gpt_server.cli:run"
