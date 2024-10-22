@@ -67,7 +67,8 @@
 * [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
-* [ ] 可视化启动界面
+* [X] 可视化启动界面
+* [ ] 支持 pip install 方式进行安装
 * [ ] 内置部分 tools (image_gen,code_interpreter,weather等)
 * [ ] 并行的function call功能（tools）
 
@@ -88,6 +89,7 @@ conda activate gpt_server
 # 3. 安装仓库（一定要使用 install.sh 安装,否则无法解决依赖冲突）
 sh install.sh
 ```
+
 
 #### 2. 修改启动配置文件
 
@@ -203,6 +205,18 @@ cd gpt_server/script
 sh start.sh
 ```
 
+#### 4. 可视化UI方式启动服务（可选）
+
+```bash
+cd gpt_server/gpt_server/serving
+streamlit run server_ui.py
+```
+
+##### 4.1 Server UI界面:
+
+![server_ui_demo.png](assets/server_ui_demo.png)
+
+
 ## 支持的模型以及推理后端
 
 **推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
@@ -258,21 +272,21 @@ sh start.sh
 
 目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
-#### 4. 使用 openai 库 进行调用
+#### 5. 使用 openai 库 进行调用
 
 **见 gpt_server/tests 目录 样例测试代码:
 https://github.com/shell-nlp/gpt_server/tree/main/tests**
 
-#### 5. 使用WebUI
+#### 6. 使用Chat UI
 
 ```bash
-cd gpt_server/tests
-python web_demo.py
+cd gpt_server/gpt_server/serving
+streamlit run chat_ui.py
 ```
 
-WebUI界面:
+Chat UI界面:
 
-![web_demo.png](assets/web_demo.png)
+![chat_ui_demo.png](assets/chat_ui_demo.png)
 
 ### Docker安装
 

@@ -2,6 +2,7 @@ serve_args:
   host: 0.0.0.0
   port: 8082
   controller_address: http://localhost:21001
+  api_keys: null
 controller_args:
   host: 0.0.0.0
   port: 21001

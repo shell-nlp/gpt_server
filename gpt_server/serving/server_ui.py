@@ -69,7 +69,13 @@ def serve_args():
         config["serve_args"]["controller_address"],
         key="serve_controller_address",
     )
-    return serve_host, int(serve_port), serve_controller_address
+    serve_api_keys = st.text_input(
+        "api_keys",
+        config["serve_args"].get("api_keys", None),
+        key="serve_api_keys",
+        placeholder="空 则表示不设置api_keys,如果设置,格式形如：111,222  (多个使用逗号分隔)",
+    )
+    return serve_host, int(serve_port), serve_controller_address, serve_api_keys
 
 
 # Function for Controller Args
@@ -311,6 +317,7 @@ if tab == "OpenAI 服务配置":
         config["serve_args"]["host"],
         config["serve_args"]["port"],
         config["serve_args"]["controller_address"],
+        config["serve_args"]["api_keys"],
     ) = serve_args()
 elif tab == "Controller 配置":
 
