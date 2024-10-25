@@ -1,4 +1,4 @@
-FROM gpt_server:latest
+FROM docker.rainbond.cc/506610466/gpt_server:latest 
 
 RUN rm -rf /gpt_server
 

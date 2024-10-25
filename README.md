@@ -244,7 +244,7 @@ streamlit run server_ui.py
 | :--------------: | :-: | :-: | :--: | :----------------: | :--------------: |
 |    glm-4v-9b    |chatglm| × |  ×  |         ×         |        √        |
 |    InternVL2    |internvl2| × |  ×  |         √         |        √        |
-|    MiniCPM-V-2_6   |minicpmv | × |  ×  |         √         |        ×        |
+|    MiniCPM-V-2_6   |minicpmv | × |  √  |         √         |        ×        |
 |    Qwen2-VL   |qwen | × |  √  |         ×         |        ×        |
 <br>
 
@@ -306,7 +306,7 @@ docker pull docker.rainbond.cc/506610466/gpt_server:latest
 ```bash
 docker build --rm -f "Dockerfile" -t gpt_server:latest "." 
 ```
-##### 1.2 Docker Compose启动
+##### 1.2 Docker Compose启动 (建议在项目里使用docker-compose启动)
 
 ```bash
 docker-compose  -f "docker-compose.yml" up -d --build gpt_server
