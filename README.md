@@ -138,7 +138,8 @@ models:
   - chatglm4:  #自定义的模型名称
       alias: null # 别名     例如  gpt4,gpt3
       enable: true  # false true 控制是否启动模型worker
-      model_name_or_path: /home/dev/model/THUDM/glm-4-9b-chat/
+      model_config:
+        model_name_or_path: /home/dev/model/THUDM/glm-4-9b-chat/
       model_type: chatglm  # qwen  yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       # lora:  # lora 配置
@@ -162,7 +163,11 @@ models:
   - qwen:  #自定义的模型名称
       alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
       enable: true  # false true 控制是否启动模型worker
-      model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
+      model_config:
+        model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
+        enable_prefix_caching: false
+        dtype: auto
+        max_model_len: 65536
       model_type: qwen  # qwen  yi internlm
       work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
       device: gpu  # gpu / cpu
@@ -176,7 +181,8 @@ models:
   - bge-base-zh:
       alias: null # 别名   
       enable: true  # false true
-      model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
+      model_config:
+        model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
       model_type: embedding_infinity # embedding_infinity 
       work_mode: hf
       device: gpu  # gpu / cpu
@@ -187,7 +193,8 @@ models:
   - bge-reranker-base:
       alias: null # 别名   
       enable: true  # false true  控制是否启动模型worker
-      model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
+      model_config:
+        model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
       model_type: embedding_infinity # embedding_infinity
       work_mode: hf
       device: gpu  # gpu / cpu

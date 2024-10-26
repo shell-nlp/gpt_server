@@ -14,10 +14,12 @@ models:
 - minicpmv:
     alias: null
     enable: false
-    model_name_or_path: /home/dev/model/OpenBMB/MiniCPM-V-2_6/
     model_type: minicpmv
+    model_config:
+      model_name_or_path: /home/dev/model/OpenBMB/MiniCPM-V-2_6/
+      enable_prefix_caching: false
+      dtype: auto
     work_mode: lmdeploy-turbomind
-    enable_prefix_caching: false
     device: gpu
     workers:
     - gpus:
@@ -25,10 +27,11 @@ models:
 - internvl2:
     alias: null
     enable: false
-    model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
+    model_config:
+      model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
+      enable_prefix_caching: false
     model_type: internvl2
     work_mode: lmdeploy-turbomind
-    enable_prefix_caching: false
     device: gpu
     workers:
     - gpus:
@@ -36,26 +39,32 @@ models:
 - chatglm4:
     alias: chatglm3
     enable: true
-    model_name_or_path: /home/dev/model/ZhipuAI/glm-4-9b-chat
+    model_config:
+      model_name_or_path: /home/dev/model/ZhipuAI/glm-4-9b-chat
+      enable_prefix_caching: false
     model_type: chatglm
     work_mode: vllm
-    enable_prefix_caching: false
     device: gpu
     workers:
     - gpus:
       - 3
+
 - qwen-72b:
     alias: qwen,gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k
     enable: true
-    model_name_or_path: /home/dev/model/qwen/Qwen2___5-72B-Instruct-AWQ/
+    model_config:
+      model_name_or_path: /home/dev/model/qwen/Qwen2___5-72B-Instruct-AWQ/
+      enable_prefix_caching: true
+      dtype: auto
+      max_model_len: 65536
     model_type: qwen
     work_mode: lmdeploy-turbomind
-    enable_prefix_caching: true
     device: gpu
     workers:
     - gpus:
       - 0
       - 1
+
 - piccolo-base-zh:
     alias: null
     enable: true
@@ -78,6 +87,7 @@ models:
     workers:
     - gpus:
       - 2
+
 - bge-reranker-base:
     alias: null
     enable: true
