@@ -3,7 +3,13 @@
 <a href="https://github.com/shell-nlp/gpt_server"><img src="assets/logo.png" width="252" height="116" alt="gpt_server logo"></a>
 
 # GPT Server
-[![License](https://img.shields.io/github/license/shell-nlp/gpt_server)](https://github.com/shell-nlp/gpt_server/blob/main/LICENSE) ![Stars](https://img.shields.io/github/stars/shell-nlp/gpt_server?color=yellow)  ![Forks](https://img.shields.io/github/forks/shell-nlp/gpt_server?color=9cf) ![Docker pulls](https://img.shields.io/docker/pulls/506610466/gpt_server)
+[![License][license-shield]][license-url]
+[![Stars][stars-shield]][stars-url]
+[![Forks][forks-shield]][forks-url]
+[![Docker pulls][docker-pulls]][docker-pulls]
+[![CI Status][ci-shield]][ci-url]
+[![issue resolution][closed-issues-shield]][closed-issues-url]
+[![open issues][open-issues-shield]][open-issues-url]
 </div>
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
@@ -335,3 +341,18 @@ docker-compose  -f "docker-compose.yml" up -d --build gpt_server
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=shell-nlp/gpt_server&type=Date)](https://star-history.com/#shell-nlp/gpt_server&Date)
+
+[open-issues-url]: https://github.com/shell-nlp/gpt_server/issues
+[open-issues-shield]: https://img.shields.io/github/issues-raw/shell-nlp/gpt_server
+[closed-issues-shield]: https://img.shields.io/github/issues-closed-raw/shell-nlp/gpt_server
+[closed-issues-url]: https://github.com/shell-nlp/gpt_server/issues
+
+[forks-url]: https://github.com/shell-nlp/gpt_server/network/members
+[forks-shield]: https://img.shields.io/github/forks/shell-nlp/gpt_server?color=9cf
+[stars-url]: https://github.com/shell-nlp/gpt_server/stargazers
+[stars-shield]: https://img.shields.io/github/stars/shell-nlp/gpt_server?color=yellow
+[license-url]: https://github.com/shell-nlp/gpt_server/blob/main/LICENSE
+[license-shield]: https://img.shields.io/github/license/shell-nlp/gpt_server
+[docker-pulls]: https://img.shields.io/docker/pulls/506610466/gpt_server
+[ci-shield]: https://github.com/shell-nlp/gpt_server/actions/workflows/docker-image.yml/badge.svg
+[ci-url]: https://github.com/shell-nlp/gpt_server/actions/workflows/docker-image.yml
