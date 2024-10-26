@@ -14,11 +14,10 @@ models:
 - minicpmv:
     alias: null
     enable: false
-    model_type: minicpmv
     model_config:
       model_name_or_path: /home/dev/model/OpenBMB/MiniCPM-V-2_6/
       enable_prefix_caching: false
-      dtype: auto
+    model_type: minicpmv
     work_mode: lmdeploy-turbomind
     device: gpu
     workers:
@@ -48,7 +47,6 @@ models:
     workers:
     - gpus:
       - 3
-
 - qwen-72b:
     alias: qwen,gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k
     enable: true
@@ -64,7 +62,6 @@ models:
     - gpus:
       - 0
       - 1
-
 - piccolo-base-zh:
     alias: null
     enable: true
@@ -87,7 +84,6 @@ models:
     workers:
     - gpus:
       - 2
-
 - bge-reranker-base:
     alias: null
     enable: true

@@ -142,14 +142,16 @@ def model_worker_args():
                             st.session_state[f"model_name_{i}"]: {
                                 "alias": st.session_state[f"alias_{i}"],
                                 "enable": st.session_state[f"enable_{i}"],
-                                "model_name_or_path": st.session_state[
-                                    f"model_name_or_path_{i}"
-                                ],
+                                "model_config": {
+                                    "model_name_or_path": st.session_state[
+                                        f"model_name_or_path_{i}"
+                                    ],
+                                    "enable_prefix_caching": st.session_state[
+                                        f"enable_prefix_caching_{i}"
+                                    ],
+                                },
                                 "model_type": st.session_state[f"model_type_{i}"],
                                 "work_mode": st.session_state[f"work_mode_{i}"],
-                                "enable_prefix_caching": st.session_state[
-                                    f"enable_prefix_caching_{i}"
-                                ],
                                 "device": st.session_state[f"device_{i}"],
                                 "workers": yaml.safe_load(
                                     st.session_state[f"workers_{i}"]
@@ -180,16 +182,18 @@ def model_worker_args():
                                     "new_model_name": {
                                         "alias": st.session_state[f"alias_{i}"],
                                         "enable": False,
-                                        "model_name_or_path": st.session_state[
-                                            f"model_name_or_path_{i}"
-                                        ],
+                                        "model_config": {
+                                            "model_name_or_path": st.session_state[
+                                                f"model_name_or_path_{i}"
+                                            ],
+                                            "enable_prefix_caching": st.session_state[
+                                                f"enable_prefix_caching_{i}"
+                                            ],
+                                        },
                                         "model_type": st.session_state[
                                             f"model_type_{i}"
                                         ],
                                         "work_mode": st.session_state[f"work_mode_{i}"],
-                                        "enable_prefix_caching": st.session_state[
-                                            f"enable_prefix_caching_{i}"
-                                        ],
                                         "device": st.session_state[f"device_{i}"],
                                         "workers": yaml.safe_load(
                                             st.session_state[f"workers_{i}"]
@@ -299,10 +303,12 @@ def model_worker_args():
                     model_name_input: {
                         "alias": model_alias,
                         "enable": enable,
-                        "model_name_or_path": model_name_or_path,
+                        "model_config": {
+                            "model_name_or_path": model_name_or_path,
+                            "enable_prefix_caching": enable_prefix_caching,
+                        },
                         "model_type": model_type,
                         "work_mode": work_mode,
-                        "enable_prefix_caching": enable_prefix_caching,
                         "device": device,
                         "workers": workers_value_dict,
                     }
