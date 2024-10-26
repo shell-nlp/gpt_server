@@ -27,7 +27,11 @@ class VllmBackend(ModelBackend):
     def __init__(self, model_path) -> None:
         lora = os.getenv("lora", None)
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
+
+        max_model_len = os.getenv("max_model_len", None)
+
         tensor_parallel_size = int(os.getenv("num_gpus", "1"))
+        dtype = os.getenv("dtype", "auto")
         max_loras = 1
         enable_lora = False
         self.lora_requests = []
@@ -53,6 +57,8 @@ class VllmBackend(ModelBackend):
             enable_lora=enable_lora,
             max_loras=max_loras,
             enable_prefix_caching=enable_prefix_caching,
+            dtype=dtype,
+            max_model_len=int(max_model_len) if max_model_len else None,
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
 

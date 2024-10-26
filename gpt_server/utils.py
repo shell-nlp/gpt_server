@@ -1,6 +1,7 @@
 import socket
 from typing import List, Optional
 import os
+import sys
 import json
 from multiprocessing import Process
 import subprocess
@@ -70,12 +71,41 @@ def start_model_worker(config: dict):
             if model_config["enable"]:
                 # pprint(model_config)
                 print()
-                # 模型地址
-                model_name_or_path = model_config["model_name_or_path"]
+                engine_config = model_config.get("model_config", None)
+                # TODO -------------- 向前兼容 --------------
+                if engine_config:
+                    # 新版本
+                    # 模型地址
+                    model_name_or_path = engine_config["model_name_or_path"]
+                    enable_prefix_caching = engine_config.get(
+                        "enable_prefix_caching", "False"
+                    )
+                    dtype = engine_config.get("dtype", "auto")
+                    lora = engine_config.get("lora", None)
+                    max_model_len = engine_config.get("max_model_len", None)
+                else:
+                    logger.error(
+                        f"""模型： {model_name}的 model_name_or_path,model_name_or_path 参数的配置必须修改到 model_config 下面！形如：
+- minicpmv:
+    alias: null
+    enable: false
+    model_type: minicpmv
+    model_config:
+      model_name_or_path: /home/dev/model/OpenBMB/MiniCPM-V-2_6/
+      enable_prefix_caching: false
+      dtype: auto
+    work_mode: lmdeploy-turbomind
+    device: gpu
+    workers:
+    - gpus:
+      - 3
+ """
+                    )
+                    sys.exit()
+
+                # -------------- 向前兼容 --------------
                 # 模型类型
                 model_type = model_config["model_type"]
-                lora = model_config.get("lora", None)
-                enable_prefix_caching = model_config.get("enable_prefix_caching", False)
                 # model type 校验
                 # py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
                 py_path = f"-m gpt_server.model_worker.{model_type}"
@@ -120,12 +150,14 @@ def start_model_worker(config: dict):
                         + f" --backend {backend}"
                         + f" --host {host}"
                         + f" --controller_address {controller_address}"
+                        + f" --dtype {dtype}"
+                        + f" --enable_prefix_caching {enable_prefix_caching}"  # 是否开启 prefix cache
                     )
+                    # 处理为 None的情况
                     if lora:
                         cmd += f" --lora '{json.dumps(lora)}'"
-                    if enable_prefix_caching:  # 是否开启 prefix cache
-                        cmd += f" --enable_prefix_caching {enable_prefix_caching}"
-
+                    if max_model_len:
+                        cmd += f" --max_model_len '{max_model_len}'"
                     p = Process(target=run_cmd, args=(cmd,))
                     p.start()
                     process.append(p)

@@ -11,17 +11,17 @@ model_worker_args:
   host: 0.0.0.0
   controller_address: http://localhost:21001
 models:
-- qwenvl:
+- minicpmv:
     alias: null
     enable: false
-    model_name_or_path: /home/dev/model/qwen/Qwen2-VL-7B-Instruct/
-    model_type: qwen
+    model_name_or_path: /home/dev/model/OpenBMB/MiniCPM-V-2_6/
+    model_type: minicpmv
     work_mode: lmdeploy-turbomind
     enable_prefix_caching: false
     device: gpu
     workers:
     - gpus:
-      - 0
+      - 3
 - internvl2:
     alias: null
     enable: false
@@ -32,7 +32,7 @@ models:
     device: gpu
     workers:
     - gpus:
-      - 0
+      - 3
 - chatglm4:
     alias: chatglm3
     enable: true
@@ -43,18 +43,7 @@ models:
     device: gpu
     workers:
     - gpus:
-      - 0
-- qwen:
-    alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k
-    enable: false
-    model_name_or_path: /home/dev/model/qwen/Qwen2___5-7B-Instruct/
-    model_type: qwen
-    work_mode: lmdeploy-turbomind
-    enable_prefix_caching: false
-    device: gpu
-    workers:
-    - gpus:
-      - 1
+      - 3
 - qwen-72b:
     alias: qwen,gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k
     enable: true
@@ -65,53 +54,13 @@ models:
     device: gpu
     workers:
     - gpus:
-      - 3
+      - 0
       - 1
-- mixtral:
-    alias: null
-    enable: false
-    model_name_or_path: /home/dev/model/NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT/
-    model_type: qwen
-    work_mode: vllm
-    device: gpu
-    workers:
-    - gpus:
-      - 3
-      - 0
-- llama3:
-    alias: null
-    enable: false
-    model_name_or_path: /home/dev/model/unsloth/unsloth/llama-3-8b-Instruct/
-    model_type: llama
-    work_mode: hf
-    device: gpu
-    workers:
-    - gpus:
-      - 0
-- yi:
-    alias: null
-    enable: false
-    model_name_or_path: /home/dev/model/01ai/Yi-34B-Chat/
-    model_type: yi
-    work_mode: hf
-    device: gpu
-    workers:
-    - gpus:
-      - 2
-- internlm2:
-    alias: null
-    enable: false
-    model_name_or_path: /home/dev/model/Shanghai_AI_Laboratory/internlm2_5-7b-chat/
-    model_type: internlm
-    work_mode: hf
-    device: gpu
-    workers:
-    - gpus:
-      - 0
 - piccolo-base-zh:
     alias: null
     enable: true
-    model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
+    model_config:
+      model_name_or_path: /home/dev/model/assets/embeddings/sensenova/piccolo-base-zh/
     model_type: embedding_infinity
     work_mode: hf
     device: gpu
@@ -121,17 +70,8 @@ models:
 - bce-embedding-base_v1:
     alias: text-embedding-ada-002
     enable: true
-    model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
-    model_type: embedding_infinity
-    work_mode: hf
-    device: gpu
-    workers:
-    - gpus:
-      - 2
-- conan:
-    alias: null
-    enable: true
-    model_name_or_path: /home/dev/model/model1001/Conan/
+    model_config:
+      model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
     model_type: embedding_infinity
     work_mode: hf
     device: gpu
@@ -141,7 +81,8 @@ models:
 - bge-reranker-base:
     alias: null
     enable: true
-    model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
+    model_config:
+      model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
     model_type: embedding_infinity
     work_mode: hf
     device: gpu
@@ -151,17 +92,8 @@ models:
 - acge_text_embedding:
     alias: text-embedding-ada-002
     enable: true
-    model_name_or_path: /home/dev/model/aspire/acge_text_embedding
-    model_type: embedding_infinity
-    work_mode: hf
-    device: gpu
-    workers:
-    - gpus:
-      - 2
-- xiaobu-embedding:
-    alias: null
-    enable: true
-    model_name_or_path: /home/dev/model/lier007/xiaobu-embedding-v2/
+    model_config:
+      model_name_or_path: /home/dev/model/aspire/acge_text_embedding
     model_type: embedding_infinity
     work_mode: hf
     device: gpu

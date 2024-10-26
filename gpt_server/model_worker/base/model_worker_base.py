@@ -184,7 +184,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument(
             "--controller_address", type=str, default="http://localhost:21001"
         )
-        parser.add_argument("--enable_prefix_caching", type=str, default=None)
+        parser.add_argument("--enable_prefix_caching", type=str, default="False")
+        parser.add_argument("--dtype", type=str, default="auto")
+        parser.add_argument("--max_model_len", type=str, default=None)
 
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
@@ -196,10 +198,14 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["backend"] = "lmdeploy-pytorch"
         elif args.backend == "lmdeploy-turbomind":
             os.environ["backend"] = "lmdeploy-turbomind"
+
         if args.lora:
             os.environ["lora"] = args.lora
-        if args.enable_prefix_caching:
-            os.environ["enable_prefix_caching"] = args.enable_prefix_caching
+        if args.max_model_len:
+            os.environ["max_model_len"] = args.max_model_len
+
+        os.environ["enable_prefix_caching"] = args.enable_prefix_caching
+        os.environ["dtype"] = args.dtype
 
         host = args.host
         controller_address = args.controller_address

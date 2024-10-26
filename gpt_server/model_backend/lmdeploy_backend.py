@@ -28,7 +28,7 @@ class LMDeployBackend(ModelBackend):
     def __init__(self, model_path) -> None:
         backend = backend_map[os.getenv("backend")]
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
-
+        max_model_len = os.getenv("max_model_len", None)
         logger.info(f"后端 {backend}")
         if backend == "pytorch":
             backend_config = PytorchEngineConfig(tp=int(os.getenv("num_gpus", "1")))
@@ -36,6 +36,7 @@ class LMDeployBackend(ModelBackend):
             backend_config = TurbomindEngineConfig(
                 tp=int(os.getenv("num_gpus", "1")),
                 enable_prefix_caching=enable_prefix_caching,
+                session_len=int(max_model_len) if max_model_len else None,
             )
         pipeline_type, pipeline_class = get_task(model_path)
         logger.info(f"模型架构：{pipeline_type}")
@@ -78,6 +79,7 @@ class LMDeployBackend(ModelBackend):
             top_k=50 if top_k == -1 else top_k,
             stop_words=list(stop),
             skip_special_tokens=True,
+            response_format=params["response_format"],
         )
         logger.info(f"request_id {int(request_id)}")
         results_generator = self.async_engine.generate(

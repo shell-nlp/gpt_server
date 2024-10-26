@@ -133,6 +133,7 @@ def model_worker_args():
         for model_name, model_config in model_config_.items():
             if model_tab.split("|")[0].strip() == model_name:
                 enable_state = model_config["enable"]
+                engine_config = model_config.get("model_config", None)
                 left, right = st.columns(2)
                 with left:
 
@@ -217,7 +218,7 @@ def model_worker_args():
                         "enable_prefix_caching",
                         options := [True, False],
                         index=options.index(
-                            model_config.get("enable_prefix_caching", False)
+                            engine_config.get("enable_prefix_caching", False)
                         ),
                         key=f"enable_prefix_caching_{i}",
                         on_change=on_change,
@@ -272,7 +273,7 @@ def model_worker_args():
 
                 model_name_or_path = st.text_input(
                     "model_name_or_path",
-                    model_config["model_name_or_path"],
+                    engine_config["model_name_or_path"],
                     key=f"model_name_or_path_{i}",
                     on_change=on_change,
                 )
