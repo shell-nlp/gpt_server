@@ -22,6 +22,7 @@ dependencies = [
     "torchvision==0.19",
     "transformers==4.45.2",
     "vllm==0.6.3",
+    "qwen_vl_utils"
 ]
 
 

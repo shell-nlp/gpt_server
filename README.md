@@ -258,7 +258,7 @@ streamlit run server_ui.py
 |    glm-4v-9b    |chatglm| × |  ×  |         ×         |        √        |
 |    InternVL2    |internvl2| × |  ×  |         √         |        √        |
 |    MiniCPM-V-2_6   |minicpmv | × |  √  |         √         |        ×        |
-|    Qwen2-VL   |qwen | × |  √  |         ×         |        ×        |
+|    Qwen2-VL   |qwen | × |  √  |         ×         |        √        |
 <br>
 
 ### Embedding模型

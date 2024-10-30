@@ -4,8 +4,7 @@ import json
 from abc import ABC, abstractmethod
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
-from fastchat.utils import get_context_length as get_context_length_
-
+from fastchat.utils import SEQUENCE_LENGTH_KEYS
 from loguru import logger
 import os
 from transformers import (
@@ -21,6 +20,24 @@ from gpt_server.model_worker.base.base_model_worker import BaseModelWorker
 
 worker = None
 app = FastAPI()
+
+
+def get_context_length_(config):
+    """Get the context length of a model from a huggingface model config."""
+    rope_scaling = getattr(config, "rope_scaling", None)
+    if rope_scaling:
+        try:
+            rope_scaling_factor = config.rope_scaling["factor"]
+        except KeyError:
+            rope_scaling_factor = 1
+    else:
+        rope_scaling_factor = 1
+
+    for key in SEQUENCE_LENGTH_KEYS:
+        val = getattr(config, key, None)
+        if val is not None:
+            return int(rope_scaling_factor * val)
+    return 2048
 
 
 class ModelWorkerBase(BaseModelWorker, ABC):
