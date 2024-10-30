@@ -27,9 +27,7 @@ class VllmBackend(ModelBackend):
     def __init__(self, model_path) -> None:
         lora = os.getenv("lora", None)
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
-
         max_model_len = os.getenv("max_model_len", None)
-
         tensor_parallel_size = int(os.getenv("num_gpus", "1"))
         dtype = os.getenv("dtype", "auto")
         max_loras = 1
