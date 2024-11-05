@@ -35,7 +35,7 @@ class InternVL2Worker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        logger.info(f"InternVL2停用词: {self.stop}")
+        logger.info(f"{model_names[0]} 停用词: {self.stop}")
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1

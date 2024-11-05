@@ -38,7 +38,7 @@ class InternlmWorker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        logger.info(f"Internlm停用词:: {self.stop}")
+        logger.info(f"{model_names[0]} 停用词: {self.stop}")
         self.other_config = {
             "chat_template": "{{ bos_token }}{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
         }
