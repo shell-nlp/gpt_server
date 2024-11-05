@@ -1,5 +1,6 @@
 from gpt_server.model_handler.react.qwen_react import qwen_tool_formatter
 from gpt_server.model_handler.react.chatglm_react import glm4_tool_formatter
+from gpt_server.model_handler.react.system_react import system_tool_formatter
 from loguru import logger
 
 
@@ -30,6 +31,10 @@ def add_tools2messages(params: dict, model_adapter: str = "default"):
 
         elif model_adapter == "chatglm4":
             system_content = glm4_tool_formatter(
+                tools=params.get("tools"), tool_choice_info=tool_choice_info
+            )
+        else:
+            system_content = system_tool_formatter(
                 tools=params.get("tools"), tool_choice_info=tool_choice_info
             )
 

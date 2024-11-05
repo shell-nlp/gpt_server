@@ -9,7 +9,7 @@
 [![Docker pulls][docker-pulls]][docker-pulls]
 [![CI Status][ci-shield]][ci-url]
 [![issue resolution][closed-issues-shield]][closed-issues-url]
-[![open issues][open-issues-shield]][open-issues-url]
+
 </div>
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
