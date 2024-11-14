@@ -338,6 +338,10 @@ docker-compose  -f "docker-compose.yml" up -d --build gpt_server
 
 [infinity](https://github.com/michaelfeil/infinity) ： https://github.com/michaelfeil/infinity
 
+## 与我联系(微信)
+
+![wechat.png](assets/wechat.png)
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=shell-nlp/gpt_server&type=Date)](https://star-history.com/#shell-nlp/gpt_server&Date)
