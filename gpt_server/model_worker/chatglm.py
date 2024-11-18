@@ -95,7 +95,7 @@ class ChatGLMWorker(ModelWorkerBase):
                 params["prompt"] = text
                 params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------
-            params["messages"] = messages
+            params["messages"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------
