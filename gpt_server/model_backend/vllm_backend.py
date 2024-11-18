@@ -111,27 +111,23 @@ class VllmBackend(ModelBackend):
         guided_decoding = None
         guided_json = None
         # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
-        # if response_format is not None:
-        #     if response_format["type"] == "json_object":
-        #         guided_json_object = True
-        #     if response_format["type"] == "json_schema":
-        #         json_schema = response_format["json_schema"]
-        #         assert json_schema is not None
-        #         guided_json = json_schema["schema"]
+        if response_format is not None:
+            if response_format["type"] == "json_object":
+                guided_json_object = True
+            if response_format["type"] == "json_schema":
+                json_schema = response_format["json_schema"]
+                assert json_schema is not None
+                guided_json = json_schema["schema"]
 
-        #     guided_decoding = GuidedDecodingParams.from_optional(
-        #         json=guided_json,
-        #         regex=None,
-        #         choice=None,
-        #         grammar=None,
-        #         json_object=guided_json_object,
-        #         backend=(
-        #             self.engine_args.guided_decoding_backend
-        #             if self.engine_args.guided_decoding_backend
-        #             else "lm-format-enforcer"
-        #         ),
-        #         whitespace_pattern=None,
-        #     )
+            guided_decoding = GuidedDecodingParams.from_optional(
+                json=guided_json,
+                regex=None,
+                choice=None,
+                grammar=None,
+                json_object=guided_json_object,
+                backend="lm-format-enforcer",
+                whitespace_pattern=None,
+            )
         # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
         sampling = SamplingParams(
             top_p=top_p,
