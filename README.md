@@ -20,9 +20,10 @@
 4. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 5. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 6. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
-7. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
-8. 支持多模态大模型
-9. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
+7. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
+8. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
+9. 支持多模态大模型
+10. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
@@ -301,9 +302,9 @@ Chat UI界面:
 
 ![chat_ui_demo.png](assets/chat_ui_demo.png)
 
-### Docker安装
+## Docker安装
 
-#### 0. 使用Docker Hub镜像
+### 0. 使用Docker Hub镜像
 ```bash
 docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的方式
 
@@ -313,13 +314,13 @@ docker pull docker.rainbond.cc/506610466/gpt_server:latest
 
 ```
 
-#### 1. 手动构建镜像（可选）
-##### 1.1 构建镜像
+### 1. 手动构建镜像（可选）
+#### 1.1 构建镜像
 
 ```bash
 docker build --rm -f "Dockerfile" -t gpt_server:latest "." 
 ```
-##### 1.2 Docker Compose启动 (建议在项目里使用docker-compose启动)
+#### 1.2 Docker Compose启动 (建议在项目里使用docker-compose启动)
 
 ```bash
 docker-compose  -f "docker-compose.yml" up -d --build gpt_server
