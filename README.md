@@ -339,7 +339,7 @@ docker-compose  -f "docker-compose.yml" up -d --build gpt_server
 
 [infinity](https://github.com/michaelfeil/infinity) ： https://github.com/michaelfeil/infinity
 
-## 与我联系(微信)
+## 与我联系(会邀请进入交流群)
 
 ![wechat.png](assets/wechat.png)
 
