@@ -29,6 +29,7 @@ class VllmBackend(ModelBackend):
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
         max_model_len = os.getenv("max_model_len", None)
         tensor_parallel_size = int(os.getenv("num_gpus", "1"))
+        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.8))
         dtype = os.getenv("dtype", "auto")
         max_loras = 1
         enable_lora = False
@@ -50,7 +51,7 @@ class VllmBackend(ModelBackend):
             model_path,
             tensor_parallel_size=tensor_parallel_size,
             trust_remote_code=True,
-            gpu_memory_utilization=0.8,
+            gpu_memory_utilization=gpu_memory_utilization,
             enable_chunked_prefill=False,
             enable_lora=enable_lora,
             max_loras=max_loras,

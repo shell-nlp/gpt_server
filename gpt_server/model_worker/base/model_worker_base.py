@@ -204,7 +204,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--enable_prefix_caching", type=str, default="False")
         parser.add_argument("--dtype", type=str, default="auto")
         parser.add_argument("--max_model_len", type=str, default=None)
-
+        parser.add_argument("--gpu_memory_utilization", type=str, default="0.8")
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -222,6 +222,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["max_model_len"] = args.max_model_len
 
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching
+        os.environ["gpu_memory_utilization"] = args.gpu_memory_utilization
         os.environ["dtype"] = args.dtype
 
         host = args.host

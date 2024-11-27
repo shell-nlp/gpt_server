@@ -83,6 +83,9 @@ def start_model_worker(config: dict):
                     dtype = engine_config.get("dtype", "auto")
                     lora = engine_config.get("lora", None)
                     max_model_len = engine_config.get("max_model_len", None)
+                    gpu_memory_utilization = engine_config.get(
+                        "gpu_memory_utilization", 0.8
+                    )
                 else:
                     logger.error(
                         f"""模型： {model_name}的 model_name_or_path,model_name_or_path 参数的配置必须修改到 model_config 下面！形如：
@@ -152,6 +155,7 @@ def start_model_worker(config: dict):
                         + f" --controller_address {controller_address}"
                         + f" --dtype {dtype}"
                         + f" --enable_prefix_caching {enable_prefix_caching}"  # 是否开启 prefix cache
+                        + f" --gpu_memory_utilization {gpu_memory_utilization}"  # 是否开启 prefix cache
                     )
                     # 处理为 None的情况
                     if lora:

@@ -29,6 +29,7 @@ class LMDeployBackend(ModelBackend):
         backend = backend_map[os.getenv("backend")]
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
         max_model_len = os.getenv("max_model_len", None)
+        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.8))
         dtype = os.getenv("dtype", "auto")
         logger.info(f"后端 {backend}")
         if backend == "pytorch":
@@ -37,6 +38,7 @@ class LMDeployBackend(ModelBackend):
                 dtype=dtype,
                 session_len=int(max_model_len) if max_model_len else None,
                 enable_prefix_caching=enable_prefix_caching,
+                cache_max_entry_count=gpu_memory_utilization,
             )
         if backend == "turbomind":
             backend_config = TurbomindEngineConfig(
@@ -44,6 +46,7 @@ class LMDeployBackend(ModelBackend):
                 enable_prefix_caching=enable_prefix_caching,
                 session_len=int(max_model_len) if max_model_len else None,
                 dtype=dtype,
+                cache_max_entry_count=gpu_memory_utilization,
             )
         pipeline_type, pipeline_class = get_task(model_path)
         logger.info(f"模型架构：{pipeline_type}")
