@@ -1,0 +1,23 @@
+"""
+Author: liab
+DateTime: 2024-11-28 17:12:06
+Description: 
+"""
+from openai import OpenAI
+client = OpenAI(
+    api_key='YOUR_API_KEY',
+    base_url="http://0.0.0.0:8010/v1"
+)
+
+chat_response = client.chat.completions.create(
+    model="QwQ-32B-Preview",
+    messages=[
+        {"role": "system", "content": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step."},
+        {
+            "role": "user",
+            "content": "How many r in strawberry.",
+        },
+    ],
+    stream=False
+)
+print("Chat response:", chat_response)
