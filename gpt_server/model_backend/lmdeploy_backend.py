@@ -4,6 +4,7 @@ from lmdeploy import (
     GenerationConfig,
     TurbomindEngineConfig,
     PytorchEngineConfig,
+    ChatTemplateConfig,
 )
 from typing import Any, Dict, AsyncGenerator
 from lmdeploy.archs import get_task
@@ -49,11 +50,13 @@ class LMDeployBackend(ModelBackend):
                 cache_max_entry_count=gpu_memory_utilization,
             )
         pipeline_type, pipeline_class = get_task(model_path)
+        chat_template_config = ChatTemplateConfig(model_name=model_path)
         logger.info(f"模型架构：{pipeline_type}")
         self.async_engine = pipeline_class(
             model_path=model_path,
             backend=backend,
             backend_config=backend_config,
+            chat_template_config=chat_template_config,
         )
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
