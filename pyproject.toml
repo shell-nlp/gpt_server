@@ -23,8 +23,12 @@ dependencies = [
     "transformers==4.45.2",
     "vllm==0.6.4.post1",
     "qwen_vl_utils",
+    "evalscope[perf]==0.7.0",
+    "modelscope==1.20.1",
 ]
 
+[tool.uv]
+override-dependencies = ["setuptools==75.2.0"]
 
 [project.scripts]
 gpt_server = "gpt_server.cli:main"
