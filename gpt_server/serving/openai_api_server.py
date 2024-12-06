@@ -724,13 +724,15 @@ async def rerank(request: RerankRequest):
         embedding = await get_embedding(payload)
         if "error_code" in embedding and embedding["error_code"] != 0:
             return create_error_response(embedding["error_code"], embedding["text"])
-        results += [
-            {
+        for i, emb in enumerate(embedding["embedding"]):
+            result = {
                 "index": num_batch * batch_size + i,
                 "relevance_score": emb[0],
             }
-            for i, emb in enumerate(embedding["embedding"])
-        ]
+            if request.return_documents:
+                result["document"] = request.documents[num_batch * batch_size + i]
+            results.append(result)
+
         token_num += embedding["token_num"]
     results.sort(key=lambda x: x["relevance_score"], reverse=True)
     if request.top_n:

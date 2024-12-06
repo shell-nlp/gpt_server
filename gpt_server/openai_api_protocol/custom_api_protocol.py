@@ -19,7 +19,7 @@ class RerankRequest(BaseModel):
     query: str
     documents: List[str]
     top_n: Optional[int] = None
-    # return_documents: Optional[bool] = False
+    return_documents: Optional[bool] = False
     # max_chunks_per_doc: Optional[int] = Field(default=None, alias="max_tokens_per_doc")
 
 
