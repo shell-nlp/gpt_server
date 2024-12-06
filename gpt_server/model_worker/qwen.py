@@ -97,6 +97,7 @@ class QwenWorker(ModelWorkerBase):
             ):  # 如果传入tools
                 logger.debug(f"工具解析成功, tool_calls: {tool_calls}")
                 ret["tool_calls"] = tool_calls
+                ret["finish_reason"] = "tool_calls"
                 yield json.dumps(ret).encode() + b"\0"
         except torch.cuda.OutOfMemoryError as e:
             ret = {

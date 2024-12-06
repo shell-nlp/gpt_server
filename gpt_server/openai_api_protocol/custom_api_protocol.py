@@ -39,6 +39,7 @@ class CustomChatMessage(ChatMessage):
 
 class CustomChatCompletionResponseChoice(ChatCompletionResponseChoice):
     message: CustomChatMessage
+    finish_reason: Optional[Literal["stop", "length", "tool_calls"]] = None
 
 
 class CustomChatCompletionResponse(ChatCompletionResponse):

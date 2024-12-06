@@ -24,6 +24,21 @@ backend_map = {
 }
 
 
+def is_stop(output: str, stop_str: str):
+    # 直接创建子序列列表，不在每次调用中重复计算
+    stop_str_sub_seq_list = [stop_str[: i + 1] for i in range(len(stop_str))]
+
+    # 判断是否以 stop_str 子序列结尾
+    for stop_str_sub_seq in stop_str_sub_seq_list:
+        if output.endswith(stop_str_sub_seq):
+            # 找到匹配的子序列，返回截断后的输出和状态
+            sub_seq_len = len(stop_str_sub_seq)
+            return output[:-sub_seq_len], stop_str_sub_seq == stop_str
+
+    # 如果没有匹配的子序列且整体不在结尾，返回原始输出
+    return output, False
+
+
 class LMDeployBackend(ModelBackend):
     def __init__(self, model_path) -> None:
         backend = backend_map[os.getenv("backend")]
@@ -92,6 +107,7 @@ class LMDeployBackend(ModelBackend):
             response_format=params["response_format"],
         )
         logger.info(f"request_id {int(request_id)}")
+        messages = prompt or messages  # TODO 可能影响推理性能
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config
         )
@@ -101,7 +117,7 @@ class LMDeployBackend(ModelBackend):
                 # Abort the request if the client disconnects.
                 await self.async_engine.stop_session(session_id=request_id)
             text_outputs += request_output.response
-
+            
             usage = {
                 "prompt_tokens": request_output.input_token_len,
                 "completion_tokens": request_output.generate_token_len,
@@ -114,6 +130,22 @@ class LMDeployBackend(ModelBackend):
                 "usage": usage,
                 "finish_reason": request_output.finish_reason,
             }
+            # TODO -------------------------------------------------------------------
+            output_info_list = []
+            for stop_str in list(stop):
+                if stop_str:
+                    text, bool_value = is_stop(output=text_outputs, stop_str=stop_str)
+                    output_info_list.append(
+                        {"text": text, "bool_value": bool_value, "text_len": len(text)}
+                    )
+            output_info_list.sort(key=lambda x: x["text_len"])
+            output_info = output_info_list[0]
+            ret["text"] = output_info["text"]
+            if output_info["bool_value"]:
+                ret["finish_reason"] = "stop"
+                yield ret
+                break
+            # TODO -------------------------------------------------------------------
             yield ret
         logger.info(text_outputs)
         logger.info(usage)
