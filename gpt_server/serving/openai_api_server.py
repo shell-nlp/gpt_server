@@ -469,7 +469,7 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
 
 async def chat_completion_stream_generator(
     model_name: str, gen_params: Dict[str, Any], n: int, worker_addr: str
-) -> Generator[str, Any, None]:
+) -> Generator[str, Any, None]:  # type: ignore
     """
     Event stream format:
     https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format
@@ -695,7 +695,47 @@ async def generate_completion(payload: Dict[str, Any], worker_addr: str):
 
 
 # TODO 使用CustomEmbeddingsRequest
-from gpt_server.openai_api_protocol.custom_api_protocol import CustomEmbeddingsRequest
+from gpt_server.openai_api_protocol.custom_api_protocol import (
+    CustomEmbeddingsRequest,
+    RerankRequest,
+)
+
+
+@app.post("/v1/rerank", dependencies=[Depends(check_api_key)])
+async def rerank(request: RerankRequest):
+    error_check_ret = await check_model(request)
+    if error_check_ret is not None:
+        return error_check_ret
+    request.documents = process_input(request.model, request.documents)
+    results = []
+    token_num = 0
+    batch_size = WORKER_API_EMBEDDING_BATCH_SIZE
+    batches = [
+        request.documents[i : min(i + batch_size, len(request.documents))]
+        for i in range(0, len(request.documents), batch_size)
+    ]
+    for num_batch, batch in enumerate(batches):
+        payload = {
+            "model": request.model,
+            "input": batch,
+            "encoding_format": None,
+            "query": request.query,  # TODO add query
+        }
+        embedding = await get_embedding(payload)
+        if "error_code" in embedding and embedding["error_code"] != 0:
+            return create_error_response(embedding["error_code"], embedding["text"])
+        results += [
+            {
+                "index": num_batch * batch_size + i,
+                "relevance_score": emb[0],
+            }
+            for i, emb in enumerate(embedding["embedding"])
+        ]
+        token_num += embedding["token_num"]
+    results.sort(key=lambda x: x["relevance_score"], reverse=True)
+    if request.top_n:
+        results = results[: request.top_n]
+    return {"results": results, "id": shortuuid.random()}
 
 
 @app.post("/v1/embeddings", dependencies=[Depends(check_api_key)])

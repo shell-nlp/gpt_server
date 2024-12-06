@@ -11,7 +11,16 @@ from fastchat.protocol.openai_api_protocol import (
     DeltaMessage,
     ModelCard,
 )
-from pydantic import Field
+from pydantic import Field, BaseModel
+
+
+class RerankRequest(BaseModel):
+    model: str
+    query: str
+    documents: List[str]
+    top_n: Optional[int] = None
+    # return_documents: Optional[bool] = False
+    # max_chunks_per_doc: Optional[int] = Field(default=None, alias="max_tokens_per_doc")
 
 
 class CustomModelCard(ModelCard):
