@@ -87,7 +87,7 @@
 
 #### 1. 配置python环境
 
-##### 1.1 uv 启动 (推荐)
+##### 1.1 uv 方式 安装 (推荐,适用于不使用conda的用户,迄今最优秀的 库 管理工具, 性能和易用性远高于 pip、conda、poetry等)
 
 ```bash
 # 安装 uv 
@@ -95,7 +95,7 @@ pip install uv # 或查看教程 https://docs.astral.sh/uv/getting-started/insta
 sh install_uv.sh
 ```
 
-##### 1.2 conda 启动(后期将启用)
+##### 1.2 conda  方式 安装(后期将弃用，可选)
 
 ```bash
 # 1. 创建conda 环境
