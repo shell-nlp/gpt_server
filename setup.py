@@ -1,6 +1,5 @@
 import os
 from setuptools import setup, find_packages
-from setuptools.command.install import install
 
 
 pwd = os.path.dirname(__file__)
