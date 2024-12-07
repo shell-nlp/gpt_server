@@ -30,6 +30,7 @@
 <br>
 ## 最新消息
 本项目将在下一个版本将Python版本环境管理工具由pip切换到 uv(https://github.com/astral-sh/uv)
+
 ## 特色
 
 1. 支持多种推理后端引擎，vLLM和LMDeploy，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
@@ -83,13 +84,21 @@
 * [ ] 并行的function call功能（tools）
 
 ## 启用方式
-
 ### Python启动
 
 #### 1. 配置python环境
 
-```bash
+##### 1.1 uv 启动 (推荐)
 
+```bash
+# 安装 uv 
+pip install uv # 或查看教程 https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
+sh install_uv.sh
+```
+
+##### 1.2 conda 启动(后期将启用)
+
+```bash
 # 1. 创建conda 环境
 conda create -n gpt_server python=3.10
 
