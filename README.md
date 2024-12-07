@@ -42,6 +42,8 @@
 ## 更新信息
 
 ```plaintext
+2024-12-7  支持了 /v1/rerank 接口
+2024-12-1  支持了 QWQ-32B-Preview
 2024-10-15 支持了 Qwen2-VL
 2024-9-19  支持了 minicpmv 模型
 2024-8-17  支持了 vllm/hf 后端的 lora 部署
@@ -75,7 +77,7 @@
 * [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
-* [X] 可视化启动界面
+* [X] 可视化启动界面(不稳定)
 * [ ] 支持 pip install 方式进行安装
 * [ ] 内置部分 tools (image_gen,code_interpreter,weather等)
 * [ ] 并行的function call功能（tools）
@@ -252,6 +254,7 @@ streamlit run server_ui.py
 |        Deepseek        |deepseek| √ |  √  |         √         |        √        |
 |        Llama-3        |llama| √ |  √  |         √         |        √        |
 |        Baichuan-2        |baichuan| √ |  √  |         √         |        √        |
+|        QWQ-32B-Preview |qwen| √ |  √  |         √         |        √        |
 
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
@@ -277,13 +280,13 @@ streamlit run server_ui.py
 | bce-reranker              | √ | √       |
 | bge-embedding             | √ | √       |
 | bce-embedding             | √ | √       |
-|puff             | √ | √       |
+|puff                       | √ | √       |
 | piccolo-base-zh-embedding | √ | √       |
 | acge_text_embedding       | √ | √       |
 | Yinka                     | √ | √       |
 | zpoint_large_embedding_zh | √ | √       |
 | xiaobu-embedding          | √ | √       |
-|Conan-embedding-v1          | √ | √       |
+|Conan-embedding-v1         | √ | √       |
 
 目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
