@@ -1,9 +1,0 @@
-FROM gpt_server:latest_uv
-
-COPY ./ /gpt_server
-
-WORKDIR /gpt_server
-
-# RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && sh install.sh && pip cache purge && ln -sf $(which python3.10) /usr/local/bin/python
-
-CMD ["/bin/bash"]
