@@ -41,7 +41,7 @@ class QwenWorker(ModelWorkerBase):
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
         # 拓展额外的stop
-        # self.stop.extend(["Observation:"])
+        self.stop.extend(["Observation"])
         logger.info(f"{model_names[0]} 停用词: {self.stop}")
         self.other_config = {
             "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content']}}{% if (loop.last and add_generation_prompt) or not loop.last %}{{ '<|im_end|>' + '\n'}}{% endif %}{% endfor %}{% if add_generation_prompt and messages[-1]['role'] != 'assistant' %}{{ '<|im_start|>assistant\n' }}{% endif %}"

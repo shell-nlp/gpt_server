@@ -33,7 +33,7 @@ class CustomEmbeddingsRequest(EmbeddingsRequest):
 
 class CustomChatCompletionRequest(ChatCompletionRequest):
     tools: Optional[list] = None
-    tool_choice: Optional[dict] = None
+    tool_choice: Optional[Union[Literal["none"], Literal["auto"], Any]] = "none"
     messages: Union[
         str,
         List[dict],
@@ -62,6 +62,7 @@ class CustomDeltaMessage(DeltaMessage):
 
 class CustomChatCompletionResponseStreamChoice(ChatCompletionResponseStreamChoice):
     delta: CustomDeltaMessage
+    finish_reason: Optional[Literal["stop", "length", "tool_calls"]] = None
 
 
 class CustomChatCompletionStreamResponse(ChatCompletionStreamResponse):
