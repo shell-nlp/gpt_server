@@ -107,7 +107,8 @@ class LMDeployBackend(ModelBackend):
             response_format=params["response_format"],
         )
         logger.info(f"request_id {int(request_id)}")
-        messages = prompt or messages  # TODO 可能影响推理性能
+        if params.get("tools", None):
+            messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config
         )

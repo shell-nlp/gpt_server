@@ -42,6 +42,7 @@
 ## 更新信息
 
 ```plaintext
+2024-12-14 支持了 phi-4
 2024-12-7  支持了 /v1/rerank 接口
 2024-12-1  支持了 QWQ-32B-Preview
 2024-10-15 支持了 Qwen2-VL
@@ -263,7 +264,7 @@ streamlit run server_ui.py
 |        Llama-3        |llama| √ |  √  |         √         |        √        |
 |        Baichuan-2        |baichuan| √ |  √  |         √         |        √        |
 |        QWQ-32B-Preview |qwen| √ |  √  |         √         |        √        |
-
+|        Phi-4 |phi| √ |  √  |         ×         |        ×        |
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
 | Models / BackEnd |model_type| HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
