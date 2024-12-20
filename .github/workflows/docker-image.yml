@@ -1,9 +1,9 @@
 name: Docker Image CI
 
 on:
-  release:
-    types: 
-      - published  # 当发布新的 release 时触发
+  # release:
+  #   types: 
+  #     - published  # 当发布新的 release 时触发
   push:
     branches:
       - build_image # 在推送到 build_image 分支时触发构建
