@@ -60,7 +60,7 @@ class EmbeddingWorker(ModelWorkerBase):
 
     async def astart(self):
         await self.engine.astart()
-        
+
     def generate_stream_gate(self, params):
         pass
 
@@ -76,10 +76,21 @@ class EmbeddingWorker(ModelWorkerBase):
             embedding = [embedding.tolist() for embedding in embeddings]
         elif self.mode == "rerank":
             query = params.get("query", None)
-            scores, usage = await self.engine.rerank(
+            ranking, usage = await self.engine.rerank(
                 query=query, docs=texts, raw_scores=False
             )
-            embedding = [[float(score)] for score in scores]
+            ranking = [
+                {
+                    "index": i.index,
+                    "relevance_score": i.relevance_score,
+                    "document": i.document,
+                }
+                for i in ranking
+            ]
+            ranking.sort(key=lambda x: x["index"])
+            embedding = [
+                [round(float(score["relevance_score"]), 6)] for score in ranking
+            ]
         ret["embedding"] = embedding
         ret["token_num"] = usage
         return ret

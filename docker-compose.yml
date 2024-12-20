@@ -6,14 +6,16 @@ services:
       context: .
       dockerfile: Dockerfile.copy
     image: gpt_server:v0.4.0
-    shm_size: '4g' # 设置共享内存为4GB
+    shm_size: '4g' # 设置共享内存为4GB 
     container_name: gpt_server
     restart: always
     # network_mode: host
     ports:
-      - "8082:8082"
+      - 8082:8082
+    environment:
+      - TZ:Asia/Shanghai  # 设置中国时区
     volumes:
-      - "/home/dev/model/:/home/dev/model/"
+      - /home/dev/model/:/home/dev/model/
     deploy:
       resources:
         reservations:
