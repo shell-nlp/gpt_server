@@ -323,7 +323,7 @@ docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的�
 
 
 # 如果国内无法拉取docker镜像，可以尝试下面的国内镜像拉取的方式（不保证国内镜像源一直可用）
-docker pull docker.rainbond.cc/506610466/gpt_server:latest 
+docker pull hub.geekery.cn/506610466/gpt_server:latest
 
 ```
 
