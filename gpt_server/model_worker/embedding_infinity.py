@@ -6,6 +6,18 @@ from loguru import logger
 from infinity_emb import AsyncEngineArray, EngineArgs, AsyncEmbeddingEngine
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 
+label_to_category = {
+    "S": "sexual",
+    "H": "hate",
+    "HR": "harassment",
+    "SH": "self-harm",
+    "S3": "sexual/minors",
+    "H2": "hate/threatening",
+    "V2": "violence/graphic",
+    "V": "violence",
+    "OK": "OK",
+}
+
 
 class EmbeddingWorker(ModelWorkerBase):
     def __init__(
@@ -105,19 +117,22 @@ class EmbeddingWorker(ModelWorkerBase):
         texts = params["input"]
         scores, usage = await self.engine.classify(sentences=texts, raw_scores=False)
         results = []
+        flagged = True
         for item in scores:
-            flagged = False
-            categories_flags = {entry["label"]: False for entry in item}
-            category_scores = {entry["label"]: 0.0 for entry in item}
+            categories_flags = {}
+            category_scores = {}
             for entry in item:
-                label = entry["label"]
+                label = entry["label"]  # 原始的laebl
+                label = label_to_category.get(
+                    label, label
+                )  # 将原始的label转换为category, 如果没有对应的category, 则使用原始的label
                 score = entry["score"]
                 # 更新类别标志和分数
-                categories_flags[label] = True
                 category_scores[label] = score
                 # 如果分数高于某个阈值，标记为 flagged
+                categories_flags[label] = False
                 if score > 0.5:
-                    flagged = True
+                    categories_flags[label] = True
             results.append(
                 {
                     "flagged": flagged,
