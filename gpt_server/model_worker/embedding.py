@@ -51,9 +51,6 @@ class EmbeddingWorker(ModelWorkerBase):
             )
             logger.info("正在使用 embedding 模型...")
 
-    def generate_stream_gate(self, params):
-        pass
-
     async def get_embeddings(self, params):
         logger.info(f"params {params}")
         logger.info(f"worker_id: {self.worker_id}")

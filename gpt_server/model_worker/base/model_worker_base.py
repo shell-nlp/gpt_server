@@ -146,18 +146,10 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             self.backend = HFBackend(tokenizer=self.tokenizer, model=self.model)
         logger.info("load_model_tokenizer 完成")
 
-    @abstractmethod
-    def generate_stream_gate(self, params):
-        pass
-
     async def generate_gate(self, params):
         async for x in self.generate_stream_gate(params):
             pass
         return json.loads(x[:-1].decode())
-
-    @abstractmethod
-    def get_embeddings(self, params):
-        pass
 
     @classmethod
     def get_worker(

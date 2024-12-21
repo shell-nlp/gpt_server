@@ -54,7 +54,7 @@ class DeepSeekWorker(ModelWorkerBase):
                 )
             elif task == "completion":
                 text = messages
-            
+
             input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
@@ -81,9 +81,6 @@ class DeepSeekWorker(ModelWorkerBase):
                 "error_code": ErrorCode.INTERNAL_ERROR,
             }
             yield json.dumps(ret).encode() + b"\0"
-
-    def get_embeddings(self, params):
-        return super().get_embeddings(params)
 
 
 if __name__ == "__main__":

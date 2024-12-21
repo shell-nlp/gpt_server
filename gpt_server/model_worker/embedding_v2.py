@@ -71,9 +71,6 @@ class EmbeddingWorker(ModelWorkerBase):
         elif self.mode == "rerank":
             self.client.predict(sentences=[["你好", "你好啊"]] * 10)
 
-    def generate_stream_gate(self, params):
-        pass
-
     async def batch_processor(self):
         logger.warning("进入batch_processor")
         while True:

@@ -89,9 +89,6 @@ class MixtralWorker(ModelWorkerBase):
             }
             yield json.dumps(ret).encode() + b"\0"
 
-    def get_embeddings(self, params):
-        return super().get_embeddings(params)
-
 
 if __name__ == "__main__":
     MixtralWorker.run()
