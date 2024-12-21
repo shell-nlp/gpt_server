@@ -19,11 +19,12 @@
 3. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
 4. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 5. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
-6. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
-7. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
-8. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
-9. 支持多模态大模型
-10. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
+6. 支持了OpenAI接口规范的文本审核模型（text-moderation）
+7. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
+8. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
+9. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
+10. 支持多模态大模型
+11. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
@@ -35,13 +36,16 @@
 1. 支持多种推理后端引擎，vLLM和LMDeploy，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
 2. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
 3. 全球唯一完美支持**Tools（Function Calling）**功能的开源框架。兼容**LangChain**的 **bind_tools**、**AgentExecutor**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
-4. 全球唯一扩展了**openai**库,实现Reranker模型。(代码样例见gpt_server/tests/test_openai_rerank.py)
-5. 支持多模态大模型
-6. 与FastChat相同的分布式架构
+4. 支持了**cohere**库接口规范的 /v1/rerank 接口
+5. 全球唯一扩展了**openai**库,实现Reranker模型。(代码样例见gpt_server/tests/test_openai_rerank.py)
+6. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation）。(代码样例见gpt_server/tests/test_openai_moderation.py)
+7. 支持多模态大模型
+8. 与FastChat相同的分布式架构
 
 ## 更新信息
 
 ```plaintext
+2024-12-21 支持了 text-moderation 文本审核模型 
 2024-12-14 支持了 phi-4
 2024-12-7  支持了 /v1/rerank 接口
 2024-12-1  支持了 QWQ-32B-Preview
@@ -78,7 +82,7 @@
 * [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
-* [X] 可视化启动界面(不稳定)
+* [X] 可视化启动界面(不稳定,对开发人员来说比较鸡肋，后期将弃用！)
 * [ ] 支持 pip install 方式进行安装
 * [ ] 内置部分 tools (image_gen,code_interpreter,weather等)
 * [ ] 并行的function call功能（tools）
@@ -135,92 +139,7 @@ cd gpt_server/script
 vim config.yaml
 ```
 
-```yaml
-serve_args:  # openai 服务的 host 和 pot
-  host: 0.0.0.0
-  port: 8082
-  controller_address: http://localhost:21001 # 控制器的ip地址
-  # api_keys: 111,222  # 用来设置 openai 密钥
-
-# controller
-controller_args: # 控制器的配置参数
-  host: 0.0.0.0
-  port: 21001
-  dispatch_method: shortest_queue # lottery、shortest_queue # 现有两种请求分发策略，随机（lottery） 和 最短队列（shortest_queue），最短队列方法更推荐。
-
-# model worker
-model_worker_args: # 模型的配置参数，这里port 不能设置，程序自动分配，并注册到 控制器中。
-  host: 0.0.0.0
-  controller_address: http://localhost:21001 # 将模型注册到 控制器的 地址
-
-models:
-  - chatglm4:  #自定义的模型名称
-      alias: null # 别名     例如  gpt4,gpt3
-      enable: true  # false true 控制是否启动模型worker
-      model_config:
-        model_name_or_path: /home/dev/model/THUDM/glm-4-9b-chat/
-      model_type: chatglm  # qwen  yi internlm
-      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      # lora:  # lora 配置
-      #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        # - 1
-        - 0
-
-# - gpus:  表示 模型使用 gpu[0,1]，默认使用的 TP(张量并行)
-#   - 0
-#   - 1
-
-# - gpus:  表示启动两个模型，模型副本1加载到 0卡， 模型副本2 加载到 1卡
-#   - 0
-# - gpus:
-#   - 1
-
-
-  - qwen:  #自定义的模型名称
-      alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
-      enable: true  # false true 控制是否启动模型worker
-      model_config:
-        model_name_or_path: /home/dev/model/qwen/Qwen1___5-14B-Chat/ 
-        enable_prefix_caching: false
-        dtype: auto
-        max_model_len: 65536
-      model_type: qwen  # qwen  yi internlm
-      work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 1
-      # - gpus:
-      #   - 3
-
-  # Embedding 模型
-  - bge-base-zh:
-      alias: null # 别名   
-      enable: true  # false true
-      model_config:
-        model_name_or_path: /home/dev/model/Xorbits/bge-base-zh-v1___5/
-      model_type: embedding_infinity # embedding_infinity 
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
- # reranker 模型
-  - bge-reranker-base:
-      alias: null # 别名   
-      enable: true  # false true  控制是否启动模型worker
-      model_config:
-        model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
-      model_type: embedding_infinity # embedding_infinity
-      work_mode: hf
-      device: gpu  # gpu / cpu
-      workers:
-      - gpus:
-        - 2
-```
+**配置文件的详细说明位于： https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml**
 
 #### 3. 运行命令
 
@@ -275,15 +194,15 @@ streamlit run server_ui.py
 |    Qwen2-VL   |qwen | × |  √  |         ×         |        √        |
 <br>
 
-### Embedding模型
+### Embedding/Rerank/Classify模型
 
-**原则上支持所有的Embedding/Rerank 模型**
+**原则上支持所有的Embedding/Rerank/Classify模型**
 
 **推理速度：** Infinity >> HF
 
 以下模型经过测试可放心使用：
 
-| Embedding/Rerank          | HF | Infinity |
+| Embedding/Rerank/Classify | HF | Infinity |
 | ------------------------- | -- | -------- |
 | bge-reranker              | √ | √       |
 | bce-reranker              | √ | √       |
@@ -296,6 +215,8 @@ streamlit run server_ui.py
 | zpoint_large_embedding_zh | √ | √       |
 | xiaobu-embedding          | √ | √       |
 |Conan-embedding-v1         | √ | √       |
+|KoalaAI/Text-Moderation    | × | √       |
+|protectai/deberta-v3-base-prompt-injection-v2| × | √       |
 
 目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 

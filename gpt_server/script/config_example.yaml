@@ -1,27 +1,70 @@
 # 后台启动 nohup sh start.sh > gptserver.log &
 # openai_api_server
 serve_args:
+  # openai 服务的 host 和 port
   host: 0.0.0.0
   port: 8082
-  controller_address: http://localhost:21001
-  # api_keys: 111,222
+  controller_address: http://localhost:21001 # 控制器的ip地址
+  # api_keys: 111,222  # 用来设置 openai 密钥
 
-# controller
+
 controller_args:
+  # 控制器的配置参数
   host: 0.0.0.0
   port: 21001
-  dispatch_method: shortest_queue # lottery shortest_queue
+  dispatch_method: shortest_queue # lottery、shortest_queue # 现有两种请求分发策略，随机（lottery） 和 最短队列（shortest_queue），最短队列方法更推荐。
 
-# model worker
 model_worker_args:
+  # 模型的配置参数，这里port 不能设置，程序自动分配，并注册到 控制器中。
+  # model worker 的配置参数
   host: 0.0.0.0
-  controller_address: http://localhost:21001
+  controller_address: http://localhost:21001 # # 将模型注册到 控制器的 地址
 
 models:
-- internvl2: #自定义的模型名称
-    alias: null # 别名     例如  gpt4,gpt3
+- qwen:
+    # 大语言模型
+    #自定义的模型名称
+    alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
     enable: false # false true
     model_config:
+      # 模型的配置参数
+      model_name_or_path: /home/dev/model/qwen/Qwen2___5-7B-Instruct/ # 模型的路径
+      enable_prefix_caching: true # 是否启用前缀缓存
+      dtype: auto # 类型
+      max_model_len: 65536 # 模型最大token  长度
+      # lora:  # lora 模型的路径
+      #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
+
+    model_type: qwen # qwen  yi internlm 等
+    work_mode: lmdeploy-turbomind # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+
+    device: gpu # gpu / cpu
+    workers:
+    - gpus:
+      - 1
+      # - gpus:
+      #   - 3
+      # - gpus:
+      #   - 0
+
+      # - gpus:  表示 模型使用 gpu[0,1]，默认使用的 TP(张量并行)
+      #   - 0
+      #   - 1
+
+      # - gpus:  表示启动两个模型，模型副本1加载到 0卡， 模型副本2 加载到 1卡
+      #   - 0
+      # - gpus:
+      #   - 1
+
+
+
+- internvl2:
+    # 多模态模型
+    #自定义的模型名称
+    alias: null # 别名  例如  gpt4,gpt3
+    enable: false # false true  控制是否启动模型worker
+    model_config:
+      # 模型的配置参数
       model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
       enable_prefix_caching: false
     model_type: internvl2 # qwen  yi internlm
@@ -31,31 +74,9 @@ models:
     - gpus:
       # - 1
       - 0
-      # - gpus:
-      #   - 0
-
-- qwen: #自定义的模型名称
-    alias: gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k # 别名     例如  gpt4,gpt3
-    enable: false # false true
-    model_config:
-      model_name_or_path: /home/dev/model/qwen/Qwen2___5-7B-Instruct/
-      enable_prefix_caching: true
-      dtype: auto
-      max_model_len: 65536
-      # lora:
-      #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
-
-    model_type: qwen # qwen  yi internlm
-    work_mode: lmdeploy-turbomind # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-
-    device: gpu # gpu / cpu
-    workers:
-    - gpus:
-      - 1
-      # - gpus:
-      #   - 3
 
 - bge-reranker-base:
+    # rerank模型
     alias: null # 别名   
     enable: true # false true
     model_config:
@@ -66,7 +87,9 @@ models:
     workers:
     - gpus:
       - 2
+
 - acge_text_embedding:
+    # 文本embedding模型
     alias: text-embedding-ada-002 # 别名   
     enable: true # false true
     model_config:
@@ -78,9 +101,15 @@ models:
     - gpus:
       - 2
 
-
-
-
-
-
-
+- text-moderation:
+    # 文本审核模型
+    alias: omni-moderation-latest
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/KoalaAI/Text-Moderation
+    model_type: embedding_infinity
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
