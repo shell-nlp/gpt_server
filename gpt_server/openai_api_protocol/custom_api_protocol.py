@@ -14,6 +14,11 @@ from fastchat.protocol.openai_api_protocol import (
 from pydantic import Field, BaseModel
 
 
+class ModerationsRequest(BaseModel):
+    input: Union[str, List[str]]
+    model: str
+
+
 class RerankRequest(BaseModel):
     model: str
     query: str

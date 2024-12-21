@@ -325,3 +325,12 @@ async def api_get_embeddings(request: Request):
     embedding = await worker.get_embeddings(params)
     release_worker_semaphore()
     return JSONResponse(content=embedding)
+
+
+@app.post("/worker_get_classify")
+async def api_get_classify(request: Request):
+    params = await request.json()
+    await acquire_worker_semaphore()
+    outputs = await worker.classify(params)
+    release_worker_semaphore()
+    return JSONResponse(content=outputs)

@@ -11,9 +11,12 @@ from fastchat.constants import WORKER_HEART_BEAT_INTERVAL
 from fastchat.conversation import Conversation
 from fastchat.utils import pretty_print_semaphore
 
+
 def build_logger():
     from loguru import logger
+
     return logger
+
 
 worker = None
 logger = None
@@ -177,6 +180,9 @@ class BaseModelWorker:
         raise NotImplementedError
 
     def get_embeddings(self, params):
+        raise NotImplementedError
+
+    def classify(self, params):
         raise NotImplementedError
 
 

@@ -33,15 +33,19 @@ class EmbeddingWorker(ModelWorkerBase):
         else:
             device = "cuda"
         logger.info(f"使用{device}加载...")
-
+        model_type = getattr(self.model_config, "model_type", None)
+        bettertransformer = True
+        if model_type is not None and "deberta" in model_type:
+            bettertransformer = False
         self.engine: AsyncEmbeddingEngine = AsyncEngineArray.from_args(
             [
                 EngineArgs(
                     model_name_or_path=model_path,
                     engine="torch",
                     embedding_dtype="float32",
-                    dtype="auto",
+                    dtype="float32",
                     device=device,
+                    bettertransformer=bettertransformer,
                 )
             ]
         )[0]
@@ -57,6 +61,7 @@ class EmbeddingWorker(ModelWorkerBase):
             logger.info("正在使用 rerank 模型...")
         elif self.mode == "embedding":
             logger.info("正在使用 embedding 模型...")
+        logger.info(f"模型：{model_names[0]}")
 
     async def astart(self):
         await self.engine.astart()
@@ -89,6 +94,38 @@ class EmbeddingWorker(ModelWorkerBase):
                 [round(float(score["relevance_score"]), 6)] for score in ranking
             ]
         ret["embedding"] = embedding
+        ret["token_num"] = usage
+        return ret
+
+    async def classify(self, params):
+        logger.info(f"params {params}")
+        logger.info(f"worker_id: {self.worker_id}")
+        self.call_ct += 1
+        ret = {}
+        texts = params["input"]
+        scores, usage = await self.engine.classify(sentences=texts, raw_scores=False)
+        results = []
+        for item in scores:
+            flagged = False
+            categories_flags = {entry["label"]: False for entry in item}
+            category_scores = {entry["label"]: 0.0 for entry in item}
+            for entry in item:
+                label = entry["label"]
+                score = entry["score"]
+                # 更新类别标志和分数
+                categories_flags[label] = True
+                category_scores[label] = score
+                # 如果分数高于某个阈值，标记为 flagged
+                if score > 0.5:
+                    flagged = True
+            results.append(
+                {
+                    "flagged": flagged,
+                    "categories": categories_flags,
+                    "category_scores": category_scores,
+                }
+            )
+        ret["results"] = results
         ret["token_num"] = usage
         return ret
 

@@ -698,7 +698,46 @@ async def generate_completion(payload: Dict[str, Any], worker_addr: str):
 from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomEmbeddingsRequest,
     RerankRequest,
+    ModerationsRequest,
 )
+
+
+@app.post("/v1/moderations", dependencies=[Depends(check_api_key)])
+async def classify(request: ModerationsRequest):
+    error_check_ret = await check_model(request)
+    if error_check_ret is not None:
+        return error_check_ret
+    request.input = process_input(request.model, request.input)
+    results = []
+    token_num = 0
+    batch_size = WORKER_API_EMBEDDING_BATCH_SIZE
+    batches = [
+        request.input[i : min(i + batch_size, len(request.input))]
+        for i in range(0, len(request.input), batch_size)
+    ]
+    for num_batch, batch in enumerate(batches):
+        payload = {
+            "model": request.model,
+            "input": batch,
+        }
+        classify = await get_classify(payload)
+        if "error_code" in classify and classify["error_code"] != 0:
+            return create_error_response(classify["error_code"], classify["text"])
+        for i, res in enumerate(classify["results"]):
+            result = {
+                "flagged": res["flagged"],
+                "categories": res["categories"],
+                "category_scores": res["category_scores"],
+            }
+            results.append(result)
+
+        token_num += classify["token_num"]
+
+    return {
+        "id": shortuuid.random(),
+        "model": request.model,
+        "results": results,
+    }
 
 
 @app.post("/v1/rerank", dependencies=[Depends(check_api_key)])
@@ -787,6 +826,15 @@ async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = 
             completion_tokens=None,
         ),
     ).dict(exclude_none=True)
+
+
+async def get_classify(payload: Dict[str, Any]):
+    controller_address = app_settings.controller_address
+    model_name = payload["model"]
+    worker_addr = await get_worker_address(model_name)
+
+    classify = await fetch_remote(worker_addr + "/worker_get_classify", payload)
+    return json.loads(classify)
 
 
 async def get_embedding(payload: Dict[str, Any]):
