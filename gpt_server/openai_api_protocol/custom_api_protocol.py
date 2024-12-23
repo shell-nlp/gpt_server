@@ -30,7 +30,9 @@ class SpeechRequest(BaseModel):
     )
     speed: Optional[float] = Field(
         default=1.0,
-        description="The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.",
+        description="The speed of the generated audio. Select a value from 0.25 to 5.0. 1.0 is the default.",
+        ge=0,
+        le=5,
     )
 
 

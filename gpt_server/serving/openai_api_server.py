@@ -3,9 +3,8 @@
 - Chat Completions. (Reference: https://platform.openai.com/docs/api-reference/chat)
 - Completions. (Reference: https://platform.openai.com/docs/api-reference/completions)
 - Embeddings. (Reference: https://platform.openai.com/docs/api-reference/embeddings)
-
-Usage:
-python3 -m fastchat.serve.openai_api_server
+- Moderations. (Reference: https://platform.openai.com/docs/api-reference/moderations)
+- Audio. (Reference: https://platform.openai.com/docs/api-reference/audio)
 """
 
 import asyncio
@@ -721,7 +720,14 @@ async def speech(request: SpeechRequest):
         )
     filename = f"{uuid.uuid4()}.mp3"
     output_path = os.path.join(OUTPUT_DIR, filename)
-    communicate = edge_tts.Communicate(text=request.input, voice=request.voice)
+    rate = 1.0
+    if request.speed >= 1:
+        rate = f"+{int((request.speed - 1) * 100)}%"
+    else:
+        rate = f"-{int((1-request.speed) * 100)}%"
+    communicate = edge_tts.Communicate(
+        text=request.input, voice=request.voice, rate=rate
+    )
     await communicate.save(output_path)
     return FileResponse(output_path, media_type="audio/mpeg", filename=filename)
 
