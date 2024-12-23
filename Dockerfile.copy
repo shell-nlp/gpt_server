@@ -1,4 +1,4 @@
-FROM docker.rainbond.cc/506610466/gpt_server:latest 
+FROM hub.geekery.cn/506610466/gpt_server:latest 
 
 COPY ./ /gpt_server
 

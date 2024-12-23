@@ -25,6 +25,7 @@ dependencies = [
     "qwen_vl_utils",
     "evalscope[perf]==0.7.0",
     "modelscope==1.20.1",
+    "edge-tts>=7.0.0",
 ]
 
 [tool.uv]
@@ -36,6 +37,10 @@ override-dependencies = [
     "outlines==0.1.11",
 
 ]
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
 
 [project.scripts]
 gpt_server = "gpt_server.cli:main"

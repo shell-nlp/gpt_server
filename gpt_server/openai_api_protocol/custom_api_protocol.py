@@ -14,6 +14,26 @@ from fastchat.protocol.openai_api_protocol import (
 from pydantic import Field, BaseModel
 
 
+class SpeechRequest(BaseModel):
+    model: str = Field(
+        default="edge_tts", description="One of the available TTS models:"
+    )
+    input: str = Field(
+        description="The text to generate audio for. The maximum length is 4096 characters."
+    )
+    voice: str = Field(
+        default="zh-CN-YunxiNeural",
+        description="The voice to use when generating the audio",
+    )
+    response_format: Optional[str] = Field(
+        default="mp3", description="The format of the audio"
+    )
+    speed: Optional[float] = Field(
+        default=1.0,
+        description="The speed of the generated audio. Select a value from 0.25 to 4.0. 1.0 is the default.",
+    )
+
+
 class ModerationsRequest(BaseModel):
     input: Union[str, List[str]]
     model: str

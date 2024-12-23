@@ -20,7 +20,7 @@ import fastapi
 from fastapi import Depends, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 import httpx
 
@@ -699,7 +699,31 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomEmbeddingsRequest,
     RerankRequest,
     ModerationsRequest,
+    SpeechRequest,
 )
+import edge_tts
+import uuid
+
+OUTPUT_DIR = "./edge_tts_cache"
+
+
+@app.post("/v1/audio/speech", dependencies=[Depends(check_api_key)])
+async def speech(request: SpeechRequest):
+    os.makedirs(OUTPUT_DIR, exist_ok=True)  # 即使存在也不会报错
+    list_voices = await edge_tts.list_voices()
+    support_list_voices = [i["ShortName"] for i in list_voices]
+    if request.voice not in support_list_voices:
+        return JSONResponse(
+            ErrorResponse(
+                message=f"不支持voice:{request.voice}", code=ErrorCode.INVALID_MODEL
+            ).dict(),
+            status_code=400,
+        )
+    filename = f"{uuid.uuid4()}.mp3"
+    output_path = os.path.join(OUTPUT_DIR, filename)
+    communicate = edge_tts.Communicate(text=request.input, voice=request.voice)
+    await communicate.save(output_path)
+    return FileResponse(output_path, media_type="audio/mpeg", filename=filename)
 
 
 @app.post("/v1/moderations", dependencies=[Depends(check_api_key)])
