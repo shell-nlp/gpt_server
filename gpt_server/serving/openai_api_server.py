@@ -16,7 +16,7 @@ from typing import Generator, Optional, Union, Dict, List, Any
 
 import aiohttp
 import fastapi
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, responses
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
@@ -362,7 +362,11 @@ async def get_conv(model_name: str, worker_addr: str):
 from gpt_server.openai_api_protocol.custom_api_protocol import CustomModelCard
 
 
-@app.get("/v1/models", dependencies=[Depends(check_api_key)])
+@app.get(
+    "/v1/models",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
 async def show_available_models():
     controller_address = app_settings.controller_address
     ret = await fetch_remote(controller_address + "/refresh_all_workers")
@@ -386,7 +390,11 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
 )
 
 
-@app.post("/v1/chat/completions", dependencies=[Depends(check_api_key)])
+@app.post(
+    "/v1/chat/completions",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
 async def create_chat_completion(request: CustomChatCompletionRequest):
     """Creates a completion for the chat message"""
     error_check_ret = await check_model(request)
@@ -531,7 +539,11 @@ async def chat_completion_stream_generator(
     yield "data: [DONE]\n\n"
 
 
-@app.post("/v1/completions", dependencies=[Depends(check_api_key)])
+@app.post(
+    "/v1/completions",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
 async def create_completion(request: CompletionRequest):
     error_check_ret = await check_model(request)
     if error_check_ret is not None:
@@ -732,7 +744,11 @@ async def speech(request: SpeechRequest):
     return FileResponse(output_path, media_type="audio/mpeg", filename=filename)
 
 
-@app.post("/v1/moderations", dependencies=[Depends(check_api_key)])
+@app.post(
+    "/v1/moderations",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
 async def classify(request: ModerationsRequest):
     error_check_ret = await check_model(request)
     if error_check_ret is not None:
@@ -770,7 +786,11 @@ async def classify(request: ModerationsRequest):
     }
 
 
-@app.post("/v1/rerank", dependencies=[Depends(check_api_key)])
+@app.post(
+    "/v1/rerank",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
 async def rerank(request: RerankRequest):
     error_check_ret = await check_model(request)
     if error_check_ret is not None:
@@ -809,8 +829,16 @@ async def rerank(request: RerankRequest):
     return {"results": results, "id": shortuuid.random()}
 
 
-@app.post("/v1/embeddings", dependencies=[Depends(check_api_key)])
-@app.post("/v1/engines/{model_name}/embeddings", dependencies=[Depends(check_api_key)])
+@app.post(
+    "/v1/embeddings",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
+@app.post(
+    "/v1/engines/{model_name}/embeddings",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
 async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = None):
     """Creates embeddings for the text"""
     if request.model is None:

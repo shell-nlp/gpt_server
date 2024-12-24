@@ -19,12 +19,13 @@
 3. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
 4. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
 5. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
-6. 支持了OpenAI接口规范的文本审核模型（text-moderation）
-7. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
-8. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
-9. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
-10. 支持多模态大模型
-11. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
+6. 支持了OpenAI接口规范的文本审核模型（text-moderation,/v1/moderations）
+7. 支持了OpenAI接口规范的TTS模型（tts,/v1/audio/speech）,自带edge-tts(免费的TTS)
+8. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
+9. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
+10. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
+11. 支持多模态大模型
+12. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
@@ -37,15 +38,17 @@
 2. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
 3. 全球唯一完美支持**Tools（Function Calling）**功能的开源框架。兼容**LangChain**的 **bind_tools**、**AgentExecutor**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
 4. 支持了**cohere**库接口规范的 /v1/rerank 接口
-5. 全球唯一扩展了**openai**库,实现Reranker模型。(代码样例见gpt_server/tests/test_openai_rerank.py)
-6. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation）。(代码样例见gpt_server/tests/test_openai_moderation.py)
-7. 支持多模态大模型
-8. 与FastChat相同的分布式架构
+5. 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
+6. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
+7. 全球唯一支持了**openai**库的文本审核模型接口（tts, /v1/audio/speech）,自带edge-tts(免费的TTS)(代码样例见gpt_server/tests/test_openai_tts.py)
+8. 支持多模态大模型
+9. 与FastChat相同的分布式架构
 
 ## 更新信息
 
 ```plaintext
-2024-12-21 支持了 text-moderation 文本审核模型 
+2024-12-22 支持了 tts, /v1/audio/speech TTS模型
+2024-12-21 支持了 text-moderation, /v1/moderations 文本审核模型 
 2024-12-14 支持了 phi-4
 2024-12-7  支持了 /v1/rerank 接口
 2024-12-1  支持了 QWQ-32B-Preview
@@ -168,30 +171,30 @@ streamlit run server_ui.py
 
 ### **LLM**
 
-|    Models / BackEnd   |model_type | HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------------: |:-: | :-: | :--: | :----------------: | :--------------: |
-|      chatglm4-9b    |chatglm  | √ |  √  |         √         |        √        |
-|      chatglm3-6b     |chatglm | √ |  √  |         ×         |        √        |
-| Qwen (7B, 14B, etc.)) |qwen | √ |  √  |         √         |        √        |
-|  Qwen-1.5 (0.5B--72B)  |qwen| √ |  √  |         √         |        √        |
-|         Qwen-2         |qwen| √ |  √  |         √         |        √        |
-|         Qwen-2.5       |qwen| √ |  √  |         √         |        √        |
-|         Yi-34B         |yi| √ |  √  |         √         |        √        |
-|      Internlm-1.0      |internlm| √ |  √  |         √         |        √        |
-|      Internlm-2.0      |internlm| √ |  √  |         √         |        √        |
-|        Deepseek        |deepseek| √ |  √  |         √         |        √        |
-|        Llama-3        |llama| √ |  √  |         √         |        √        |
-|        Baichuan-2        |baichuan| √ |  √  |         √         |        √        |
-|        QWQ-32B-Preview |qwen| √ |  √  |         √         |        √        |
-|        Phi-4 |phi| √ |  √  |         ×         |        ×        |
+|   Models / BackEnd    | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |
+| :-------------------: | :--------: | :---: | :---: | :----------------: | :--------------: |
+|      chatglm4-9b      |  chatglm   |   √   |   √   |         √          |        √         |
+|      chatglm3-6b      |  chatglm   |   √   |   √   |         ×          |        √         |
+| Qwen (7B, 14B, etc.)) |    qwen    |   √   |   √   |         √          |        √         |
+| Qwen-1.5 (0.5B--72B)  |    qwen    |   √   |   √   |         √          |        √         |
+|        Qwen-2         |    qwen    |   √   |   √   |         √          |        √         |
+|       Qwen-2.5        |    qwen    |   √   |   √   |         √          |        √         |
+|        Yi-34B         |     yi     |   √   |   √   |         √          |        √         |
+|     Internlm-1.0      |  internlm  |   √   |   √   |         √          |        √         |
+|     Internlm-2.0      |  internlm  |   √   |   √   |         √          |        √         |
+|       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |
+|        Llama-3        |   llama    |   √   |   √   |         √          |        √         |
+|      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |
+|    QWQ-32B-Preview    |    qwen    |   √   |   √   |         √          |        √         |
+|         Phi-4         |    phi     |   √   |   √   |         ×          |        ×         |
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
-| Models / BackEnd |model_type| HF | vllm | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------: | :-: | :-: | :--: | :----------------: | :--------------: |
-|    glm-4v-9b    |chatglm| × |  ×  |         ×         |        √        |
-|    InternVL2    |internvl2| × |  ×  |         √         |        √        |
-|    MiniCPM-V-2_6   |minicpmv | × |  √  |         √         |        ×        |
-|    Qwen2-VL   |qwen | × |  √  |         ×         |        √        |
+| Models / BackEnd | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |
+| :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: |
+|    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |
+|    InternVL2     | internvl2  |   ×   |   ×   |         √          |        √         |
+|  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |
+|     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |
 <br>
 
 ### Embedding/Rerank/Classify模型
@@ -202,21 +205,21 @@ streamlit run server_ui.py
 
 以下模型经过测试可放心使用：
 
-| Embedding/Rerank/Classify | HF | Infinity |
-| ------------------------- | -- | -------- |
-| bge-reranker              | √ | √       |
-| bce-reranker              | √ | √       |
-| bge-embedding             | √ | √       |
-| bce-embedding             | √ | √       |
-|puff                       | √ | √       |
-| piccolo-base-zh-embedding | √ | √       |
-| acge_text_embedding       | √ | √       |
-| Yinka                     | √ | √       |
-| zpoint_large_embedding_zh | √ | √       |
-| xiaobu-embedding          | √ | √       |
-|Conan-embedding-v1         | √ | √       |
-|KoalaAI/Text-Moderation    | × | √       |
-|protectai/deberta-v3-base-prompt-injection-v2| × | √       |
+| Embedding/Rerank/Classify                     | HF  | Infinity |
+| --------------------------------------------- | --- | -------- |
+| bge-reranker                                  | √   | √        |
+| bce-reranker                                  | √   | √        |
+| bge-embedding                                 | √   | √        |
+| bce-embedding                                 | √   | √        |
+| puff                                          | √   | √        |
+| piccolo-base-zh-embedding                     | √   | √        |
+| acge_text_embedding                           | √   | √        |
+| Yinka                                         | √   | √        |
+| zpoint_large_embedding_zh                     | √   | √        |
+| xiaobu-embedding                              | √   | √        |
+| Conan-embedding-v1                            | √   | √        |
+| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）                     | ×   | √        |
+| protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入） | ×   | √        |
 
 目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
