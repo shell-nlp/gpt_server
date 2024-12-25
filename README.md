@@ -99,7 +99,7 @@
 ```bash
 # 安装 uv 
 pip install uv -U # 或查看教程 https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
-sh install_uv.sh
+bash install_uv.sh  # 也可以复制 install_uv.sh 中的内容一条一条执行
 ```
 
 #### 1.2 conda  方式 安装(后期将弃用，可选)
@@ -112,7 +112,7 @@ conda create -n gpt_server python=3.10
 conda activate gpt_server
 
 # 3. 安装仓库（一定要使用 install.sh 安装,否则无法解决依赖冲突）
-sh install.sh
+bash install.sh
 ```
 
 ### 2. 修改启动配置文件
