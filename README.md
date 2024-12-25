@@ -90,20 +90,19 @@
 * [ ] 内置部分 tools (image_gen,code_interpreter,weather等)
 * [ ] 并行的function call功能（tools）
 
-## 启用方式
-### Python启动
+## 快速开始
 
-#### 1. 配置python环境
+### 1. 配置python环境
 
-##### 1.1 uv 方式 安装 (推荐,适用于不使用conda的用户,迄今最优秀的 库 管理工具, 性能和易用性远高于 pip、conda、poetry等)
+#### 1.1 uv 方式 安装 (推荐,适用于不使用conda的用户,迄今最优秀的 库 管理工具, 性能和易用性远高于 pip、conda、poetry等)
 
 ```bash
 # 安装 uv 
-pip install uv # 或查看教程 https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
+pip install uv -U # 或查看教程 https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
 sh install_uv.sh
 ```
 
-##### 1.2 conda  方式 安装(后期将弃用，可选)
+#### 1.2 conda  方式 安装(后期将弃用，可选)
 
 ```bash
 # 1. 创建conda 环境
@@ -116,11 +115,28 @@ conda activate gpt_server
 sh install.sh
 ```
 
+### 2. 修改启动配置文件
 
-#### 2. 修改启动配置文件
+#### 2.1 复制样例配置文件:
 
-修改模型后端方式（vllm,lmdeploy等）
+```bash
+# 进入script目录
+cd gpt_server/script
+# 复制样例配置文件
+cp config_example.yaml config.yaml
+```
 
+
+
+#### 2.2 修改配置文件
+```bash
+cd gpt_server/script
+vim config.yaml
+```
+
+**配置文件的详细说明信息位于：[config_example.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")**
+
+#### 2.3 如何切换模型后端（vllm,lmdeploy等）
 config.yaml中：
 
 ```bash
@@ -135,34 +151,69 @@ config.yaml中：
 model_type: embedding_infinity # embedding 或 embedding_infinity  embedding_infinity后端速度远远大于 embedding
 ```
 
-[config.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml "配置文件")
-
-```bash
-cd gpt_server/script
-vim config.yaml
-```
-
-**配置文件的详细说明位于： https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml**
-
-#### 3. 运行命令
+### 3. 启动服务
+#### 3.1 命令启动
 
 [start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/start.sh "服务主文件")
 
 ```bash
-cd gpt_server/script
 sh start.sh
 ```
+或者
+```bash
+python gpt_server/serving/main.py
+```
 
-#### 4. 可视化UI方式启动服务（可选）
+#### 3.2 Docker启动
+
+##### 3.2.0 使用Docker Hub镜像
+```bash
+docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的方式
+# 如果国内无法拉取docker镜像，可以尝试下面的国内镜像拉取的方式（不保证国内镜像源一直可用）
+docker pull hub.geekery.cn/506610466/gpt_server:latest
+```
+
+##### 3.2.1 手动构建镜像（可选）
+- 构建镜像
 
 ```bash
-cd gpt_server/gpt_server/serving
+docker build --rm -f "Dockerfile" -t gpt_server:latest "." 
+```
+##### 3.2.2 Docker Compose 启动 (建议在项目里使用docker-compose启动)
+
+```bash
+docker-compose  -f "docker-compose.yml" up -d --build gpt_server
+```
+
+
+#### 3.3 可视化UI方式启动服务（可选,有Bug，不建议使用，欢迎大佬优化代码）
+
+```bash
+cd gpt_server/serving
 streamlit run server_ui.py
 ```
 
-##### 4.1 Server UI界面:
+##### 3.3.1 Server UI界面:
 
 ![server_ui_demo.png](assets/server_ui_demo.png)
+
+
+### 4. 使用 openai 库 进行调用
+
+**见 gpt_server/tests 目录 样例测试代码:
+https://github.com/shell-nlp/gpt_server/tree/main/tests**
+
+### 5. 使用Chat UI
+
+```bash
+cd gpt_server/gpt_server/serving
+streamlit run chat_ui.py
+```
+
+Chat UI界面:
+
+![chat_ui_demo.png](assets/chat_ui_demo.png)
+
 
 
 ## 支持的模型以及推理后端
@@ -223,45 +274,7 @@ streamlit run server_ui.py
 
 目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
-#### 5. 使用 openai 库 进行调用
 
-**见 gpt_server/tests 目录 样例测试代码:
-https://github.com/shell-nlp/gpt_server/tree/main/tests**
-
-#### 6. 使用Chat UI
-
-```bash
-cd gpt_server/gpt_server/serving
-streamlit run chat_ui.py
-```
-
-Chat UI界面:
-
-![chat_ui_demo.png](assets/chat_ui_demo.png)
-
-## Docker安装
-
-### 0. 使用Docker Hub镜像
-```bash
-docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的方式
-
-
-# 如果国内无法拉取docker镜像，可以尝试下面的国内镜像拉取的方式（不保证国内镜像源一直可用）
-docker pull hub.geekery.cn/506610466/gpt_server:latest
-
-```
-
-### 1. 手动构建镜像（可选）
-#### 1.1 构建镜像
-
-```bash
-docker build --rm -f "Dockerfile" -t gpt_server:latest "." 
-```
-#### 1.2 Docker Compose启动 (建议在项目里使用docker-compose启动)
-
-```bash
-docker-compose  -f "docker-compose.yml" up -d --build gpt_server
-```
 ## 架构
 
 ![gpt_server_archs.png](assets/gpt_server_archs.png)

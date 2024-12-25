@@ -7,3 +7,4 @@ logs/
 outputs/
 data/
 .venv/
+config.yaml

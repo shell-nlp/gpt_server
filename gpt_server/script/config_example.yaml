@@ -32,6 +32,7 @@ models:
       enable_prefix_caching: true # 是否启用前缀缓存
       dtype: auto # 类型
       max_model_len: 65536 # 模型最大token  长度
+      gpu_memory_utilization: 0.8
       # lora:  # lora 模型的路径
       #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
 
