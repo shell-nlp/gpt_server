@@ -7,13 +7,55 @@ from multiprocessing import Process
 import subprocess
 from loguru import logger
 import torch
+import psutil
+from rich import print
+import signal
 
 logger.add("logs/gpt_server.log", rotation="100 MB", level="INFO")
 
 
+def kill_child_processes(parent_pid, including_parent=False):
+    "杀死子进程/僵尸进程"
+    try:
+        parent = psutil.Process(parent_pid)
+        children = parent.children(recursive=True)
+        for child in children:
+            try:
+                print(f"终止子进程 {child.pid}...")
+                os.kill(child.pid, signal.SIGTERM)  # 优雅终止
+                child.wait(5)  # 等待子进程最多 5 秒
+            except psutil.NoSuchProcess:
+                pass
+            except psutil.TimeoutExpired():
+                print(f"终止子进程 {child.pid} 超时！强制终止...")
+                os.kill(child.pid, signal.SIGKILL)  # 强制终止
+        if including_parent:
+            print(f"终止父进程 {parent_pid}...")
+            os.kill(parent_pid, signal.SIGTERM)
+    except psutil.NoSuchProcess:
+        print(f"父进程 {parent_pid} 不存在！")
+
+
+# 记录父进程 PID
+parent_pid = os.getpid()
+
+
+def signal_handler(signum, frame):
+    print("\nCtrl-C detected! Cleaning up...")
+    kill_child_processes(parent_pid, including_parent=False)
+    exit(0)  # 正常退出程序
+
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
 def run_cmd(cmd: str, *args, **kwargs):
     logger.info(f"执行命令如下：\n{cmd}\n")
-    subprocess.run(cmd, shell=True)
+    # subprocess.run(cmd, shell=True)
+    process = subprocess.Popen(cmd, shell=True)
+    # 等待命令执行完成
+    process.wait()
+    return process.pid
 
 
 def start_controller(controller_host, controller_port, dispatch_method):

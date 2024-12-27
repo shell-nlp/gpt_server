@@ -1,7 +1,6 @@
 import yaml
 import os
 import sys
-import signal
 import ray
 
 os.environ["OPENBLAS_NUM_THREADS"] = (
@@ -20,7 +19,6 @@ os.environ["LOGDIR"] = os.path.join(root_dir, "logs")
 from gpt_server.utils import (
     start_api_server,
     start_model_worker,
-    stop_server,
     delete_log,
 )
 
@@ -28,19 +26,18 @@ from gpt_server.utils import (
 delete_log()
 
 
-def signal_handler(signum, frame):
-    stop_server()
-    raise KeyboardInterrupt
-
-
-signal.signal(signal.SIGINT, signal_handler)
-
 config_path = os.path.join(root_dir, "gpt_server/script/config.yaml")
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
+
+
 # print(config)
-if __name__ == "__main__":
+def main():
     # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------
     start_api_server(config=config)
     # ----------------------------启动 Model Worker 服务----------------------------------------------------
     start_model_worker(config=config)
+
+
+if __name__ == "__main__":
+    main()
