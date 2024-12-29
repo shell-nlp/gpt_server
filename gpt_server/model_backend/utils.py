@@ -18,7 +18,12 @@ class XgrammarLogitsProcessor(LogitsProcessor):
         self.grammar_compiler = xgr.GrammarCompiler(tokenizer_info)
         # -----------
 
-    def get_grammar_compiler(self, schema: Union[str, Type[BaseModel]]):
+    def get_json_grammar_processor(self):
+        compiled_grammar = self.grammar_compiler.compile_builtin_json_grammar()
+        self.xgr_logits_processor = xgr.contrib.hf.LogitsProcessor(compiled_grammar)
+        return self.xgr_logits_processor
+
+    def get_json_schema_processor(self, schema: Union[str, Type[BaseModel]]):
         compiled_grammar = self.grammar_compiler.compile_json_schema(schema)
         self.xgr_logits_processor = xgr.contrib.hf.LogitsProcessor(compiled_grammar)
         return self.xgr_logits_processor

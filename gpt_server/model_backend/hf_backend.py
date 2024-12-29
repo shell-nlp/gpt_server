@@ -11,6 +11,7 @@ from gpt_server.model_backend.utils import (
     InvalidScoreLogitsProcessor,
     StoppingCriteriaList,
     StopAtSpecificTokenCriteria,
+    XgrammarLogitsProcessor,
 )
 import asyncio
 from loguru import logger
@@ -30,6 +31,7 @@ class HFBackend(ModelBackend):
     def __init__(self, tokenizer, model: torch.nn.Module) -> None:
         self.model = model
         self.tokenizer = tokenizer
+        self.xgrammar_processor = XgrammarLogitsProcessor(tokenizer)
         self.lora_requests = []
         lora = os.getenv("lora", None)
         if lora:
@@ -79,6 +81,28 @@ class HFBackend(ModelBackend):
             skip_prompt=True,
             decode_kwargsl={"skip_special_tokens": True},
         )
+        # TODO
+        # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
+        response_format = params["response_format"]
+        if response_format is not None:
+            if response_format["type"] == "json_object":
+                xgrammar_processor = (
+                    self.xgrammar_processor.get_json_grammar_processor()
+                )
+                logits_processor.append(xgrammar_processor)
+
+            elif response_format["type"] == "json_schema":
+                json_schema = response_format["json_schema"]
+                assert json_schema is not None
+                guided_json = json_schema["schema"]
+                xgrammar_processor = self.xgrammar_processor.get_json_schema_processor(
+                    schema=json.dumps(guided_json)
+                )
+                logits_processor.append(xgrammar_processor)
+            elif response_format["type"] == "text":
+                pass
+
+        # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
         generation_kwargs = dict(
             input_ids=input_ids.to(self.model.device),
             streamer=streamer,
