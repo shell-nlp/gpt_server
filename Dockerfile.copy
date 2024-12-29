@@ -1,4 +1,4 @@
-FROM hub.geekery.cn/506610466/gpt_server:latest 
+FROM func.ink/506610466/gpt_server:latest 
 
 COPY ./ /gpt_server
 
