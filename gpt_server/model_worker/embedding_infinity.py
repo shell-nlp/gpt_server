@@ -66,11 +66,13 @@ class EmbeddingWorker(ModelWorkerBase):
             self.mode = "rerank"
         elif "ImageEmbedEngine" in engine_type_str:
             self.mode = "image"
+        elif "PredictEngine" in engine_type_str:
+            self.mode = "classify"
         self.engine: AsyncEmbeddingEngine = AsyncEngineArray.from_args([engine_args])[0]
         loop = asyncio.get_running_loop()
         loop.create_task(self.engine.astart())
-        logger.info(f"正在使用 {self.mode} 模型...")
         logger.info(f"模型：{model_names[0]}")
+        logger.info(f"正在使用 {self.mode} 模型...")
 
     async def astart(self):
         await self.engine.astart()
