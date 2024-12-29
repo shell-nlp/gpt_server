@@ -1,13 +1,32 @@
-from typing import List
+from typing import List, Type, Union
+from pydantic import BaseModel
 from transformers.generation.logits_process import LogitsProcessor
+from transformers import PreTrainedTokenizerBase
 from transformers.generation.stopping_criteria import (
     StoppingCriteria,
     StoppingCriteriaList,
     STOPPING_CRITERIA_INPUTS_DOCSTRING,
     add_start_docstrings,
 )
-
+import xgrammar as xgr
 import torch
+
+
+class XgrammarLogitsProcessor(LogitsProcessor):
+    def __init__(self, tokenizer: PreTrainedTokenizerBase):
+        tokenizer_info = xgr.TokenizerInfo.from_huggingface(tokenizer)
+        self.grammar_compiler = xgr.GrammarCompiler(tokenizer_info)
+        # -----------
+
+    def get_grammar_compiler(self, schema: Union[str, Type[BaseModel]]):
+        compiled_grammar = self.grammar_compiler.compile_json_schema(schema)
+        self.xgr_logits_processor = xgr.contrib.hf.LogitsProcessor(compiled_grammar)
+        return self.xgr_logits_processor
+
+    def __call__(
+        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
+    ) -> torch.FloatTensor:
+        return self.xgr_logits_processor(input_ids=input_ids, scores=scores)
 
 
 class InvalidScoreLogitsProcessor(LogitsProcessor):

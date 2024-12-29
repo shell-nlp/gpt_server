@@ -4,6 +4,7 @@ import asyncio
 from loguru import logger
 
 from infinity_emb import AsyncEngineArray, EngineArgs, AsyncEmbeddingEngine
+from infinity_emb.inference.select_model import get_engine_type_from_config
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 
 label_to_category = {
@@ -49,30 +50,26 @@ class EmbeddingWorker(ModelWorkerBase):
         bettertransformer = True
         if model_type is not None and "deberta" in model_type:
             bettertransformer = False
-        self.engine: AsyncEmbeddingEngine = AsyncEngineArray.from_args(
-            [
-                EngineArgs(
-                    model_name_or_path=model_path,
-                    engine="torch",
-                    embedding_dtype="float32",
-                    dtype="float32",
-                    device=device,
-                    bettertransformer=bettertransformer,
-                )
-            ]
-        )[0]
+        engine_args = EngineArgs(
+            model_name_or_path=model_path,
+            engine="torch",
+            embedding_dtype="float32",
+            dtype="float32",
+            device=device,
+            bettertransformer=bettertransformer,
+        )
+        engine_type = get_engine_type_from_config(engine_args)
+        engine_type_str = str(engine_type)
+        if "EmbedderEngine" in engine_type_str:
+            self.mode = "embedding"
+        elif "RerankEngine" in engine_type_str:
+            self.mode = "rerank"
+        elif "ImageEmbedEngine" in engine_type_str:
+            self.mode = "image"
+        self.engine: AsyncEmbeddingEngine = AsyncEngineArray.from_args([engine_args])[0]
         loop = asyncio.get_running_loop()
         loop.create_task(self.engine.astart())
-        self.mode = "embedding"
-        # rerank
-        for model_name in model_names:
-            if "rerank" in model_name:
-                self.mode = "rerank"
-                break
-        if self.mode == "rerank":
-            logger.info("正在使用 rerank 模型...")
-        elif self.mode == "embedding":
-            logger.info("正在使用 embedding 模型...")
+        logger.info(f"正在使用 {self.mode} 模型...")
         logger.info(f"模型：{model_names[0]}")
 
     async def astart(self):
@@ -83,7 +80,7 @@ class EmbeddingWorker(ModelWorkerBase):
         logger.info(f"worker_id: {self.worker_id}")
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
-        texts = params["input"]
+        texts: list = params["input"]
         if self.mode == "embedding":
             texts = list(map(lambda x: x.replace("\n", " "), texts))
             embeddings, usage = await self.engine.embed(sentences=texts)
@@ -105,6 +102,17 @@ class EmbeddingWorker(ModelWorkerBase):
             embedding = [
                 [round(float(score["relevance_score"]), 6)] for score in ranking
             ]
+        elif self.mode == "image":
+            if (
+                isinstance(texts[0], bytes)
+                or "http" in texts[0]
+                or "data:image" in texts[0]
+            ):
+                embeddings, usage = await self.engine.image_embed(images=texts)
+            else:
+                embeddings, usage = await self.engine.embed(sentences=texts)
+
+            embedding = [embedding.tolist() for embedding in embeddings]
         ret["embedding"] = embedding
         ret["token_num"] = usage
         return ret

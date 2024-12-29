@@ -126,7 +126,7 @@ class VllmBackend(ModelBackend):
                 choice=None,
                 grammar=None,
                 json_object=guided_json_object,
-                backend="lm-format-enforcer",
+                backend="xgrammar",
                 whitespace_pattern=None,
             )
         # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----

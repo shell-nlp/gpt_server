@@ -42,7 +42,8 @@ parent_pid = os.getpid()
 
 def signal_handler(signum, frame):
     print("\nCtrl-C detected! Cleaning up...")
-    kill_child_processes(parent_pid, including_parent=False)
+    # kill_child_processes(parent_pid, including_parent=False)
+    stop_server()
     exit(0)  # 正常退出程序
 
 
