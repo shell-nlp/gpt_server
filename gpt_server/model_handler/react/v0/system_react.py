@@ -2,13 +2,13 @@ from typing import Any, Dict, List, Tuple, Union, Optional
 import json
 import uuid
 
-from gpt_server.model_handler.react.prompt import (
+from gpt_server.model_handler.react.v0.prompt import (
     GLM4_TOOL_PROMPT,
     TOOL_SUFFIX_PROMPT,
 )
 
 
-def glm4_tool_formatter(
+def system_tool_formatter(
     tools: List[Dict[str, Any]], tool_choice_info: Optional[dict] = None
 ) -> str:
     tool_text = "\n"
@@ -23,7 +23,7 @@ def glm4_tool_formatter(
     ).strip()
 
 
-def glm4_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
+def system_tool_extractor(content: str) -> Union[str, List[Tuple[str, str]]]:
     i = content.rfind("Action:")
     j = content.rfind("Action Input:")
     tool_name = content[i + len("Action:") : j].strip().strip(".")
@@ -50,9 +50,9 @@ if __name__ == "__main__":
     tools_str = tools_str.replace("'", '"')
     tools = json.loads(tools_str)
 
-    res = glm4_tool_formatter(tools=tools)
+    res = system_tool_formatter(tools=tools)
     print(res)
     print()
     out = 'multiply\n{"first_int": 8, "second_int": 9}'
-    r = glm4_tool_extractor(out)
+    r = system_tool_extractor(out)
     print(r)

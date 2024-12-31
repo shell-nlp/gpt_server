@@ -3,10 +3,10 @@ from typing import Any, Dict, List, Tuple, Union, Optional
 import json
 import uuid
 
-from gpt_server.model_handler.react.prompt import (
+from gpt_server.model_handler.react.v0.prompt import (
     TOOL_SUFFIX_PROMPT,
 )
-from gpt_server.model_handler.react.prompts.qwen_prompt import (
+from gpt_server.model_handler.react.v0.prompts.qwen_prompt import (
     TOOL_SYSTEM_PROMPT_CN,
     TOOl_CHOICE_SYSTEM_PROMPT_CN,
     TOOL_CHOICE_SUFFIX_PROMPT,

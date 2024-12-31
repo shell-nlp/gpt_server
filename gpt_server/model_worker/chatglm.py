@@ -4,7 +4,7 @@ from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_handler.react.chatglm_react import glm4_tool_extractor
+from gpt_server.model_handler.react.v0.chatglm_react import glm4_tool_extractor
 from gpt_server.model_handler.utils import add_tools2messages
 
 
