@@ -5,8 +5,7 @@ from loguru import logger
 import torch
 
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_handler.react.v0.qwen_react import qwen_tool_extractor
-from gpt_server.model_handler.utils import add_tools2messages
+from gpt_server.model_handler.utils import add_tools2messages, qwen_tool_extractor
 
 
 class QwenWorker(ModelWorkerBase):
