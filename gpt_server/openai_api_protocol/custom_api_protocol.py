@@ -39,6 +39,7 @@ class SpeechRequest(BaseModel):
 class ModerationsRequest(BaseModel):
     input: Union[str, List[str]]
     model: str
+    threshold: float = Field(default=0.5, description="审核的阈值")
 
 
 class RerankRequest(BaseModel):

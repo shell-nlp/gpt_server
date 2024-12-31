@@ -125,6 +125,7 @@ class EmbeddingWorker(ModelWorkerBase):
         self.call_ct += 1
         ret = {}
         texts = params["input"]
+        threshold = params["threshold"]
         scores, usage = await self.engine.classify(sentences=texts, raw_scores=False)
         results = []
         flagged = True
@@ -141,7 +142,7 @@ class EmbeddingWorker(ModelWorkerBase):
                 category_scores[label] = score
                 # 如果分数高于某个阈值，标记为 flagged
                 categories_flags[label] = False
-                if score > 0.5:
+                if score > threshold:
                     categories_flags[label] = True
             results.append(
                 {

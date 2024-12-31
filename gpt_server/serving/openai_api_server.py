@@ -765,6 +765,7 @@ async def classify(request: ModerationsRequest):
         payload = {
             "model": request.model,
             "input": batch,
+            "threshold": request.threshold,
         }
         classify = await get_classify(payload)
         if "error_code" in classify and classify["error_code"] != 0:
