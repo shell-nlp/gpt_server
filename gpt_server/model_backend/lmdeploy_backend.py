@@ -45,6 +45,7 @@ class LMDeployBackend(ModelBackend):
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
         max_model_len = os.getenv("max_model_len", None)
         gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.8))
+        kv_cache_quant_policy = int(os.getenv("kv_cache_quant_policy", 0))
         dtype = os.getenv("dtype", "auto")
         logger.info(f"后端 {backend}")
         if backend == "pytorch":
@@ -54,6 +55,7 @@ class LMDeployBackend(ModelBackend):
                 session_len=int(max_model_len) if max_model_len else None,
                 enable_prefix_caching=enable_prefix_caching,
                 cache_max_entry_count=gpu_memory_utilization,
+                quant_policy=kv_cache_quant_policy,
             )
         if backend == "turbomind":
             backend_config = TurbomindEngineConfig(
@@ -62,6 +64,7 @@ class LMDeployBackend(ModelBackend):
                 session_len=int(max_model_len) if max_model_len else None,
                 dtype=dtype,
                 cache_max_entry_count=gpu_memory_utilization,
+                quant_policy=kv_cache_quant_policy,  # 默认为：0
             )
         pipeline_type, pipeline_class = get_task(model_path)
         logger.info(f"模型架构：{pipeline_type}")
@@ -118,7 +121,7 @@ class LMDeployBackend(ModelBackend):
                 # Abort the request if the client disconnects.
                 await self.async_engine.stop_session(session_id=request_id)
             text_outputs += request_output.response
-            
+
             usage = {
                 "prompt_tokens": request_output.input_token_len,
                 "completion_tokens": request_output.generate_token_len,

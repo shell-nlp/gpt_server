@@ -56,7 +56,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         self.model_config = AutoConfig.from_pretrained(
             model_path, trust_remote_code=True
         )
-        logger.info(f"模型配置：{self.model_config}")
+        # logger.info(f"模型配置：{self.model_config}")
         self.vision_config = getattr(self.model_config, "vision_config", None)
         is_vision = self.vision_config is not None
         super().__init__(
@@ -197,6 +197,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--dtype", type=str, default="auto")
         parser.add_argument("--max_model_len", type=str, default=None)
         parser.add_argument("--gpu_memory_utilization", type=str, default="0.8")
+        # kv_cache_quant_policy
+        parser.add_argument("--kv_cache_quant_policy", type=str, default="0")
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -215,6 +217,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching
         os.environ["gpu_memory_utilization"] = args.gpu_memory_utilization
+        os.environ["kv_cache_quant_policy"] = args.kv_cache_quant_policy
         os.environ["dtype"] = args.dtype
 
         host = args.host
