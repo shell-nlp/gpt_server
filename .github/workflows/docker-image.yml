@@ -6,7 +6,7 @@ on:
   #     - published  # 当发布新的 release 时触发
   push:
     branches:
-      - build_image # 在推送到 build_image 分支时触发构建
+    - build_image # 在推送到 build_image 分支时触发构建
 
 jobs:
 
@@ -16,14 +16,26 @@ jobs:
 
     steps:
     # 检出代码
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
     # 登录 Docker Hub
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    # 从 pyproject.toml 中抽取版本信息
+    - name: Extract version
+      id: get_version
+      run: |
+        # 使用 grep 和 sed 从 pyproject.toml 中提取版本
+        version=$(grep -Po '(?<=^version = ")[^"]*' pyproject.toml)
+        echo "VERSION=$version" >> $GITHUB_ENV
+
     # 构建 Docker 镜像
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest .
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} .
+        docker tag ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
     # 推送镜像到 Docker Hub
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
+    - name: Push Docker image
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
