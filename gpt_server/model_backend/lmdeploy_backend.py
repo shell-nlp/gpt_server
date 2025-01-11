@@ -7,6 +7,7 @@ from lmdeploy import (
 )
 from typing import Any, Dict, AsyncGenerator
 from lmdeploy.archs import get_task
+from lmdeploy.serve.async_engine import get_names_from_model
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
 
@@ -73,6 +74,10 @@ class LMDeployBackend(ModelBackend):
             backend=backend,
             backend_config=backend_config,
         )
+        model_type = get_names_from_model(model_path=model_path)[1]
+        self.messages_type_select = (
+            model_type[1] == "base"
+        )  # 如果为True 则使用 prompt:str 否则： messages：list
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -112,6 +117,8 @@ class LMDeployBackend(ModelBackend):
         logger.info(f"request_id {int(request_id)}")
         if params.get("tools", None):
             messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
+        if self.messages_type_select:
+            messages = prompt or messages
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config
         )

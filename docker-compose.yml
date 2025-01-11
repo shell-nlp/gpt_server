@@ -25,4 +25,4 @@ services:
               count: all
               # count: 2  # 两种方式
               capabilities: [ gpu ]
-    command: uv run gpt_server/serving/main.py
+    command: python gpt_server/serving/main.py

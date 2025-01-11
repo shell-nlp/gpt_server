@@ -316,19 +316,10 @@ model_type_mapping = {
 }
 
 
-def infer_model_type(model_path: str) -> str:
-    """自动推测模型类型，未使用此代码"""
-    from lmdeploy.model import best_match_model
-    from transformers import AutoConfig
-
-    match_model_type = best_match_model(model_path)
-    model_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
-    config_model_type = model_config.get("model_type", False)
-    return model_type_mapping[match_model_type]
-
-
 if __name__ == "__main__":
-    # ckpt = "deepseek-ai/deepseek-moe-16b-base"  # internlm2
-    # model_type = best_match_model(ckpt)
-    # print(model_type)
-    pass
+    # /home/dev/model/KirillR/QwQ-32B-Preview-AWQ
+    from lmdeploy.serve.async_engine import get_names_from_model
+
+    ckpt = "/home/dev/model/KirillR/QwQ-32B-Preview-AWQ"  # internlm2
+    model_type = get_names_from_model(ckpt)
+    print(model_type[1] == "base")
