@@ -2,6 +2,7 @@
 # openai_api_server
 serve_args:
   # openai 服务的 host 和 port
+  enable: true
   host: 0.0.0.0
   port: 8082
   controller_address: http://localhost:21001 # 控制器的ip地址
@@ -10,6 +11,7 @@ serve_args:
 
 controller_args:
   # 控制器的配置参数
+  enable: true
   host: 0.0.0.0
   port: 21001
   dispatch_method: shortest_queue # lottery、shortest_queue # 现有两种请求分发策略，随机（lottery） 和 最短队列（shortest_queue），最短队列方法更推荐。

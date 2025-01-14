@@ -78,24 +78,34 @@ def start_openai_server(host, port, controller_address, api_keys=None):
 
 
 def start_api_server(config: dict):
+    server_enable = config["serve_args"].get("enable", True)
     host = config["serve_args"]["host"]
     port = config["serve_args"]["port"]
     controller_address = config["serve_args"]["controller_address"]
     api_keys = config["serve_args"].get("api_keys", None)
 
+    controller_enable = config["controller_args"].get("enable", True)
     controller_host = config["controller_args"]["host"]
     controller_port = config["controller_args"]["port"]
     dispatch_method = config["controller_args"].get("dispatch_method", "shortest_queue")
-
-    start_server(
-        host=host,
-        port=port,
-        controller_address=controller_address,
-        api_keys=api_keys,
-        controller_host=controller_host,
-        controller_port=controller_port,
-        dispatch_method=dispatch_method,
-    )
+    # -----------------------------------------------------------------------
+    # 判断端口是否被占用
+    used_ports = []
+    if is_port_in_use(controller_port):
+        used_ports.append(controller_port)
+    if is_port_in_use(port):
+        used_ports.append(port)
+    if len(used_ports) > 0:
+        logger.warning(
+            f"端口：{used_ports} 已被占用!为了系统的正常运行,请确保是被已启动的gpt_server服务占用。"
+        )
+    if controller_port not in used_ports and controller_enable:
+        # 启动控制器
+        start_controller(controller_host, controller_port, dispatch_method)
+    if port not in used_ports and server_enable:
+        # 启动openai_api服务
+        start_openai_server(host, port, controller_address, api_keys)
+    # -----------------------------------------------------------------------
 
 
 def start_model_worker(config: dict):
