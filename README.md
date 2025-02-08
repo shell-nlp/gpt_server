@@ -47,6 +47,7 @@
 ## 更新信息
 
 ```plaintext
+2025-2-9   支持了 QVQ
 2024-12-22 支持了 tts, /v1/audio/speech TTS模型
 2024-12-21 支持了 text-moderation, /v1/moderations 文本审核模型 
 2024-12-14 支持了 phi-4
@@ -170,7 +171,7 @@ python gpt_server/serving/main.py
 ```bash
 docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的方式
 # 如果国内无法拉取docker镜像，可以尝试下面的国内镜像拉取的方式（不保证国内镜像源一直可用）
-docker pull func.ink/506610466/gpt_server:latest
+docker pull hub.littlediary.cn/506610466/gpt_server:latest
 ```
 
 ##### 3.2.1 手动构建镜像（可选）
@@ -246,6 +247,7 @@ Chat UI界面:
 |    InternVL2     | internvl2  |   ×   |   ×   |         √          |        √         |
 |  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |
 |     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |
+|     QVQ     |    qwen    |   ×   |   √   |         ×          |        ×         |
 <br>
 
 ### Embedding/Rerank/Classify模型

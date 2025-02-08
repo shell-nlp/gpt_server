@@ -88,7 +88,7 @@ class VllmBackend(ModelBackend):
             tokenizer = await self.engine.get_tokenizer()
             model_config = await self.engine.get_model_config()
             conversation, mm_data_future = parse_chat_messages_futures(
-                messages, model_config, tokenizer
+                messages, model_config, tokenizer, content_format="openai"
             )
             prompt = apply_hf_chat_template(
                 tokenizer,
