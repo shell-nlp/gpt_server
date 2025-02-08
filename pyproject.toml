@@ -13,15 +13,15 @@ dependencies = [
     "fschat==0.2.36",
     "gradio==4.26.0",
     "infinity-emb[all]==0.0.73",
-    "lmdeploy==0.6.2",
+    "lmdeploy==0.7.0",
     "loguru>=0.7.2",
     "openai==1.55.3",
     "setuptools==75.2.0",
     "streamlit==1.39.0",
     "torch==2.5.1",
     "torchvision==0.20.1",
-    "transformers==4.45.2",
-    "vllm==0.6.6.post1",
+    "transformers==4.48.2",
+    "vllm==0.7.2",
     "qwen_vl_utils",
     "evalscope[perf]==0.7.0",
     "modelscope==1.20.1",
@@ -35,6 +35,7 @@ override-dependencies = [
     "torch==2.5.1",
     "triton",
     "outlines==0.1.11",
+    "pynvml==12.0.0" # 解决vllm==0.7.2的bug https://github.com/vllm-project/vllm/issues/12847，后面可去掉
 
 ]
 

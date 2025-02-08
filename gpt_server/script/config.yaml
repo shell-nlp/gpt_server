@@ -1,13 +1,20 @@
 serve_args:
+  # openai 服务的 host 和 port
+  enable: true
   host: 0.0.0.0
   port: 8082
-  controller_address: http://localhost:21001
-  api_keys: null
+  controller_address: http://localhost:21001 # 控制器的ip地址
+  api_keys: null # api_keys: 111,222  # 用来设置 openai 密钥
 controller_args:
+  # 控制器的配置参数
+  enable: true
   host: 0.0.0.0
   port: 21001
-  dispatch_method: shortest_queue
+  dispatch_method: shortest_queue # lottery、shortest_queue # 现有两种请求分发策略，随机（lottery） 和 最短队列（shortest_queue），最短队列方法更推荐。
+
 model_worker_args:
+  # 模型的配置参数，这里port 不能设置，程序自动分配，并注册到 控制器中。
+  # model worker 的配置参数
   host: 0.0.0.0
   controller_address: http://localhost:21001
 models:
@@ -47,14 +54,16 @@ models:
     workers:
     - gpus:
       - 3
-- qwen-72b:
-    alias: qwen,gpt-4,gpt-3.5-turbo,gpt-3.5-turbo-16k
+
+- qwen-32b:
+    alias: qwen,gpt-4,gpt-4o,gpt-3.5-turbo,gpt-3.5-turbo-16k
     enable: true
     model_config:
-      model_name_or_path: /home/dev/model/qwen/Qwen2___5-72B-Instruct-AWQ/
+      model_name_or_path: /home/dev/model/Qwen/Qwen2___5-32B-Instruct-AWQ/
       enable_prefix_caching: true
       dtype: auto
       max_model_len: 65536
+      kv_cache_quant_policy: 8
     model_type: qwen
     work_mode: lmdeploy-turbomind
     device: gpu
@@ -62,6 +71,9 @@ models:
     - gpus:
       - 0
       - 1
+    # - gpus:
+    #   - 3
+    #   - 2
 - piccolo-base-zh:
     alias: null
     enable: true
@@ -73,11 +85,11 @@ models:
     workers:
     - gpus:
       - 2
-- bce-embedding-base_v1:
-    alias: text-embedding-ada-002
+- injection:
+    alias: null
     enable: true
     model_config:
-      model_name_or_path: /home/dev/model/maidalun1020/bce-embedding-base_v1/
+      model_name_or_path: /home/dev/model/protectai/deberta-v3-base-prompt-injection-v2
     model_type: embedding_infinity
     work_mode: hf
     device: gpu
@@ -95,11 +107,11 @@ models:
     workers:
     - gpus:
       - 2
-- acge_text_embedding:
-    alias: text-embedding-ada-002
-    enable: true
+- MiniCPM-Embedding:
+    alias: null
+    enable: false
     model_config:
-      model_name_or_path: /home/dev/model/aspire/acge_text_embedding
+      model_name_or_path: /home/dev/model/openbmb/MiniCPM-Embedding
     model_type: embedding_infinity
     work_mode: hf
     device: gpu
