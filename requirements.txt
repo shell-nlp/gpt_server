@@ -148,7 +148,7 @@ edge-tts==7.0.0
     # via gpt-server (pyproject.toml)
 editdistance==0.8.1
     # via evalscope
-einops==0.8.0
+einops==0.8.1
     # via
     #   infinity-emb
     #   lmdeploy
@@ -313,11 +313,11 @@ latex2mathml==3.77.0
     # via markdown2
 lm-format-enforcer==0.10.9
     # via vllm
-lmdeploy==0.7.0
+lmdeploy==0.7.0.post3
     # via gpt-server (pyproject.toml)
 loguru==0.7.3
     # via gpt-server (pyproject.toml)
-lxml==5.3.0
+lxml==5.3.1
     # via sacrebleu
 markdown-it-py==3.0.0
     # via rich
@@ -334,7 +334,7 @@ matplotlib==3.10.0
     #   seaborn
 mdurl==0.1.2
     # via markdown-it-py
-mistral-common==1.5.2
+mistral-common==1.5.3
     # via vllm
 mmengine-lite==0.10.6
     # via lmdeploy
@@ -358,7 +358,7 @@ multiprocess==0.70.16
     # via
     #   datasets
     #   evaluate
-narwhals==1.25.2
+narwhals==1.26.0
     # via
     #   altair
     #   plotly
@@ -542,7 +542,7 @@ ply==3.11
     # via simple-ddl-parser
 portalocker==3.1.1
     # via sacrebleu
-posthog==3.11.0
+posthog==3.12.0
     # via infinity-emb
 prometheus-client==0.21.1
     # via
@@ -724,7 +724,7 @@ rpds-py==0.22.3
     #   referencing
 rsa==4.9
     # via google-auth
-ruff==0.9.5
+ruff==0.9.6
     # via gradio
 sacrebleu==2.5.1
     # via evalscope
@@ -826,7 +826,7 @@ termcolor==2.5.0
     #   mmengine-lite
 threadpoolctl==3.5.0
     # via scikit-learn
-tiktoken==0.7.0
+tiktoken==0.8.0
     # via
     #   evalscope
     #   fschat
@@ -960,7 +960,7 @@ uvicorn==0.32.1
     #   vllm
 uvloop==0.21.0
     # via uvicorn
-virtualenv==20.29.1
+virtualenv==20.29.2
     # via ray
 vllm==0.7.2
     # via gpt-server (pyproject.toml)

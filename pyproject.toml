@@ -13,7 +13,7 @@ dependencies = [
     "fschat==0.2.36",
     "gradio==4.26.0",
     "infinity-emb[all]==0.0.73",
-    "lmdeploy==0.7.0",
+    "lmdeploy==0.7.0.post3",
     "loguru>=0.7.2",
     "openai==1.55.3",
     "setuptools==75.2.0",
