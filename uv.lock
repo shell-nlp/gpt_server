@@ -910,7 +910,7 @@ wheels = [
 
 [[package]]
 name = "evalscope"
-version = "0.7.0"
+version = "0.10.1"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "absl-py" },
@@ -946,9 +946,9 @@ dependencies = [
     { name = "transformers" },
     { name = "transformers-stream-generator" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/fe/3c/500d655a27ca80e1aba3fb2b1e8886951942732b869ad1516422d9e6ac97/evalscope-0.7.0.tar.gz", hash = "sha256:6de790ec4d191413ca4d070e85eb7e3f7585319a8b90b83d020a06dc4d339c1f", size = 1307040 }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e3/d3/dda2ac0513904bff8aa0c2efe77bc851d3acc6d514707db36648e4a903d2/evalscope-0.10.1.tar.gz", hash = "sha256:95b048d9e57e13ff1431ee6ccd5134b86de2a46ce367fd90ed0f8656baa3663f", size = 1316891 }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/20/92/6fff1dfd12a4f73489c451dab56351b6a3c1095a92bb55025c2934fc625d/evalscope-0.7.0-py3-none-any.whl", hash = "sha256:1f9da82d638a7eddf85d10e80b8c72606d92f1e0cd2cbf1a3480acf452fdcd6e", size = 1428085 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/a7/8f/907045290d359b4e07e7acc96ec60173380748b49e9f3c91b7ddd8e8342d/evalscope-0.10.1-py3-none-any.whl", hash = "sha256:5de21a8d9203f915745512769538d636acc5dd0a7e18c4da912c592960e7d054", size = 1428367 },
 ]
 
 [package.optional-dependencies]
@@ -1280,7 +1280,7 @@ dependencies = [
 requires-dist = [
     { name = "accelerate", specifier = ">=1.0.1" },
     { name = "edge-tts", specifier = ">=7.0.0" },
-    { name = "evalscope", extras = ["perf"], specifier = "==0.7.0" },
+    { name = "evalscope", extras = ["perf"], specifier = "==0.10.1" },
     { name = "fastapi", specifier = "==0.114.1" },
     { name = "ffmpy" },
     { name = "fschat", specifier = "==0.2.36" },
