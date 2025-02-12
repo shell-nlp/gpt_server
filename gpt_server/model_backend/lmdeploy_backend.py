@@ -40,6 +40,15 @@ def is_stop(output: str, stop_str: str):
     return output, False
 
 
+def is_messages_with_tool(messages: list):
+    flag = False
+    for msg in messages:
+        if "content" not in msg:
+            flag = True
+            break
+    return flag
+
+
 class LMDeployBackend(ModelBackend):
     def __init__(self, model_path) -> None:
         backend = backend_map[os.getenv("backend")]
@@ -115,7 +124,7 @@ class LMDeployBackend(ModelBackend):
             response_format=params["response_format"],
         )
         logger.info(f"request_id {int(request_id)}")
-        if params.get("tools", None):
+        if params.get("tools", None) or is_messages_with_tool(messages=messages):
             messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
         if self.messages_type_select:
             messages = prompt or messages
