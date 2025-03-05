@@ -11,7 +11,6 @@ dependencies = [
     "fastapi==0.114.1",
     "ffmpy",
     "fschat==0.2.36",
-    "gradio==4.26.0",
     "infinity-emb[all]==0.0.73",
     "lmdeploy==0.7.0.post3",
     "loguru>=0.7.2",

@@ -122,7 +122,11 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
             logger.info(f"{self.worker_name} 使用 vllm 后端")
             self.backend = VllmBackend(model_path=self.model_path)
+        elif "sglang" in os.getenv("backend"):
+            from gpt_server.model_backend.sglang_backend import SGLangBackend
 
+            logger.info(f"{self.worker_name} 使用 SGLang 后端")
+            self.backend = SGLangBackend(model_path=self.model_path)
         elif "lmdeploy" in os.getenv("backend"):
             from gpt_server.model_backend.lmdeploy_backend import LMDeployBackend
 
@@ -209,6 +213,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["backend"] = "lmdeploy-pytorch"
         elif args.backend == "lmdeploy-turbomind":
             os.environ["backend"] = "lmdeploy-turbomind"
+        elif args.backend == "sglang":
+            os.environ["backend"] = "sglang"
 
         if args.lora:
             os.environ["lora"] = args.lora
