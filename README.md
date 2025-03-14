@@ -237,7 +237,7 @@ Chat UI界面:
 |       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |
 |        Llama-3        |   llama    |   √   |   √   |         √          |        √         |
 |      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |
-|    QWQ-32B-Preview    |    qwen    |   √   |   √   |         √          |        √         |
+|    QWQ-32B    |    qwen    |   √   |   √   |         √          |        √         |
 |         Phi-4         |    phi     |   √   |   √   |         ×          |        ×         |
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
