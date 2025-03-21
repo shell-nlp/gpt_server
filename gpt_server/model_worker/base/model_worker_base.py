@@ -53,9 +53,13 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         model_type: str = "AutoModel",
         multimodal: bool = False,
     ):
-        self.model_config = AutoConfig.from_pretrained(
-            model_path, trust_remote_code=True
-        )
+        try:
+            self.model_config = AutoConfig.from_pretrained(
+                model_path, trust_remote_code=True
+            )
+        except ValueError as e:
+            logger.warning(e)
+            self.model_config = {}
         # logger.info(f"模型配置：{self.model_config}")
         self.vision_config = getattr(self.model_config, "vision_config", None)
         is_vision = self.vision_config is not None

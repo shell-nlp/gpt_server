@@ -7,6 +7,7 @@ from lmdeploy import (
 )
 from typing import Any, Dict, AsyncGenerator
 from lmdeploy.archs import get_task
+# from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
 from lmdeploy.serve.async_engine import get_names_from_model
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
@@ -87,6 +88,8 @@ class LMDeployBackend(ModelBackend):
         self.messages_type_select = (
             model_type[1] == "base"
         )  # 如果为True 则使用 prompt:str 否则： messages：list
+        # self.reasoning_parser = False
+        # self.tokenizer = self.async_engine.tokenizer
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -131,12 +134,16 @@ class LMDeployBackend(ModelBackend):
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config
         )
-        text_outputs = ""
+        previous_text = ""
+        current_text = ""
+        previous_token_ids = []
+        current_token_ids = []
+        delta_token_ids = []
         async for request_output in results_generator:
             if await request.is_disconnected():
                 # Abort the request if the client disconnects.
                 await self.async_engine.stop_session(session_id=request_id)
-            text_outputs += request_output.response
+            current_text = current_text + request_output.response
 
             usage = {
                 "prompt_tokens": request_output.input_token_len,
@@ -145,16 +152,39 @@ class LMDeployBackend(ModelBackend):
                 + request_output.generate_token_len,
             }
             ret = {
-                "text": text_outputs,
+                "text": current_text,
                 "error_code": 0,
                 "usage": usage,
                 "finish_reason": request_output.finish_reason,
             }
+            # if self.reasoning_parser is not None:
+            #     delta_token_ids = (
+            #         request_output.token_ids
+            #         if request_output.token_ids is not None
+            #         else []
+            #     )
+            #     current_token_ids = current_token_ids + delta_token_ids
+            #     reasoning_parser = ReasoningParserManager.get("deepseek-r1")(
+            #         self.tokenizer
+            #     )
+            #     reasoning_delta = reasoning_parser.reasoning_parser.extract_reasoning_content_streaming(
+            #         previous_text=previous_text,
+            #         current_text=current_text,
+            #         delta_text=request_output.response,
+            #         previous_token_ids=previous_token_ids,
+            #         current_token_ids=current_token_ids,
+            #         delta_token_ids=delta_token_ids,
+            #     )
+            #     if reasoning_delta is not None:
+            #         ret["text"] = reasoning_delta.content
+            #         ret["reasoning_content"] = reasoning_delta.reasoning_content
+            #     previous_text = current_text
+            #     previous_token_ids = current_token_ids
             # TODO -------------------------------------------------------------------
             output_info_list = []
             for stop_str in list(stop):
                 if stop_str:
-                    text, bool_value = is_stop(output=text_outputs, stop_str=stop_str)
+                    text, bool_value = is_stop(output=current_text, stop_str=stop_str)
                     output_info_list.append(
                         {"text": text, "bool_value": bool_value, "text_len": len(text)}
                     )
@@ -167,5 +197,5 @@ class LMDeployBackend(ModelBackend):
                 break
             # TODO -------------------------------------------------------------------
             yield ret
-        logger.info(text_outputs)
+        logger.info(current_text)
         logger.info(usage)
