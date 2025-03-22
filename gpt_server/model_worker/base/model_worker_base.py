@@ -125,7 +125,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             from gpt_server.model_backend.vllm_backend import VllmBackend
 
             logger.info(f"{self.worker_name} 使用 vllm 后端")
-            self.backend = VllmBackend(model_path=self.model_path)
+            self.backend = VllmBackend(
+                model_path=self.model_path, tokenizer=self.tokenizer
+            )
         elif "sglang" in os.getenv("backend"):
             from gpt_server.model_backend.sglang_backend import SGLangBackend
 

@@ -7,7 +7,9 @@ from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 import vllm
+from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
 from vllm.lora.request import LoRARequest
+from transformers import AutoTokenizer
 from vllm.entrypoints.chat_utils import (
     ConversationMessage,
     apply_hf_chat_template,
@@ -24,7 +26,7 @@ vllm_version = vllm.__version__
 
 
 class VllmBackend(ModelBackend):
-    def __init__(self, model_path) -> None:
+    def __init__(self, model_path, tokenizer: AutoTokenizer) -> None:
         lora = os.getenv("lora", None)
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
         max_model_len = os.getenv("max_model_len", None)
@@ -60,6 +62,7 @@ class VllmBackend(ModelBackend):
             max_model_len=int(max_model_len) if max_model_len else None,
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
+        self.tokenizer = tokenizer
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -154,6 +157,9 @@ class VllmBackend(ModelBackend):
         )
         current_text = ""
         previous_text = ""
+        previous_token_ids = []
+        current_token_ids = []
+        delta_token_ids = []
         async for request_output in results_generator:
             current_text = request_output.outputs[0].text
             delta_text = current_text[len(previous_text) :]
@@ -184,6 +190,33 @@ class VllmBackend(ModelBackend):
                 "usage": usage,
                 "finish_reason": request_output.outputs[0].finish_reason,
             }
+            reasoning_parser = params.get("reasoning_parser", None)
+            if reasoning_parser:
+                current_token_ids = list(request_output.outputs[0].token_ids)
+                delta_token_ids = current_token_ids[len(previous_token_ids) :]
+                reasoning_parser = ReasoningParserManager.get(reasoning_parser)(
+                    self.tokenizer
+                )
+                reasoning_delta = reasoning_parser.extract_reasoning_content_streaming(
+                    previous_text=previous_text,
+                    current_text=current_text,
+                    delta_text=delta_text,  #
+                    previous_token_ids=previous_token_ids,  #
+                    current_token_ids=current_token_ids,
+                    delta_token_ids=delta_token_ids,  #
+                )
+                if reasoning_delta is not None:
+                    ret["text"] = (
+                        reasoning_delta.content if reasoning_delta.content else ""
+                    )
+                    ret["reasoning_content"] = (
+                        reasoning_delta.reasoning_content
+                        if reasoning_delta.reasoning_content
+                        else ""
+                    )
+                # previous_text = current_text
+                previous_token_ids = current_token_ids
+
             yield ret
             previous_text = current_text
             if aborted:
