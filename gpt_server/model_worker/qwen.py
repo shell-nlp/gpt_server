@@ -86,8 +86,9 @@ class QwenWorker(ModelWorkerBase):
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------
+            response = ""
             async for ret in self.backend.stream_chat(params=params):
-                response = ret["text"]
+                response += ret["text"]
                 yield json.dumps(ret).encode() + b"\0"
             # ------ add tool_calls ------
             tool_calls = qwen_tool_extractor(response)
