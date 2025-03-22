@@ -129,7 +129,6 @@ class VllmBackend(ModelBackend):
                 backend="xgrammar",
                 whitespace_pattern=None,
             )
-        # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
         sampling = SamplingParams(
             top_p=top_p,
             top_k=top_k,
@@ -153,10 +152,12 @@ class VllmBackend(ModelBackend):
             request_id=request_id,
             lora_request=lora_request,
         )
-
+        current_text = ""
+        previous_text = ""
         async for request_output in results_generator:
-            text_outputs = request_output.outputs[0].text
-            partial_stop = any(is_partial_stop(text_outputs, i) for i in stop)
+            current_text = request_output.outputs[0].text
+            delta_text = current_text[len(previous_text) :]
+            partial_stop = any(is_partial_stop(current_text, i) for i in stop)
             # prevent yielding partial stop sequence
             if partial_stop:
                 continue
@@ -178,15 +179,15 @@ class VllmBackend(ModelBackend):
                 "total_tokens": prompt_tokens + completion_tokens,
             }
             ret = {
-                "text": text_outputs,
+                "text": delta_text,
                 "error_code": 0,
                 "usage": usage,
                 "finish_reason": request_output.outputs[0].finish_reason,
             }
             yield ret
-
+            previous_text = current_text
             if aborted:
                 break
         logger.info(f"Lora: {request_output.lora_request}")
-        logger.info(text_outputs)
+        logger.info(current_text)
         logger.info(usage)

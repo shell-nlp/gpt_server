@@ -86,6 +86,7 @@ class CustomChatCompletionResponse(ChatCompletionResponse):
 # chat.completion.chunk
 class CustomDeltaMessage(DeltaMessage):
     tool_calls: Optional[list] = None
+    reasoning_content: Optional[str] = None
 
 
 class CustomChatCompletionResponseStreamChoice(ChatCompletionResponseStreamChoice):

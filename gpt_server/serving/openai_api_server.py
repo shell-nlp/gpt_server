@@ -484,38 +484,19 @@ async def chat_completion_stream_generator(
     id = f"chatcmpl-{shortuuid.random()}"
     finish_stream_events = []
     for i in range(n):
-        # First chunk with role
-        # choice_data = ChatCompletionResponseStreamChoice(
-        #     index=i,
-        #     delta=DeltaMessage(role="assistant"),
-        #     finish_reason=None,
-        # )
-        # chunk = ChatCompletionStreamResponse(
-        #     id=id, choices=[choice_data], model=model_name
-        # )
-        # yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
-
-        previous_text = ""
         async for content in generate_completion_stream(gen_params, worker_addr):
             if content["error_code"] != 0:
                 yield f"data: {json.dumps(content, ensure_ascii=False)}\n\n"
                 yield "data: [DONE]\n\n"
                 return
-            decoded_unicode = content["text"].replace("\ufffd", "")
-            delta_text = decoded_unicode[len(previous_text) :]
-            previous_text = (
-                decoded_unicode
-                if len(decoded_unicode) > len(previous_text)
-                else previous_text
-            )
-            if len(delta_text) == 0:
-                delta_text = None
+            delta_text = content.get("text", "")
             choice_data = CustomChatCompletionResponseStreamChoice(
                 index=i,
                 delta=CustomDeltaMessage(
                     role="assistant",
-                    content=delta_text if delta_text else "",
+                    content=delta_text,
                     tool_calls=content.get("tool_calls", None),
+                    reasoning_content=content.get("reasoning_content", None),
                 ),
                 finish_reason=content.get("finish_reason", "stop"),
             )

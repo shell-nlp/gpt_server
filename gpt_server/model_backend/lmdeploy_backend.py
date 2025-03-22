@@ -7,7 +7,7 @@ from lmdeploy import (
 )
 from typing import Any, Dict, AsyncGenerator
 from lmdeploy.archs import get_task
-# from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
+from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
 from lmdeploy.serve.async_engine import get_names_from_model
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
@@ -88,8 +88,8 @@ class LMDeployBackend(ModelBackend):
         self.messages_type_select = (
             model_type[1] == "base"
         )  # 如果为True 则使用 prompt:str 否则： messages：list
-        # self.reasoning_parser = False
-        # self.tokenizer = self.async_engine.tokenizer
+        self.reasoning_parser = False
+        self.tokenizer = self.async_engine.tokenizer
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -152,49 +152,49 @@ class LMDeployBackend(ModelBackend):
                 + request_output.generate_token_len,
             }
             ret = {
-                "text": current_text,
+                "text": request_output.response,
                 "error_code": 0,
                 "usage": usage,
                 "finish_reason": request_output.finish_reason,
             }
-            # if self.reasoning_parser is not None:
-            #     delta_token_ids = (
-            #         request_output.token_ids
-            #         if request_output.token_ids is not None
-            #         else []
-            #     )
-            #     current_token_ids = current_token_ids + delta_token_ids
-            #     reasoning_parser = ReasoningParserManager.get("deepseek-r1")(
-            #         self.tokenizer
-            #     )
-            #     reasoning_delta = reasoning_parser.reasoning_parser.extract_reasoning_content_streaming(
-            #         previous_text=previous_text,
-            #         current_text=current_text,
-            #         delta_text=request_output.response,
-            #         previous_token_ids=previous_token_ids,
-            #         current_token_ids=current_token_ids,
-            #         delta_token_ids=delta_token_ids,
-            #     )
-            #     if reasoning_delta is not None:
-            #         ret["text"] = reasoning_delta.content
-            #         ret["reasoning_content"] = reasoning_delta.reasoning_content
-            #     previous_text = current_text
-            #     previous_token_ids = current_token_ids
+            if self.reasoning_parser:
+                delta_token_ids = (
+                    request_output.token_ids
+                    if request_output.token_ids is not None
+                    else []
+                )
+                current_token_ids = current_token_ids + delta_token_ids
+                reasoning_parser = ReasoningParserManager.get("deepseek-r1")(
+                    self.tokenizer
+                )
+                reasoning_delta = reasoning_parser.extract_reasoning_content_streaming(
+                    previous_text=previous_text,
+                    current_text=current_text,
+                    delta_text=request_output.response,
+                    previous_token_ids=previous_token_ids,
+                    current_token_ids=current_token_ids,
+                    delta_token_ids=delta_token_ids,
+                )
+                if reasoning_delta is not None:
+                    ret["text"] = reasoning_delta.content
+                    ret["reasoning_content"] = reasoning_delta.reasoning_content
+                previous_text = current_text
+                previous_token_ids = current_token_ids
             # TODO -------------------------------------------------------------------
-            output_info_list = []
-            for stop_str in list(stop):
-                if stop_str:
-                    text, bool_value = is_stop(output=current_text, stop_str=stop_str)
-                    output_info_list.append(
-                        {"text": text, "bool_value": bool_value, "text_len": len(text)}
-                    )
-            output_info_list.sort(key=lambda x: x["text_len"])
-            output_info = output_info_list[0]
-            ret["text"] = output_info["text"]
-            if output_info["bool_value"]:
-                ret["finish_reason"] = "stop"
-                yield ret
-                break
+            # output_info_list = []
+            # for stop_str in list(stop):
+            #     if stop_str:
+            #         text, bool_value = is_stop(output=current_text, stop_str=stop_str)
+            #         output_info_list.append(
+            #             {"text": text, "bool_value": bool_value, "text_len": len(text)}
+            #         )
+            # output_info_list.sort(key=lambda x: x["text_len"])
+            # output_info = output_info_list[0]
+            # ret["text"] = output_info["text"]
+            # if output_info["bool_value"]:
+            #     ret["finish_reason"] = "stop"
+            #     yield ret
+            #     break
             # TODO -------------------------------------------------------------------
             yield ret
         logger.info(current_text)
