@@ -68,6 +68,7 @@ class CustomChatCompletionRequest(ChatCompletionRequest):
         # List[Dict[str, Union[str, List[Dict[str, Union[str, Dict[str, str]]]]]]],
     ]
     response_format: Optional[Any] = None
+    reasoning_parser: Optional[str] = None
 
 
 class CustomChatMessage(ChatMessage):

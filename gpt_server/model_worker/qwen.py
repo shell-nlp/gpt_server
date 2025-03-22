@@ -57,6 +57,14 @@ class QwenWorker(ModelWorkerBase):
         try:
             messages = params.get("messages", [])
             tools = params.get("tools", None)
+            tool_choice = params.get("tool_choice", "none")
+            if tool_choice == "none":
+                tools = None
+            elif tool_choice == "auto" or tool_choice == "required":
+                pass
+            elif isinstance(tool_choice, dict):
+                raise NotImplementedError
+
             if not self.vision_config:
                 if isinstance(messages, list):
                     text = self.chat_template.messages2prompt(messages, True, tools)

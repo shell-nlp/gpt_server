@@ -88,7 +88,6 @@ class LMDeployBackend(ModelBackend):
         self.messages_type_select = (
             model_type[1] == "base"
         )  # 如果为True 则使用 prompt:str 否则： messages：list
-        self.reasoning_parser = False
         self.tokenizer = self.async_engine.tokenizer
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
@@ -157,14 +156,15 @@ class LMDeployBackend(ModelBackend):
                 "usage": usage,
                 "finish_reason": request_output.finish_reason,
             }
-            if self.reasoning_parser:
+            reasoning_parser = params.get("reasoning_parser", None)
+            if reasoning_parser:
                 delta_token_ids = (
                     request_output.token_ids
                     if request_output.token_ids is not None
                     else []
                 )
                 current_token_ids = current_token_ids + delta_token_ids
-                reasoning_parser = ReasoningParserManager.get("deepseek-r1")(
+                reasoning_parser = ReasoningParserManager.get(reasoning_parser)(
                     self.tokenizer
                 )
                 reasoning_delta = reasoning_parser.extract_reasoning_content_streaming(

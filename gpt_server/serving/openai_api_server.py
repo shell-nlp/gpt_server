@@ -287,6 +287,7 @@ async def get_gen_params(
     tools: Optional[list] = None,
     tool_choice=None,
     response_format=None,
+    reasoning_parser: str = None,
 ) -> Dict[str, Any]:
     images = []
     if isinstance(messages, str):
@@ -325,6 +326,7 @@ async def get_gen_params(
     gen_params["tool_choice"] = tool_choice
     # ------- TODO add messages tools -------
     gen_params["response_format"] = response_format
+    gen_params["reasoning_parser"] = reasoning_parser
     logger.debug(f"==== request ====\n{gen_params}")
     return gen_params
 
@@ -421,6 +423,7 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         tools=request.tools,
         tool_choice=request.tool_choice,
         response_format=request.response_format,
+        reasoning_parser=request.reasoning_parser,
     )
     if gen_params["max_new_tokens"] is None:
         gen_params["max_new_tokens"] = 1024 * 16
