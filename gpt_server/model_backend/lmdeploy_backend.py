@@ -176,25 +176,31 @@ class LMDeployBackend(ModelBackend):
                     delta_token_ids=delta_token_ids,
                 )
                 if reasoning_delta is not None:
-                    ret["text"] = reasoning_delta.content
-                    ret["reasoning_content"] = reasoning_delta.reasoning_content
-                previous_text = current_text
+                    ret["text"] = (
+                        reasoning_delta.content if reasoning_delta.content else ""
+                    )
+                    ret["reasoning_content"] = (
+                        reasoning_delta.reasoning_content
+                        if reasoning_delta.reasoning_content
+                        else ""
+                    )
+                # previous_text = current_text
                 previous_token_ids = current_token_ids
             # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
-            output_info_list = []
-            for stop_str in list(stop):
-                if stop_str:
-                    text, bool_value = is_stop(output=current_text, stop_str=stop_str)
-                    output_info_list.append(
-                        {"text": text, "bool_value": bool_value, "text_len": len(text)}
-                    )
-            output_info_list.sort(key=lambda x: x["text_len"])
-            output_info = output_info_list[0]
-            ret["text"] = output_info["text"][len(previous_text) :]
-            if output_info["bool_value"]:
-                ret["finish_reason"] = "stop"
-                yield ret
-                break
+            # output_info_list = []
+            # for stop_str in list(stop):
+            #     if stop_str:
+            #         text, bool_value = is_stop(output=current_text, stop_str=stop_str)
+            #         output_info_list.append(
+            #             {"text": text, "bool_value": bool_value, "text_len": len(text)}
+            #         )
+            # output_info_list.sort(key=lambda x: x["text_len"])
+            # output_info = output_info_list[0]
+            # ret["text"] = output_info["text"][len(previous_text) :]
+            # if output_info["bool_value"]:
+            #     ret["finish_reason"] = "stop"
+            #     yield ret
+            #     break
             # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
             yield ret
             previous_text = current_text

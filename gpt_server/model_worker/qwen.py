@@ -81,7 +81,7 @@ class QwenWorker(ModelWorkerBase):
             # ---------------添加额外的参数------------------------
             full_text = ""
             async for ret in self.backend.stream_chat(params=params):
-                full_text += ret["text"]
+                full_text += ret.get("text", "")
                 yield json.dumps(ret).encode() + b"\0"
             # ------ add tool_calls ------
             yield tool_parser(
