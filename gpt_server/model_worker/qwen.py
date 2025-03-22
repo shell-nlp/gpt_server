@@ -5,7 +5,8 @@ from loguru import logger
 import torch
 
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_handler.utils import add_tools2messages, qwen_tool_extractor
+from gpt_server.model_handler.prompts import MODELS
+from lmdeploy.serve.openai.tool_parser import ToolParserManager
 
 
 class QwenWorker(ModelWorkerBase):
@@ -42,40 +43,23 @@ class QwenWorker(ModelWorkerBase):
         # 拓展额外的stop
         self.stop.extend(["Observation"])
         logger.info(f"{model_names[0]} 停用词: {self.stop}")
-        self.other_config = {
-            "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content']}}{% if (loop.last and add_generation_prompt) or not loop.last %}{{ '<|im_end|>' + '\n'}}{% endif %}{% endfor %}{% if add_generation_prompt and messages[-1]['role'] != 'assistant' %}{{ '<|im_start|>assistant\n' }}{% endif %}"
-        }
+
+        self.chat_template = MODELS.module_dict["qwen2_5"]()
+        self.tool_parser = ToolParserManager.module_dict["qwen"](
+            tokenizer=self.tokenizer
+        )
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         logger.info(f"params {params}")
         logger.info(f"worker_id: {self.worker_id}")
         try:
-            model_type = getattr(self.model_config, "model_type", "qwen")
-            messages = add_tools2messages(params=params, model_adapter="qwen")
+            messages = params.get("messages", [])
+            tools = params.get("tools", None)
             if not self.vision_config:
                 if isinstance(messages, list):
-                    task = "chat"
+                    text = self.chat_template.messages2prompt(messages, True, tools)
                 elif isinstance(messages, str):
-                    task = "completion"
-                if task == "chat":
-                    # 暂时保留，用于特殊情况的处理
-                    if model_type == "qwen":
-                        logger.info("正在使用qwen-1.0 !")
-                        text = self.tokenizer.apply_chat_template(
-                            conversation=messages,
-                            tokenize=False,
-                            add_generation_prompt=True,
-                            chat_template=self.other_config["chat_template"],
-                        )
-                    elif model_type == "qwen2":
-                        logger.info("正在使用qwen-2.0 !")
-                        text = self.tokenizer.apply_chat_template(
-                            conversation=messages,
-                            tokenize=False,
-                            add_generation_prompt=True,
-                        )
-                elif task == "completion":
                     text = messages
 
                 input_ids = self.tokenizer([text], return_tensors="pt").input_ids
@@ -91,10 +75,11 @@ class QwenWorker(ModelWorkerBase):
                 response += ret["text"]
                 yield json.dumps(ret).encode() + b"\0"
             # ------ add tool_calls ------
-            tool_calls = qwen_tool_extractor(response)
-            if params.get("tools", False) and isinstance(
-                tool_calls, list
-            ):  # 如果传入tools
+            tool_call_info = self.tool_parser.extract_tool_calls(response, "")
+            tools_called = tool_call_info.tools_called
+            text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
+            tool_calls = [i.model_dump() for i in tool_calls]
+            if params.get("tools", False) and tools_called:  # 如果传入tools
                 logger.debug(f"工具解析成功, tool_calls: {tool_calls}")
                 ret["tool_calls"] = tool_calls
                 ret["finish_reason"] = "tool_calls"

@@ -25,14 +25,14 @@ tools = [
                     },
                     "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
                 },
-                "required": ["location", "unit"],
+                "required": ["location"],
             },
         },
     }
 ]
 # 方式一
 response = client.chat.completions.create(
-    model="qwen-3b",
+    model="qwen",
     messages=[{"role": "user", "content": "南京的天气怎么样"}],
     tools=tools,
     tool_choice="auto",
