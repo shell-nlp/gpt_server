@@ -180,22 +180,23 @@ class LMDeployBackend(ModelBackend):
                     ret["reasoning_content"] = reasoning_delta.reasoning_content
                 previous_text = current_text
                 previous_token_ids = current_token_ids
-            # TODO -------------------------------------------------------------------
-            # output_info_list = []
-            # for stop_str in list(stop):
-            #     if stop_str:
-            #         text, bool_value = is_stop(output=current_text, stop_str=stop_str)
-            #         output_info_list.append(
-            #             {"text": text, "bool_value": bool_value, "text_len": len(text)}
-            #         )
-            # output_info_list.sort(key=lambda x: x["text_len"])
-            # output_info = output_info_list[0]
-            # ret["text"] = output_info["text"]
-            # if output_info["bool_value"]:
-            #     ret["finish_reason"] = "stop"
-            #     yield ret
-            #     break
-            # TODO -------------------------------------------------------------------
+            # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
+            output_info_list = []
+            for stop_str in list(stop):
+                if stop_str:
+                    text, bool_value = is_stop(output=current_text, stop_str=stop_str)
+                    output_info_list.append(
+                        {"text": text, "bool_value": bool_value, "text_len": len(text)}
+                    )
+            output_info_list.sort(key=lambda x: x["text_len"])
+            output_info = output_info_list[0]
+            ret["text"] = output_info["text"][len(previous_text) :]
+            if output_info["bool_value"]:
+                ret["finish_reason"] = "stop"
+                yield ret
+                break
+            # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
             yield ret
+            previous_text = current_text
         logger.info(current_text)
         logger.info(usage)
