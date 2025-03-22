@@ -4,7 +4,7 @@ from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-
+import traceback
 
 class GemmaWorker(ModelWorkerBase):
     def __init__(
@@ -71,6 +71,7 @@ class GemmaWorker(ModelWorkerBase):
             }
             yield json.dumps(ret).encode() + b"\0"
         except (ValueError, RuntimeError) as e:
+            traceback.print_exc()
             logger.info(e)
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",

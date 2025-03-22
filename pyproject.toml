@@ -8,18 +8,17 @@ authors = [{ name = "Yu Liu", email = "506610466@qq.com" }]
 requires-python = ">=3.10"
 dependencies = [
     "accelerate>=1.0.1",
-    "fastapi==0.114.1",
+    "fastapi==0.115.0",
     "ffmpy",
     "fschat==0.2.36",
     "infinity-emb[all]==0.0.73",
-    "lmdeploy==0.7.1",
+    "lmdeploy==0.7.2.post1",
     "loguru>=0.7.2",
     "openai==1.55.3",
     "setuptools==75.2.0",
     "streamlit==1.39.0",
     "torch==2.5.1",
     "torchvision==0.20.1",
-    "transformers==4.48.2",
     "vllm==0.7.3",
     "qwen_vl_utils",
     "evalscope[perf]==0.10.1",
@@ -34,6 +33,7 @@ override-dependencies = [
     "torch==2.5.1",
     "triton",
     "outlines==0.1.11",
+    "transformers==4.50.0"
 ]
 
 [[tool.uv.index]]
