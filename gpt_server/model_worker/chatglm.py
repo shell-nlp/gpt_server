@@ -98,13 +98,13 @@ class ChatGLMWorker(ModelWorkerBase):
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------
-            response = ""
+            full_text = ""
             async for ret in self.backend.stream_chat(params=params):
-                response += ret["text"]
+                full_text += ret["text"]
 
                 yield json.dumps(ret).encode() + b"\0"
             # ------ add tool_calls ------
-            tool_calls = glm4_tool_extractor(response)
+            tool_calls = glm4_tool_extractor(full_text)
             if params.get("tools", False) and isinstance(
                 tool_calls, list
             ):  # 如果传入tools

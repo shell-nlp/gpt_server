@@ -7,6 +7,7 @@ import torch
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_handler.prompts import MODELS
 from lmdeploy.serve.openai.tool_parser import ToolParserManager
+from gpt_server.model_handler.tool_parser import tool_parser
 
 
 class QwenWorker(ModelWorkerBase):
@@ -70,20 +71,15 @@ class QwenWorker(ModelWorkerBase):
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------
-            response = ""
+            full_text = ""
             async for ret in self.backend.stream_chat(params=params):
-                response += ret["text"]
+                full_text += ret["text"]
                 yield json.dumps(ret).encode() + b"\0"
             # ------ add tool_calls ------
-            tool_call_info = self.tool_parser.extract_tool_calls(response, "")
-            tools_called = tool_call_info.tools_called
-            text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
-            tool_calls = [i.model_dump() for i in tool_calls]
-            if params.get("tools", False) and tools_called:  # 如果传入tools
-                logger.debug(f"工具解析成功, tool_calls: {tool_calls}")
-                ret["tool_calls"] = tool_calls
-                ret["finish_reason"] = "tool_calls"
-                yield json.dumps(ret).encode() + b"\0"
+            yield tool_parser(
+                full_text=full_text, tool_parser=self.tool_parser, tools=tools, ret=ret
+            )
+            # ------ add tool_calls ------
         except torch.cuda.OutOfMemoryError as e:
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",
