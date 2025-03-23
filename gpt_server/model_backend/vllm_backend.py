@@ -63,6 +63,7 @@ class VllmBackend(ModelBackend):
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         self.tokenizer = tokenizer
+        self.reasoning_parser_cache = {}
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -190,13 +191,22 @@ class VllmBackend(ModelBackend):
                 "usage": usage,
                 "finish_reason": request_output.outputs[0].finish_reason,
             }
-            reasoning_parser = params.get("reasoning_parser", None)
-            if reasoning_parser:
+            reasoning_parser_type = params.get("reasoning_parser", None)
+            if reasoning_parser_type:
+                reasoning_parser = None
                 current_token_ids = list(request_output.outputs[0].token_ids)
                 delta_token_ids = current_token_ids[len(previous_token_ids) :]
-                reasoning_parser = ReasoningParserManager.get(reasoning_parser)(
-                    self.tokenizer
-                )
+                if reasoning_parser_type in self.reasoning_parser_cache:
+                    reasoning_parser = self.reasoning_parser_cache.get(
+                        reasoning_parser_type
+                    )
+                else:
+                    reasoning_parser = ReasoningParserManager.get(
+                        reasoning_parser_type
+                    )(self.tokenizer)
+                    self.reasoning_parser_cache[reasoning_parser_type] = (
+                        reasoning_parser
+                    )
                 reasoning_delta = reasoning_parser.extract_reasoning_content_streaming(
                     previous_text=previous_text,
                     current_text=current_text,
