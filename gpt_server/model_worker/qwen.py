@@ -3,11 +3,10 @@ from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 from loguru import logger
 import torch
-
+import traceback
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_handler.prompts import MODELS
-from lmdeploy.serve.openai.tool_parser import ToolParserManager
-from gpt_server.model_handler.tool_parser import tool_parser
+from gpt_server.model_handler.tool_parser import tool_parser, ToolParserManager
 
 
 class QwenWorker(ModelWorkerBase):
@@ -46,7 +45,7 @@ class QwenWorker(ModelWorkerBase):
         logger.info(f"{model_names[0]} 停用词: {self.stop}")
 
         self.chat_template = MODELS.module_dict["qwen2_5"]()
-        self.tool_parser = ToolParserManager.module_dict["qwen"](
+        self.tool_parser = ToolParserManager.module_dict["qwen2_5"](
             tokenizer=self.tokenizer
         )
 
@@ -95,6 +94,7 @@ class QwenWorker(ModelWorkerBase):
             }
             yield json.dumps(ret).encode() + b"\0"
         except (ValueError, RuntimeError) as e:
+            traceback.print_exc()
             logger.info(e)
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",
