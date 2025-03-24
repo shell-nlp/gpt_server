@@ -157,9 +157,12 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         logger.info("load_model_tokenizer 完成")
 
     async def generate_gate(self, params):
-        async for x in self.generate_stream_gate(params):
-            pass
-        return json.loads(x[:-1].decode())
+        full_text = ""
+        async for ret in self.generate_stream_gate(params):
+            full_text += json.loads(ret[:-1].decode()).get("text", "")
+        ret = json.loads(ret[:-1].decode())
+        ret["text"] = full_text
+        return ret
 
     @classmethod
     def get_worker(
