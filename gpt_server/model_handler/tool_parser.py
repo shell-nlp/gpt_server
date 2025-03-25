@@ -182,7 +182,7 @@ class Qwen2d5ToolParser(ToolParser):
     def extract_tool_calls(
         self,
         model_output: str,
-        request: ChatCompletionRequest,
+        tools,
     ) -> ExtractedToolCallInformation:
         text = model_output
         if self.tool_start_token in text:
@@ -211,7 +211,9 @@ class Qwen2d5ToolParser(ToolParser):
                 tool_calls=tool_calls,
                 content=text if len(text) > 0 else "",
             )
-        elif self.tool_start_token not in text and self.tool_end_token in text:
+        elif (
+            self.tool_start_token not in text and self.tool_end_token in text
+        ) or tools:
             # 如果 tool_start_token 不在 text 但是 tool_end_token 在text
             logger.debug("tool_parse tool_start_token 不在 text")
             pattern = r"\{[^{}]*\{[^{}]*\}[^{}]*\}|{[^{}]*}"
@@ -238,7 +240,7 @@ class Qwen2d5ToolParser(ToolParser):
 
 
 def tool_parser(full_text: str, tool_parser, tools, ret):
-    tool_call_info = tool_parser.extract_tool_calls(full_text, "")
+    tool_call_info = tool_parser.extract_tool_calls(full_text, tools)
     tools_called = tool_call_info.tools_called
     text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
     tool_calls = [i.model_dump() for i in tool_calls]

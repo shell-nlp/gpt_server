@@ -7,7 +7,7 @@ from lmdeploy import (
 )
 from typing import Any, Dict, AsyncGenerator
 from lmdeploy.archs import get_task
-from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
+from gpt_server.model_handler.reasoning_parser import ReasoningParserManager
 from lmdeploy.serve.async_engine import get_names_from_model
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
@@ -194,7 +194,6 @@ class LMDeployBackend(ModelBackend):
                         if reasoning_delta.reasoning_content
                         else ""
                     )
-                # previous_text = current_text
                 previous_token_ids = current_token_ids
             # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
             # output_info_list = []
@@ -212,6 +211,8 @@ class LMDeployBackend(ModelBackend):
             #     yield ret
             #     break
             # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
+            if not ret["text"] and not ret.get("reasoning_content", ""):
+                continue
             yield ret
             previous_text = current_text
         logger.info(current_text)
