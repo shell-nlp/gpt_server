@@ -14,18 +14,8 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
-1. **在此基础上完美适配了更多的模型**，**优化了fastchat兼容较差的模型**
-2. 支持了**Function Calling (Tools)** 能力（现阶段支持Qwen/ChatGLM，对Qwen支持更好）
-3. 重新适配了vllm对模型适配较差，导致解码内容和hf不对齐的问题。
-4. 支持了**vllm**、**LMDeploy**和**hf**的加载方式
-5. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
-6. 支持了OpenAI接口规范的文本审核模型（text-moderation,/v1/moderations）
-7. 支持了OpenAI接口规范的TTS模型（tts,/v1/audio/speech）,自带edge-tts(免费的TTS)
-8. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
-9. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
-10. Chat模板无角色限制，使其完美支持了**LangGraph Agent**框架
-11. 支持多模态大模型
-12. **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
+1. 重新适配了vLLM对模型适配较差，导致解码内容和hf不对齐的问题。
+2.  **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
@@ -36,13 +26,15 @@
 
 1. 支持多种推理后端引擎，vLLM和LMDeploy，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
 2. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
-3. 全球唯一完美支持**Tools（Function Calling）**功能的开源框架。兼容**LangChain**的 **bind_tools**、**AgentExecutor**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
-4. 支持了**cohere**库接口规范的 /v1/rerank 接口
-5. 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
-6. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
-7. 全球唯一支持了**openai**库的文本审核模型接口（tts, /v1/audio/speech）,自带edge-tts(免费的TTS)(代码样例见gpt_server/tests/test_openai_tts.py)
-8. 支持多模态大模型
-9. 与FastChat相同的分布式架构
+3. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
+4. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
+5. 支持了**Tools（Function Calling）**功能,并优化Tools解析方式，大大提高tools的调用成功率。兼容**LangChain**的 **bind_tools**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
+6. 支持了**cohere**库接口规范的 /v1/rerank 接口
+7. 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
+8. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
+9. 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）,自带edge-tts(免费的TTS)(代码样例见gpt_server/tests/test_openai_tts.py)
+10. 支持多模态大模型
+11. 与FastChat相同的分布式架构
 
 ## 更新信息
 
@@ -87,20 +79,22 @@
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
 * [X] 可视化启动界面(不稳定,对开发人员来说比较鸡肋，后期将弃用！)
+* [X] 并行的function call功能（tools）
 * [ ] 支持 pip install 方式进行安装
-* [ ] 内置部分 tools (image_gen,code_interpreter,weather等)
-* [ ] 并行的function call功能（tools）
+
 
 ## 快速开始
 
 ### 1. 配置python环境
 
-#### 1.1 uv 方式 安装 (推荐,适用于不使用conda的用户,迄今最优秀的 库 管理工具, 性能和易用性远高于 pip、conda、poetry等)
+#### 1.1 uv 方式 安装 (推荐,迄今最优秀的 库 管理工具, 性能和易用性远高于 pip、conda、poetry等,各大优秀开源项目都在使用。)
 
 ```bash
 # 安装 uv 
 pip install uv -U # 或查看教程 https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
-bash install_uv.sh  # 也可以复制 install_uv.sh 中的内容一条一条执行
+# uv venv --seed # （可选）创建 uv 虚拟环境，并设置seed
+uv sync
+source .venv/bin/activate # 激活 uv 环境
 ```
 
 #### 1.2 conda  方式 安装(后期将弃用，可选)
@@ -119,6 +113,7 @@ bash install.sh
 ### 2. 修改启动配置文件
 
 #### 2.1 复制样例配置文件:
+**配置文件的详细说明信息位于：[config_example.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")**
 
 ```bash
 # 进入script目录
@@ -127,36 +122,14 @@ cd gpt_server/script
 cp config_example.yaml config.yaml
 ```
 
-
-
-#### 2.2 修改配置文件
-```bash
-cd gpt_server/script
-vim config.yaml
-```
-
-**配置文件的详细说明信息位于：[config_example.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")**
-
-#### 2.3 如何切换模型后端（vllm,lmdeploy等）
-config.yaml中：
-
-```bash
-work_mode: vllm  # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
-```
-
-修改embedding/reranker后端方式（embedding或embedding_infinity）
-
-config.yaml中：
-
-```bash
-model_type: embedding_infinity # embedding 或 embedding_infinity  embedding_infinity后端速度远远大于 embedding
-```
-
 ### 3. 启动服务
 #### 3.1 命令启动
 
 [start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/start.sh "服务主文件")
-
+```bash
+uv run gpt_server/serving/main.py
+```
+或者
 ```bash
 sh start.sh
 ```

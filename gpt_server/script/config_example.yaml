@@ -40,7 +40,7 @@ models:
       #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
 
     model_type: qwen # qwen  yi internlm 等
-    work_mode: lmdeploy-turbomind # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+    work_mode: lmdeploy-turbomind # vllm/hf/lmdeploy-turbomind/lmdeploy-pytorch
 
     device: gpu # gpu / cpu
     workers:
@@ -72,7 +72,7 @@ models:
       model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
       enable_prefix_caching: false
     model_type: internvl2 # qwen  yi internlm
-    work_mode: lmdeploy-turbomind # vllm hf lmdeploy-turbomind  lmdeploy-pytorch
+    work_mode: lmdeploy-turbomind # vllm/hf/lmdeploy-turbomind/lmdeploy-pytorch
     device: gpu # gpu / cpu
     workers:
     - gpus:
@@ -85,7 +85,7 @@ models:
     enable: true # false true
     model_config:
       model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
-    model_type: embedding_infinity # embedding_infinity
+    model_type: embedding_infinity # embedding_infinity/embedding 
     work_mode: hf
     device: gpu # gpu / cpu
     workers:
@@ -98,7 +98,7 @@ models:
     enable: true # false true
     model_config:
       model_name_or_path: /home/dev/model/aspire/acge_text_embedding
-    model_type: embedding_infinity # embedding_infinity
+    model_type: embedding_infinity # embedding_infinity/embedding 
     work_mode: hf
     device: gpu # gpu / cpu
     workers:
@@ -111,7 +111,7 @@ models:
     enable: true
     model_config:
       model_name_or_path: /home/dev/model/KoalaAI/Text-Moderation
-    model_type: embedding_infinity
+    model_type: embedding_infinity # embedding_infinity/embedding 
     work_mode: hf
     device: gpu
     workers:
