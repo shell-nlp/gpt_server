@@ -79,6 +79,7 @@ class QwenWorker(ModelWorkerBase):
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------
             full_text = ""
+            ret = {}
             async for ret in self.backend.stream_chat(params=params):
                 full_text += ret.get("text", "")
                 yield json.dumps(ret).encode() + b"\0"

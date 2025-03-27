@@ -134,6 +134,7 @@ class LMDeployBackend(ModelBackend):
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config
         )
+        usage = {}
         previous_text = ""
         current_text = ""
         previous_token_ids = []

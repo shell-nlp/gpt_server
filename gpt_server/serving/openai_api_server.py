@@ -399,6 +399,7 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
 )
 async def create_chat_completion(request: CustomChatCompletionRequest):
     """Creates a completion for the chat message"""
+    logger.info(f"/v1/chat/completions ---> \n{request.model_dump_json(indent=2)}")
     error_check_ret = await check_model(request)
     if error_check_ret is not None:
         return error_check_ret

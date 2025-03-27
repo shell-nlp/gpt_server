@@ -1,9 +1,10 @@
 import json
 from loguru import logger
 import re
-from typing import Dict, Sequence, Union
+from typing import Dict, List, Literal, Sequence, Union, Optional
 
 import partial_json_parser
+from pydantic import BaseModel, Field
 import shortuuid
 from partial_json_parser.core.options import Allow
 
@@ -12,13 +13,31 @@ from lmdeploy.serve.openai.protocol import (
     DeltaFunctionCall,
     DeltaMessage,
     DeltaToolCall,
-    ExtractedToolCallInformation,
     FunctionCall,
-    ToolCall,
 )
 
 from lmdeploy.serve.openai.tool_parser import ToolParser, ToolParserManager
 from lmdeploy.serve.openai.tool_parser.utils import extract_intermediate_diff
+
+
+class ToolCall(BaseModel):
+    """Tool call response."""
+
+    index: Optional[int] = None
+    id: str = Field(default_factory=lambda: f"chatcmpl-{shortuuid.random()}")
+    type: Literal["function"] = "function"
+    function: FunctionCall
+
+
+class ExtractedToolCallInformation(BaseModel):
+    # modified from https://github.com/vllm-project/vllm/blob/v0.7.3/vllm/entrypoints/openai/protocol.py#L1199
+    # indicate if tools were called
+    tools_called: bool
+    # extracted tool calls
+    tool_calls: List[ToolCall]
+    # content - per OpenAI spec, content AND tool calls can be returned rarely
+    # But some models will do this intentionally
+    content: Optional[str] = None
 
 
 @ToolParserManager.register_module(["qwen2_5"])
@@ -219,17 +238,25 @@ class Qwen2d5ToolParser(ToolParser):
             pattern = r"\{[^{}]*\{[^{}]*\}[^{}]*\}|{[^{}]*}"
             match_result_list = re.findall(pattern, text, re.DOTALL)
             tool_calls = []
+            tools_called = False
+            index = -1
             for match_result in match_result_list:
+                index += 1
                 action = json.loads(match_result)
                 name, arguments = action["name"], json.dumps(
                     action["arguments"], ensure_ascii=False
                 )
                 tool_calls.append(
-                    ToolCall(function=FunctionCall(name=name, arguments=arguments))
+                    ToolCall(
+                        function=FunctionCall(name=name, arguments=arguments),
+                        index=index,
+                    )
                 )
+                tools_called = True
                 # get text outside of tags
+
             return ExtractedToolCallInformation(
-                tools_called=True,
+                tools_called=tools_called,
                 tool_calls=tool_calls,
                 content=text if len(text) > 0 else "",
             )
@@ -246,7 +273,7 @@ def tool_parser(full_text: str, tool_parser, tools, ret):
     tool_calls = [i.model_dump() for i in tool_calls]
     if tools and tools_called:  # 如果传入tools
         logger.debug(f"工具解析成功, tool_calls: {tool_calls}")
-        ret["text"] = text
+        ret["text"] = ""
         ret["tool_calls"] = tool_calls
         ret["finish_reason"] = "tool_calls"
         return json.dumps(ret).encode() + b"\0"
