@@ -125,13 +125,12 @@ cp config_example.yaml config.yaml
 ### 3. 启动服务
 #### 3.1 命令启动
 
-[start.sh](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/start.sh "服务主文件")
 ```bash
 uv run gpt_server/serving/main.py
 ```
 或者
 ```bash
-sh start.sh
+sh gpt_server/script/start.sh
 ```
 或者
 ```bash
