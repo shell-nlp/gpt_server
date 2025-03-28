@@ -87,8 +87,12 @@ class Qwen2d5Chat(Qwen7BChat):
             ):
                 ret += f"{box_map[message['role']]}{message['content']}{self.eosys}"
             elif message["role"] == "assistant":
-                ret += f"<|im_start|>assistant"
-                if message.get("content") is not None:
+                name = message.get("name", "")
+                ret += f"<|im_start|>assistant name: {name}"
+                if (
+                    message.get("content") is not None
+                    and message.get("tool_calls") is None
+                ):  # 是否添加and message.get("tool_calls") is None 来去掉带tool的 content内容
                     ret += f"{self.separator}{message['content']}"
 
                 if message.get("tool_calls") is not None:
