@@ -17,8 +17,8 @@ class Qwen2d5Chat(Qwen7BChat):
         assistant="<|im_start|>assistant\n",
         eoa="<|im_end|>",
         separator="\n",
-        tools="""\n\n# Tools\n\n您可以调用一个或多个function来协助处理用户查询。\n\n如果,你调用function,你必须要把function tag放在<tools></tools> XML 标签中间:\n<tools>""",
-        eotools="""\n</tools>\n\n对于单个function的调用，返回一个包含function name和参数的 JSON 对象，并用 <tool_call></tool_call> XML 标签包裹,例如:\n<tool_call>\n{"name": <function-name>, "arguments": <args-json-object>}\n</tool_call>""",
+        tools="""\n\n# Tools\n\n您可以调用一个或多个function来协助处理用户查询。\n\n在<tools></tools> XML标签中提供了function的签名(即函数的结构信息):\n<tools>""",
+        eotools="""\n</tools>\n\n对于单个function的调用，返回一个包含function name和参数的 JSON 对象，并用 <tool_call></tool_call> XML 标签包裹,形如:\n<tool_call>\n{"name": <function-name>, "arguments": <args-json-object>}\n</tool_call>""",
         stop_words=["<|im_end|>"],
         **kwargs,
     ):
@@ -26,7 +26,7 @@ class Qwen2d5Chat(Qwen7BChat):
         self.tools = tools
         self.eotools = (
             eotools
-            + """\n如果需要同时调用多个function,则返回多个包含function name和参数的 JSON 对象，并用 <tool_call></tool_call> XML 标签包裹,例如:
+            + """\n如果需要同时调用多个function,则返回多个包含function name和参数的 JSON 对象，并用 <tool_call></tool_call> XML 标签包裹,形如:
 <tool_call>
 {"name": <function-name-1>, "arguments": <args-json-object>}
 </tool_call>
@@ -90,8 +90,9 @@ class Qwen2d5Chat(Qwen7BChat):
                 name = message.get("name", "")
                 ret += f"<|im_start|>assistant name: {name}"
                 if (
-                    message.get("content") is not None
-                    and message.get("tool_calls") is None
+                    message.get("content")
+                    is not None
+                    # and message.get("tool_calls") is None
                 ):  # 是否添加and message.get("tool_calls") is None 来去掉带tool的 content内容
                     ret += f"{self.separator}{message['content']}"
 

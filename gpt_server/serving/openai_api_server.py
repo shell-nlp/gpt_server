@@ -399,7 +399,6 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
 )
 async def create_chat_completion(request: CustomChatCompletionRequest):
     """Creates a completion for the chat message"""
-    logger.info(f"/v1/chat/completions ---> \n{request.model_dump_json(indent=2)}")
     error_check_ret = await check_model(request)
     if error_check_ret is not None:
         return error_check_ret
@@ -489,6 +488,10 @@ async def chat_completion_stream_generator(
     finish_stream_events = []
     for i in range(n):
         async for content in generate_completion_stream(gen_params, worker_addr):
+            try:
+                error_code = content["error_code"]
+            except Exception as e:
+                print(content)
             if content["error_code"] != 0:
                 yield f"data: {json.dumps(content, ensure_ascii=False)}\n\n"
                 yield "data: [DONE]\n\n"

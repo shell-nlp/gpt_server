@@ -9,6 +9,19 @@ from gpt_server.model_handler.prompts import MODELS
 from gpt_server.model_handler.tool_parser import tool_parser, ToolParserManager
 
 
+def pop_matching_tool(tools, tool_choice):
+    # 获取目标function名称
+    target_name = tool_choice["function"]["name"]
+
+    # 遍历tools列表，查找匹配项
+    for index, tool in enumerate(tools):
+        if tool["function"]["name"] == target_name:
+            return [tools.pop(index)]
+
+    # 未找到时返回None
+    return None
+
+
 class QwenWorker(ModelWorkerBase):
     def __init__(
         self,
@@ -62,7 +75,7 @@ class QwenWorker(ModelWorkerBase):
             elif tool_choice == "auto" or tool_choice == "required":
                 pass
             elif isinstance(tool_choice, dict):
-                raise NotImplementedError
+                tools = pop_matching_tool(tools=tools, tool_choice=tool_choice)
 
             if not self.vision_config:
                 if isinstance(messages, list):
