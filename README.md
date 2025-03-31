@@ -219,6 +219,7 @@ Chat UI界面:
 |    InternVL2     | internvl2  |   ×   |   ×   |         √          |        √         |
 |  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |
 |     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |
+|     Qwen2.5-VL     |    qwen    |   ×   |   ×   |         ×          |        √         |
 |     QVQ     |    qwen    |   ×   |   √   |         ×          |        ×         |
 <br>
 

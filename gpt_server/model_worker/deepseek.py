@@ -29,8 +29,8 @@ class DeepSeekWorker(ModelWorkerBase):
         )
 
         self.stop_words_ids = [
-            32013,  # bos  <｜begin▁of▁sentence｜>
-            32021,  # eos  <|EOT|>
+            # 32013,  # bos  <｜begin▁of▁sentence｜>
+            # 32021,  # eos  <|EOT|>
         ]
 
         self.stop = [
@@ -44,28 +44,25 @@ class DeepSeekWorker(ModelWorkerBase):
         logger.info(f"worker_id: {self.worker_id}")
         try:
             messages = params["messages"]
-            if isinstance(messages, list):
-                task = "chat"
-            elif isinstance(messages, str):
-                task = "completion"
-            if task == "chat":
-                text = self.tokenizer.apply_chat_template(
-                    conversation=messages, tokenize=False, add_generation_prompt=True
-                )
-            elif task == "completion":
-                text = messages
-
-            input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+            if not self.vision_config:
+                if isinstance(messages, list):
+                    text = self.tokenizer.apply_chat_template(
+                        conversation=messages,
+                        tokenize=False,
+                        add_generation_prompt=True,
+                    )
+                elif isinstance(messages, str):
+                    text = messages
+                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+                params["input_ids"] = input_ids
+                params["prompt"] = text
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
-            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
-
                 yield json.dumps(ret).encode() + b"\0"
 
         except torch.cuda.OutOfMemoryError as e:
