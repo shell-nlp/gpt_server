@@ -699,7 +699,6 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     RerankRequest,
     ModerationsRequest,
     SpeechRequest,
-    TranscriptionRequest,
 )
 import edge_tts
 import uuid
@@ -744,19 +743,32 @@ async def get_transcriptions(payload: Dict[str, Any]):
     return json.loads(transcription)
 
 
+from fastapi import UploadFile, Form
+import base64
+
+
 @app.post(
-    "/v1/transcriptions",
+    "/v1/audio/transcriptions",
     dependencies=[Depends(check_api_key)],
     response_class=responses.ORJSONResponse,
 )
-async def transcriptions(request: TranscriptionRequest):
-    error_check_ret = await check_model(request)
+async def transcriptions(file: UploadFile, model: str = Form()):
+    controller_address = app_settings.controller_address
+    error_check_ret = None
+    models = await fetch_remote(controller_address + "/list_models", None, "models")
+    if model not in models:
+        error_check_ret = create_error_response(
+            ErrorCode.INVALID_MODEL,
+            f"Only {'&&'.join(models)} allowed now, your model {model}",
+        )
     if error_check_ret is not None:
         return error_check_ret
     payload = {
-        "model": request.model,
-        "file": request.file,
-        "language": request.language,
+        "model": model,
+        "file": base64.b64encode(await file.read()).decode(
+            "utf-8"
+        ),  # bytes → Base64 字符串
+        "language": "zh",
     }
     transcription = await get_transcriptions(payload)
     text = transcription["text"]

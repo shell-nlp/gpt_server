@@ -1,11 +1,11 @@
 import os
 from typing import List
-
+import base64
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from funasr import AutoModel
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
-
+from io import BytesIO
 
 class FunASRWorker(ModelWorkerBase):
     def __init__(
@@ -41,9 +41,9 @@ class FunASRWorker(ModelWorkerBase):
         )
         logger.info(f"模型：{model_names[0]}")
 
-    def transcription(self, params):
-        logger.debug(params)
-        file_input = params["file"]
+    async def transcription(self, params):
+        file_input = base64.b64decode(params["file"])  # Base64 → bytes
+        file_input = BytesIO(file_input)
         ret = {}
         res = self.model.generate(
             input=file_input,

@@ -14,25 +14,6 @@ from fastchat.protocol.openai_api_protocol import (
 from pydantic import Field, BaseModel
 
 
-class TranscriptionRequest(BaseModel):
-    """ASR"""
-
-    file: bytes = Field(
-        ...,
-        description="The audio file object (not file name) to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.",
-    )
-    model: str = Field(..., description="ID of the model to use")
-
-    language: Optional[str] = Field(
-        None,
-        description="The language of the input audio in ISO-639-1 format",
-        min_length=2,
-        max_length=2,
-    )
-
-    stream: Optional[bool] = Field(False, description="Whether to stream the response")
-
-
 class SpeechRequest(BaseModel):
     "TTS"
 
