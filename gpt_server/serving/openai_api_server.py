@@ -699,6 +699,7 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     RerankRequest,
     ModerationsRequest,
     SpeechRequest,
+    TranscriptionRequest,
 )
 import edge_tts
 import uuid
@@ -730,6 +731,36 @@ async def speech(request: SpeechRequest):
     )
     await communicate.save(output_path)
     return FileResponse(output_path, media_type="audio/mpeg", filename=filename)
+
+
+async def get_transcriptions(payload: Dict[str, Any]):
+    controller_address = app_settings.controller_address
+    model_name = payload["model"]
+    worker_addr = await get_worker_address(model_name)
+
+    transcription = await fetch_remote(
+        worker_addr + "/worker_get_transcription", payload
+    )
+    return json.loads(transcription)
+
+
+@app.post(
+    "/v1/transcriptions",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
+async def transcriptions(request: TranscriptionRequest):
+    error_check_ret = await check_model(request)
+    if error_check_ret is not None:
+        return error_check_ret
+    payload = {
+        "model": request.model,
+        "file": request.file,
+        "language": request.language,
+    }
+    transcription = await get_transcriptions(payload)
+    text = transcription["text"]
+    return {"text": text}
 
 
 @app.post(

@@ -185,6 +185,9 @@ class BaseModelWorker:
     def classify(self, params):
         raise NotImplementedError
 
+    def transcription(self, params):
+        raise NotImplementedError
+
 
 def release_worker_semaphore():
     worker.semaphore.release()

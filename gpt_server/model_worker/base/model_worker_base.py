@@ -53,16 +53,18 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         model_type: str = "AutoModel",
         multimodal: bool = False,
     ):
-        try:
-            self.model_config = AutoConfig.from_pretrained(
-                model_path, trust_remote_code=True
-            )
-        except ValueError as e:
-            logger.warning(e)
-            self.model_config = {}
-        # logger.info(f"模型配置：{self.model_config}")
-        self.vision_config = getattr(self.model_config, "vision_config", None)
-        is_vision = self.vision_config is not None
+        is_vision = False
+        if model_type != "asr":
+            try:
+                self.model_config = AutoConfig.from_pretrained(
+                    model_path, trust_remote_code=True
+                )
+            except ValueError as e:
+                logger.warning(e)
+                self.model_config = {}
+            # logger.info(f"模型配置：{self.model_config}")
+            self.vision_config = getattr(self.model_config, "vision_config", None)
+            is_vision = self.vision_config is not None
         super().__init__(
             controller_addr,
             worker_addr,
@@ -114,7 +116,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
     def load_model_tokenizer(self, model_path):
         """加载 模型 和 分词器 直接对 self.model 和 self.tokenizer 进行赋值"""
-        if self.model_type == "embedding":
+        if self.model_type == "embedding" or self.model_type == "asr":
             return 1
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,
@@ -350,5 +352,14 @@ async def api_get_classify(request: Request):
     params = await request.json()
     await acquire_worker_semaphore()
     outputs = await worker.classify(params)
+    release_worker_semaphore()
+    return JSONResponse(content=outputs)
+
+
+@app.post("/worker_get_transcription")
+async def api_get_transcription(request: Request):
+    params = await request.json()
+    await acquire_worker_semaphore()
+    outputs = await worker.transcription(params)
     release_worker_semaphore()
     return JSONResponse(content=outputs)
