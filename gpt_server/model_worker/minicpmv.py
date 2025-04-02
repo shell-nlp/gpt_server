@@ -29,8 +29,8 @@ class MiniCPMVWorker(ModelWorkerBase):
             multimodal=True,
         )
         self.stop_words_ids = [
-            151643,  # <|endoftext|>
-            151645,  # <|im_end|>
+            # 151643,  # <|endoftext|>
+            # 151645,  # <|im_end|>
         ]
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
@@ -44,17 +44,8 @@ class MiniCPMVWorker(ModelWorkerBase):
         try:
             messages = params["messages"]
             if isinstance(messages, list):
-                task = "chat"
-            elif isinstance(messages, str):
-                task = "completion"
-            if task == "chat":
-                # text = self.tokenizer.apply_chat_template(
-                #     conversation=messages,
-                #     tokenize=True,
-                #     add_generation_prompt=True,
-                # )
                 pass
-            elif task == "completion":
+            elif isinstance(messages, str):
                 text = messages
 
             # input_ids = self.tokenizer([text], return_tensors="pt").input_ids

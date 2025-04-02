@@ -216,7 +216,8 @@ Chat UI界面:
 | Models / BackEnd | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |
 | :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: |
 |    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |
-|    InternVL2     | internvl2  |   ×   |   ×   |         √          |        √         |
+|    InternVL2     | internvl  |   ×   |   ×   |         √          |        √         |
+|    InternVL2.5     | internvl  |   ×   |   ×   |         √          |        √         |
 |  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |
 |     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |
 |     Qwen2.5-VL     |    qwen    |   ×   |   ×   |         ×          |        √         |

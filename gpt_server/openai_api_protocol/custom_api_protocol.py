@@ -79,7 +79,7 @@ class CustomChatMessage(ChatMessage):
 
 class CustomChatCompletionResponseChoice(ChatCompletionResponseChoice):
     message: CustomChatMessage
-    finish_reason: Optional[Literal["stop", "length", "tool_calls"]] = None
+    finish_reason: Optional[Literal["stop", "length", "tool_calls", "error"]] = None
 
 
 class CustomChatCompletionResponse(ChatCompletionResponse):
@@ -94,7 +94,7 @@ class CustomDeltaMessage(DeltaMessage):
 
 class CustomChatCompletionResponseStreamChoice(ChatCompletionResponseStreamChoice):
     delta: CustomDeltaMessage
-    finish_reason: Optional[Literal["stop", "length", "tool_calls"]] = None
+    finish_reason: Optional[Literal["stop", "length", "tool_calls", "error"]] = None
 
 
 class CustomChatCompletionStreamResponse(ChatCompletionStreamResponse):

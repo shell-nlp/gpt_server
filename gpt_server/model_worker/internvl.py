@@ -29,8 +29,8 @@ class InternVL2Worker(ModelWorkerBase):
             multimodal=True,
         )
         self.stop_words_ids = [
-            2,  # <|endoftext|>
-            7,  # <|im_end|>
+            # 2,  # <|endoftext|>
+            # 7,  # <|im_end|>
         ]
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
@@ -44,18 +44,14 @@ class InternVL2Worker(ModelWorkerBase):
         try:
             messages = params["messages"]
             if isinstance(messages, list):
-                task = "chat"
-            elif isinstance(messages, str):
-                task = "completion"
-            if task == "chat":
                 pass
-            elif task == "completion":
+            elif isinstance(messages, str):
                 text = messages
 
             params["messages"] = messages
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-
+            ret = {}
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
 
