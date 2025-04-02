@@ -108,6 +108,24 @@ def start_api_server(config: dict):
     # -----------------------------------------------------------------------
 
 
+def get_model_types():
+    model_types = []
+    root_dir = os.path.dirname(__file__)
+    model_worker_path = os.path.join(root_dir, "model_worker")
+    # 遍历目录及其子目录
+    for root, dirs, files in os.walk(model_worker_path):
+        for file in files:
+            # 检查文件是否以 .py 结尾
+            if file.endswith(".py") and file != "__init__.py":
+                # 输出文件的完整路径
+                model_type = file[:-3]
+                model_types.append(model_type)
+    return model_types
+
+
+model_types = get_model_types()
+
+
 def start_model_worker(config: dict):
     process = []
     try:
@@ -166,8 +184,12 @@ def start_model_worker(config: dict):
                 # -------------- 向前兼容 --------------
                 # 模型类型
                 model_type = model_config["model_type"]
-                # model type 校验
-                # py_path = f"{root_dir}/gpt_server/model_worker/{model_type}.py"
+                # 对model type 进行校验
+                if model_type not in model_types:
+                    logger.error(
+                        f"不支持model_type: {model_type},仅支持{model_types}模型之一！"
+                    )
+                    sys.exit()
                 py_path = f"-m gpt_server.model_worker.{model_type}"
 
                 model_names = model_name
@@ -328,8 +350,10 @@ model_type_mapping = {
 
 if __name__ == "__main__":
     # /home/dev/model/KirillR/QwQ-32B-Preview-AWQ
+    get_model_types()
     from lmdeploy.serve.async_engine import get_names_from_model
 
     ckpt = "/home/dev/model/KirillR/QwQ-32B-Preview-AWQ"  # internlm2
     model_type = get_names_from_model(ckpt)
     print(model_type[1] == "base")
+    print()
