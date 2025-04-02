@@ -7,6 +7,7 @@ from funasr import AutoModel
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 from io import BytesIO
 
+
 class FunASRWorker(ModelWorkerBase):
     def __init__(
         self,
@@ -33,9 +34,10 @@ class FunASRWorker(ModelWorkerBase):
         else:
             device = "cuda"
         logger.info(f"使用{device}加载...")
+        vad_model = os.environ.get("vad_model", None)
         self.model = AutoModel(
             model=model_path,
-            vad_model="fsmn-vad",
+            vad_model=vad_model,
             vad_kwargs={"max_single_segment_time": 30000},
             device="cuda",
         )

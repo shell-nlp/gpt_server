@@ -214,6 +214,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--gpu_memory_utilization", type=str, default="0.8")
         # kv_cache_quant_policy
         parser.add_argument("--kv_cache_quant_policy", type=str, default="0")
+        # vad_model
+        parser.add_argument("--vad_model", type=str, default="")
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -231,6 +233,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["lora"] = args.lora
         if args.max_model_len:
             os.environ["max_model_len"] = args.max_model_len
+        if args.vad_model:
+            os.environ["vad_model"] = args.vad_model
 
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching
         os.environ["gpu_memory_utilization"] = args.gpu_memory_utilization

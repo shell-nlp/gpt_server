@@ -33,12 +33,19 @@
 7. 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
 8. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
 9. 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）,自带edge-tts(免费的TTS)(代码样例见gpt_server/tests/test_openai_tts.py)
-10. 支持多模态大模型
-11. 与FastChat相同的分布式架构
+10. 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
+11. 支持多模态大模型
+12. 与FastChat相同的分布式架构
+## 配置文档
+通过这个样例文件，可以很快的掌握项目的配置方式。
+<br>
+**配置文件的详细说明信息位于：[config_example.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")**
 
 ## 更新信息
 
 ```plaintext
+2025-4-2   支持了 OpenAI的ASR接口 /v1/audio/transcriptions
+2025-4-1   支持了 internvl2.5模型
 2025-2-9   支持了 QVQ
 2024-12-22 支持了 tts, /v1/audio/speech TTS模型
 2024-12-21 支持了 text-moderation, /v1/moderations 文本审核模型 
@@ -209,19 +216,19 @@ Chat UI界面:
 |       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |
 |        Llama-3        |   llama    |   √   |   √   |         √          |        √         |
 |      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |
-|    QWQ-32B    |    qwen    |   √   |   √   |         √          |        √         |
+|        QWQ-32B        |    qwen    |   √   |   √   |         √          |        √         |
 |         Phi-4         |    phi     |   √   |   √   |         ×          |        ×         |
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
 | Models / BackEnd | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |
 | :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: |
 |    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |
-|    InternVL2     | internvl  |   ×   |   ×   |         √          |        √         |
-|    InternVL2.5     | internvl  |   ×   |   ×   |         √          |        √         |
+|    InternVL2     |  internvl  |   ×   |   ×   |         √          |        √         |
+|   InternVL2.5    |  internvl  |   ×   |   ×   |         √          |        √         |
 |  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |
 |     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |
-|     Qwen2.5-VL     |    qwen    |   ×   |   ×   |         ×          |        √         |
-|     QVQ     |    qwen    |   ×   |   √   |         ×          |        ×         |
+|    Qwen2.5-VL    |    qwen    |   ×   |   ×   |         ×          |        √         |
+|       QVQ        |    qwen    |   ×   |   √   |         ×          |        ×         |
 <br>
 
 ### Embedding/Rerank/Classify模型
@@ -232,24 +239,41 @@ Chat UI界面:
 
 以下模型经过测试可放心使用：
 
-| Embedding/Rerank/Classify                     | HF  | Infinity |
-| --------------------------------------------- | --- | -------- |
-| bge-reranker                                  | √   | √        |
-| bce-reranker                                  | √   | √        |
-| bge-embedding                                 | √   | √        |
-| bce-embedding                                 | √   | √        |
-| puff                                          | √   | √        |
-| piccolo-base-zh-embedding                     | √   | √        |
-| acge_text_embedding                           | √   | √        |
-| Yinka                                         | √   | √        |
-| zpoint_large_embedding_zh                     | √   | √        |
-| xiaobu-embedding                              | √   | √        |
-| Conan-embedding-v1                            | √   | √        |
-| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）                     | ×   | √        |
+| Embedding/Rerank/Classify                                                           | HF  | Infinity |
+| ----------------------------------------------------------------------------------- | --- | -------- |
+| bge-reranker                                                                        | √   | √        |
+| bce-reranker                                                                        | √   | √        |
+| bge-embedding                                                                       | √   | √        |
+| bce-embedding                                                                       | √   | √        |
+| puff                                                                                | √   | √        |
+| piccolo-base-zh-embedding                                                           | √   | √        |
+| acge_text_embedding                                                                 | √   | √        |
+| Yinka                                                                               | √   | √        |
+| zpoint_large_embedding_zh                                                           | √   | √        |
+| xiaobu-embedding                                                                    | √   | √        |
+| Conan-embedding-v1                                                                  | √   | √        |
+| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）            | ×   | √        |
 | protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入） | ×   | √        |
 
 目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
+<br>
+
+### **ASR** (支持FunASR非实时模型 https://github.com/modelscope/FunASR/blob/main/README_zh.md)
+目前只测试了SenseVoiceSmall模型（性能最优的），其它模型的支持情况只是从官方文档中拷贝过来，不一定可以正常使用，欢迎测试/提issue。
+
+|    Models / BackEnd    | model_type |
+| :--------------------: | :--------: |
+|    SenseVoiceSmall     |   funasr   |
+|     paraformer-zh      |   funasr   |
+|     paraformer-en      |   funasr   |
+|      conformer-en      |   funasr   |
+|    Whisper-large-v3    |   funasr   |
+| Whisper-large-v3-turbo |   funasr   |
+|       Qwen-Audio       |   funasr   |
+|    Qwen-Audio-Chat     |   funasr   |
+
+<br>
 
 ## 架构
 

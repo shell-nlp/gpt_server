@@ -117,3 +117,16 @@ models:
     workers:
     - gpus:
       - 2
+- SenseVoiceSmall:
+    ## 最新支持ASR模型
+    alias: null
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/iic/SenseVoiceSmall # 模型路径
+      vad_model: /home/dev/model/iic/speech_fsmn_vad_zh-cn-16k-common-pytorch/ # VAD模型，可以不设置
+    model_type: funasr # 类型只能是 funasr
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2

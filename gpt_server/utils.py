@@ -160,6 +160,7 @@ def start_model_worker(config: dict):
                     kv_cache_quant_policy = engine_config.get(
                         "kv_cache_quant_policy", 0
                     )
+                    vad_model = engine_config.get("vad_model", "")
 
                 else:
                     logger.error(
@@ -242,6 +243,8 @@ def start_model_worker(config: dict):
                         cmd += f" --lora '{json.dumps(lora)}'"
                     if max_model_len:
                         cmd += f" --max_model_len '{max_model_len}'"
+                    if vad_model:
+                        cmd += f" --vad_model '{vad_model}'"
                     p = Process(target=run_cmd, args=(cmd,))
                     p.start()
                     process.append(p)
