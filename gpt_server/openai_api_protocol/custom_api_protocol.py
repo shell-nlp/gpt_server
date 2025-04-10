@@ -63,7 +63,7 @@ class CustomEmbeddingsRequest(EmbeddingsRequest):
 
 class CustomChatCompletionRequest(ChatCompletionRequest):
     tools: Optional[list] = None
-    tool_choice: Optional[Union[Literal["none"], Literal["auto"], Any]] = "none"
+    tool_choice: Optional[Union[Literal["none"], Literal["auto"], Any]] = "auto"
     messages: Union[
         str,
         List[dict],

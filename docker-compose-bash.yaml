@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  gpt_server_bash:
+    image: docker.1ms.run/506610466/gpt_server:latest 
+    command: /bin/bash
+    container_name: bash
+    tty: true              # 对应 -it 的交互模式
+    stdin_open: true       # 允许标准输入
+    network_mode: "host"   # --network=host
+    volumes:
+      - "/home/dev/model/:/home/dev/model/"
+    shm_size: "100gb"      # --shm-size 100gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    ulimits:               # --ulimit memlock=-1
+      memlock:
+        soft: -1
+        hard: -1
