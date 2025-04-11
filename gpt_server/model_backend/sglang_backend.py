@@ -1,4 +1,3 @@
-import multiprocessing
 import os
 from typing import Any, Dict, AsyncGenerator
 from fastchat.utils import is_partial_stop
@@ -6,16 +5,6 @@ from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 
 import sglang as sgl
-
-
-@sgl.function
-def pipeline(s, prompt, max_tokens):
-    for p in prompt:
-        if isinstance(p, str):
-            s += p
-        else:
-            s += sgl.image(p)
-    s += sgl.gen("response", max_tokens=max_tokens)
 
 
 class SGLangBackend(ModelBackend):
@@ -30,8 +19,7 @@ class SGLangBackend(ModelBackend):
         enable_lora = False
         self.lora_requests = []
         # ---
-        multiprocessing.set_start_method("spawn", force=True)
-        runtime = sgl.Runtime(
+        self.async_engine = sgl.Engine(
             model_path=model_path,
             trust_remote_code=True,
             mem_fraction_static=gpu_memory_utilization,
@@ -40,8 +28,6 @@ class SGLangBackend(ModelBackend):
             context_length=int(max_model_len) if max_model_len else None,
             grammar_backend="xgrammar",
         )
-
-        sgl.set_default_backend(runtime)
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -65,28 +51,31 @@ class SGLangBackend(ModelBackend):
             stop.update(stop_str)
 
         input_ids = params.get("input_ids", None)
-        text_outputs = ""
-        state = pipeline.run(
-            prompt,
-            max_new_tokens=max_new_tokens,
-            stop_token_ids=stop_token_ids,
-            stop=stop,
-            temperature=temperature,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
-            top_k=top_k,
-            top_p=top_p,
+        generator = await self.async_engine.async_generate(
+            prompt=prompt,
+            sampling_params={
+                "max_new_tokens": max_new_tokens,
+                "stop_token_ids": stop_token_ids,
+                "stop": stop,
+                "temperature": temperature,
+                "presence_penalty": presence_penalty,
+                "frequency_penalty": frequency_penalty,
+                "top_k": top_k,
+                "top_p": top_p,
+            },
             stream=True,
         )
-        async for out, meta_info in state.text_async_iter(
-            var_name="response", return_meta_data=True
-        ):
 
-            partial_stop = any(is_partial_stop(out, i) for i in stop)
+        previous_text = ""
+        async for chunk in generator:
+            current_text = chunk["text"]
+            meta_info = chunk["meta_info"]
+            delta_text = current_text[len(previous_text) :]
+            partial_stop = any(is_partial_stop(current_text, i) for i in stop)
             # prevent yielding partial stop sequence
             if partial_stop:
                 continue
-            text_outputs += out
+
             aborted = False
             prompt_tokens = meta_info["prompt_tokens"]
             completion_tokens = meta_info["completion_tokens"]
@@ -96,14 +85,20 @@ class SGLangBackend(ModelBackend):
                 "total_tokens": prompt_tokens + completion_tokens,
             }
             ret = {
-                "text": text_outputs,
+                "text": delta_text,
                 "error_code": 0,
                 "usage": usage,
-                "finish_reason": meta_info["finish_reason"]["type"],
+                "finish_reason": (
+                    meta_info["finish_reason"]["type"]
+                    if meta_info["finish_reason"]
+                    else None
+                ),
             }
+            if not ret["text"]:
+                continue
             yield ret
-
+            previous_text = current_text
             if aborted:
                 break
-        logger.info(text_outputs)
+        logger.info(current_text)
         logger.info(usage)
