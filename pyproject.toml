@@ -28,21 +28,38 @@ dependencies = [
 ]
 
 [tool.uv]
+default-groups = [] # 默认只安装dependencies中的库
 override-dependencies = [
     "setuptools==75.2.0",
     "torchvision==0.20.1",
     "torch==2.5.1",
     "triton",
     "outlines==0.1.11",
-    "transformers==4.50.0"
+    "transformers==4.50.0",
+    "soundfile==0.13.1", # infinity
+    "xgrammar==0.1.17" # vll
 ]
+
+[project.scripts]
+gpt_server = "gpt_server.cli:main"
 
 [[tool.uv.index]]
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
 
-[project.scripts]
-gpt_server = "gpt_server.cli:main"
+# 强制要求 flashinfer-python通过官方源安装
+[[tool.uv.index]]
+name = "flashinfer-python"
+url = "https://flashinfer.ai/whl/cu124/torch2.5"
+
+[tool.uv.sources]
+flashinfer-python = { index = "flashinfer-python" }
+
+[dependency-groups]
+dev = [
+    "sglang[all]>=0.4.5",
+    "flashinfer-python"
+]
 
 [build-system]
 requires = ["setuptools", "wheel"]
