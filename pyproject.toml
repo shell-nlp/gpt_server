@@ -19,7 +19,7 @@ dependencies = [
     "streamlit==1.39.0",
     "torch==2.5.1",
     "torchvision==0.20.1",
-    "vllm==0.7.3",
+    "vllm==0.8.3",
     "qwen_vl_utils",
     "evalscope[perf]==0.10.1",
     "modelscope==1.20.1",
@@ -31,13 +31,12 @@ dependencies = [
 default-groups = [] # 默认只安装dependencies中的库
 override-dependencies = [
     "setuptools==75.2.0",
-    "torchvision==0.20.1",
-    "torch==2.5.1",
+    "torchvision==0.21.0",
+    "torch==2.6.0",
     "triton",
     "outlines==0.1.11",
     "transformers==4.50.0",
     "soundfile==0.13.1", # infinity
-    "xgrammar==0.1.17" # vll
 ]
 
 [project.scripts]

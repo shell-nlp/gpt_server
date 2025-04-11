@@ -22,7 +22,7 @@ import ray
 
 ray.init(ignore_reinit_error=True, num_cpus=4)
 
-vllm_version = vllm.__version__
+os.environ["VLLM_USE_V1"] = "0"
 
 
 class VllmBackend(ModelBackend):
