@@ -1462,7 +1462,7 @@ wheels = [
 
 [[package]]
 name = "gpt-server"
-version = "0.3.9"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
@@ -1470,6 +1470,7 @@ dependencies = [
     { name = "evalscope", extra = ["perf"] },
     { name = "fastapi" },
     { name = "ffmpy" },
+    { name = "flashinfer-python" },
     { name = "fschat" },
     { name = "funasr" },
     { name = "infinity-emb", extra = ["all"] },
@@ -1479,16 +1480,11 @@ dependencies = [
     { name = "openai" },
     { name = "qwen-vl-utils" },
     { name = "setuptools" },
+    { name = "sglang", extra = ["all"] },
     { name = "streamlit" },
     { name = "torch" },
     { name = "torchvision" },
     { name = "vllm" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "flashinfer-python" },
-    { name = "sglang", extra = ["all"] },
 ]
 
 [package.metadata]
@@ -1498,6 +1494,7 @@ requires-dist = [
     { name = "evalscope", extras = ["perf"], specifier = "==0.10.1" },
     { name = "fastapi", specifier = "==0.115.0" },
     { name = "ffmpy" },
+    { name = "flashinfer-python", index = "https://flashinfer.ai/whl/cu124/torch2.5" },
     { name = "fschat", specifier = "==0.2.36" },
     { name = "funasr", specifier = ">=1.2.6" },
     { name = "infinity-emb", extras = ["all"], specifier = "==0.0.73" },
@@ -1507,16 +1504,11 @@ requires-dist = [
     { name = "openai", specifier = "==1.55.3" },
     { name = "qwen-vl-utils" },
     { name = "setuptools", specifier = "==75.2.0" },
+    { name = "sglang", extras = ["all"], specifier = ">=0.4.5" },
     { name = "streamlit", specifier = "==1.39.0" },
     { name = "torch", specifier = "==2.5.1" },
     { name = "torchvision", specifier = "==0.20.1" },
     { name = "vllm", specifier = "==0.8.3" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "flashinfer-python", index = "https://flashinfer.ai/whl/cu124/torch2.5" },
-    { name = "sglang", extras = ["all"], specifier = ">=0.4.5" },
 ]
 
 [[package]]

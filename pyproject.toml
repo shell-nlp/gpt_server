@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.3.9"
+version = "0.4.0"
 description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -25,6 +25,8 @@ dependencies = [
     "modelscope==1.20.1",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
+    "sglang[all]>=0.4.5",
+    "flashinfer-python"
 ]
 
 [tool.uv]
@@ -53,12 +55,6 @@ url = "https://flashinfer.ai/whl/cu124/torch2.5"
 
 [tool.uv.sources]
 flashinfer-python = { index = "flashinfer-python" }
-
-[dependency-groups]
-dev = [
-    "sglang[all]>=0.4.5",
-    "flashinfer-python"
-]
 
 [build-system]
 requires = ["setuptools", "wheel"]
