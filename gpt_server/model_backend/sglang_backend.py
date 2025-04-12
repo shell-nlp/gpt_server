@@ -5,6 +5,7 @@ from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 
 import sglang as sgl
+from sglang.utils import convert_json_schema_to_str
 
 
 class SGLangBackend(ModelBackend):
@@ -27,6 +28,7 @@ class SGLangBackend(ModelBackend):
             dtype=dtype,
             context_length=int(max_model_len) if max_model_len else None,
             grammar_backend="xgrammar",
+            disable_radix_cache=not enable_prefix_caching,
         )
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
@@ -36,7 +38,7 @@ class SGLangBackend(ModelBackend):
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
-        top_k = params.get("top_k", -1.0)
+        top_k = params.get("top_k", -1)
         max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
         stop_str = params.get("stop", None)
         stop_token_ids = params.get("stop_words_ids", None) or []
@@ -51,18 +53,28 @@ class SGLangBackend(ModelBackend):
             stop.update(stop_str)
 
         input_ids = params.get("input_ids", None)
+        # ---- 支持 response_format ----
+        response_format = params["response_format"]
+        json_schema = None
+        if response_format is not None:
+            if response_format["type"] == "json_schema":
+                json_schema = convert_json_schema_to_str(
+                    response_format["json_schema"]["schema"]
+                )
+        sampling_params = {
+            "max_new_tokens": max_new_tokens,
+            "stop_token_ids": stop_token_ids,
+            "stop": stop,
+            "temperature": temperature,
+            "presence_penalty": presence_penalty,
+            "frequency_penalty": frequency_penalty,
+            "top_k": top_k,
+            "top_p": top_p if top_p != 0 else 0.01,
+            "json_schema": json_schema,
+        }
         generator = await self.async_engine.async_generate(
             prompt=prompt,
-            sampling_params={
-                "max_new_tokens": max_new_tokens,
-                "stop_token_ids": stop_token_ids,
-                "stop": stop,
-                "temperature": temperature,
-                "presence_penalty": presence_penalty,
-                "frequency_penalty": frequency_penalty,
-                "top_k": top_k,
-                "top_p": top_p,
-            },
+            sampling_params=sampling_params,
             stream=True,
         )
 
