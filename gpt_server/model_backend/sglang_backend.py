@@ -1,11 +1,44 @@
+import base64
+from io import BytesIO
 import os
-from typing import Any, Dict, AsyncGenerator
+from typing import Any, Dict, AsyncGenerator, List, Optional
 from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
-
+from PIL import Image
 import sglang as sgl
 from sglang.utils import convert_json_schema_to_str
+from sglang.srt.conversation import generate_chat_conv
+
+from qwen_vl_utils import process_vision_info
+
+
+def _transform_messages(
+    messages,
+):
+    transformed_messages = []
+    for msg in messages:
+        new_content = []
+        role = msg["role"]
+        content = msg["content"]
+        if isinstance(content, str):
+            new_content.append({"type": "text", "text": content})
+        elif isinstance(content, List):
+            for item in content:  # type: ignore
+                if "text" in item:
+                    new_content.append({"type": "text", "text": item["text"]})
+                elif "image_url" in item:
+                    new_content.append(
+                        {"type": "image", "image": item["image_url"]["url"]}
+                    )
+                elif "video_url" in item:
+                    new_content.append(
+                        {"type": "video", "video": item["video_url"]["url"]}
+                    )
+        new_message = {"role": role, "content": new_content}
+        transformed_messages.append(new_message)
+
+    return transformed_messages
 
 
 class SGLangBackend(ModelBackend):
@@ -51,8 +84,28 @@ class SGLangBackend(ModelBackend):
             stop.add(stop_str)
         elif isinstance(stop_str, list) and stop_str != []:
             stop.update(stop_str)
-
         input_ids = params.get("input_ids", None)
+        base64_images = []
+        # 支持多模型模型
+        if input_ids is None:  # 多模态模型
+            _messages = _transform_messages(messages)
+            images, video_inputs = process_vision_info(_messages)
+            if video_inputs:
+                raise ValueError("Not support video input now.")
+            if images:
+                for image in images:
+                    if isinstance(image, Image.Image):
+                        buffered = BytesIO()
+                        image.save(buffered, format="JPEG", quality=100)
+                        base64_images.append(
+                            base64.b64encode(buffered.getvalue()).decode()
+                        )
+                    elif isinstance(image, str):
+                        base64_images.append(image)
+                    else:
+                        raise ValueError(
+                            f"Unsupported image type: {type(image)}, only support PIL.Image and base64 string"
+                        )
         # ---- 支持 response_format ----
         response_format = params["response_format"]
         json_schema = None
@@ -76,6 +129,7 @@ class SGLangBackend(ModelBackend):
             prompt=prompt,
             sampling_params=sampling_params,
             stream=True,
+            image_data=base64_images if base64_images else None,
         )
 
         previous_text = ""

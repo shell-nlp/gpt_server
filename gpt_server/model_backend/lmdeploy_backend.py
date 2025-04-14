@@ -112,7 +112,6 @@ class LMDeployBackend(ModelBackend):
             stop.add(stop_str)
         elif isinstance(stop_str, list) and stop_str != []:
             stop.update(stop_str)
-        # input_ids = params.get("input_ids")
         # prompt_token_ids = input_ids.tolist()[0]
         # make sampling params in vllm
         top_p = max(top_p, 1e-5)
@@ -131,6 +130,9 @@ class LMDeployBackend(ModelBackend):
             messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
         if self.messages_type_select:
             messages = prompt or messages
+        input_ids = params.get("input_ids", None)
+        if input_ids is None:  # 多模态模型
+            messages = params["messages"]
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config
         )
