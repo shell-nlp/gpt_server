@@ -14,7 +14,7 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
-1. 重新适配了vLLM对模型适配较差，导致解码内容和hf不对齐的问题。
+1. 支持多种推理后端引擎，vLLM、LMDeploy和SGLang
 2.  **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
 （仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
@@ -24,7 +24,7 @@
 
 ## 特色
 
-1. 支持多种推理后端引擎，vLLM和LMDeploy，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
+1. 支持多种推理后端引擎，vLLM、LMDeploy和SGLang，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
 2. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
 3. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 4. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
@@ -44,6 +44,7 @@
 ## 更新信息
 
 ```plaintext
+2025-4-14  支持了 SGLang后端以及部分VL模型
 2025-4-2   支持了 OpenAI的ASR接口 /v1/audio/transcriptions
 2025-4-1   支持了 internvl2.5模型
 2025-2-9   支持了 QVQ
@@ -202,33 +203,33 @@ Chat UI界面:
 
 ### **LLM**
 
-|   Models / BackEnd    | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |
-| :-------------------: | :--------: | :---: | :---: | :----------------: | :--------------: |
-|      chatglm4-9b      |  chatglm   |   √   |   √   |         √          |        √         |
-|      chatglm3-6b      |  chatglm   |   √   |   √   |         ×          |        √         |
-| Qwen (7B, 14B, etc.)) |    qwen    |   √   |   √   |         √          |        √         |
-| Qwen-1.5 (0.5B--72B)  |    qwen    |   √   |   √   |         √          |        √         |
-|        Qwen-2         |    qwen    |   √   |   √   |         √          |        √         |
-|       Qwen-2.5        |    qwen    |   √   |   √   |         √          |        √         |
-|        Yi-34B         |     yi     |   √   |   √   |         √          |        √         |
-|     Internlm-1.0      |  internlm  |   √   |   √   |         √          |        √         |
-|     Internlm-2.0      |  internlm  |   √   |   √   |         √          |        √         |
-|       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |
-|        Llama-3        |   llama    |   √   |   √   |         √          |        √         |
-|      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |
-|        QWQ-32B        |    qwen    |   √   |   √   |         √          |        √         |
-|         Phi-4         |    phi     |   √   |   √   |         ×          |        ×         |
+|   Models / BackEnd    | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |SGLang|
+| :-------------------: | :--------: | :---: | :---: | :----------------: | :--------------: |:--------------: |
+|      chatglm4-9b      |  chatglm   |   √   |   √   |         √          |        √         |        √         |
+|      chatglm3-6b      |  chatglm   |   √   |   √   |         ×          |        √         |        √         |
+| Qwen (7B, 14B, etc.)) |    qwen    |   √   |   √   |         √          |        √         |        √         |
+| Qwen-1.5 (0.5B--72B)  |    qwen    |   √   |   √   |         √          |        √         |        √         |
+|        Qwen-2         |    qwen    |   √   |   √   |         √          |        √         |        √         |
+|       Qwen-2.5        |    qwen    |   √   |   √   |         √          |        √         |        √         |
+|        Yi-34B         |     yi     |   √   |   √   |         √          |        √         |        √         |
+|     Internlm-1.0      |  internlm  |   √   |   √   |         √          |        √         |        √         |
+|     Internlm-2.0      |  internlm  |   √   |   √   |         √          |        √         |        √         |
+|       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |        √         |
+|        Llama-3        |   llama    |   √   |   √   |         √          |        √         |        √         |
+|      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |        √         |
+|        QWQ-32B        |    qwen    |   √   |   √   |         √          |        √         |        √         |
+|         Phi-4         |    phi     |   √   |   √   |         ×          |        ×         |        √         |
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
-| Models / BackEnd | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |
-| :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: |
-|    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |
-|    InternVL2     |  internvl  |   ×   |   ×   |         √          |        √         |
-|   InternVL2.5    |  internvl  |   ×   |   ×   |         √          |        √         |
-|  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |
-|     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |
-|    Qwen2.5-VL    |    qwen    |   ×   |   ×   |         ×          |        √         |
-|       QVQ        |    qwen    |   ×   |   √   |         ×          |        ×         |
+| Models / BackEnd | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |SGLang|
+| :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: | :--------------: |
+|    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |        ×         |
+|    InternVL2     |  internvl  |   ×   |   ×   |         √          |        √         |        ×         |
+|   InternVL2.5    |  internvl  |   ×   |   ×   |         √          |        √         |        ×         |
+|  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |        ×         |
+|     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |        √         |
+|    Qwen2.5-VL    |    qwen    |   ×   |   ×   |         ×          |        √         |        √         |
+|       QVQ        |    qwen    |   ×   |   √   |         ×          |        ×         |        ×         |
 <br>
 
 ### Embedding/Rerank/Classify模型
@@ -286,6 +287,8 @@ Chat UI界面:
  [vLLM](https://github.com/vllm-project/vllm)   : https://github.com/vllm-project/vllm
 
 [LMDeploy ](https://github.com/InternLM/lmdeploy)： https://github.com/InternLM/lmdeploy
+
+[SGLang ](https://github.com/sgl-project/sglang)： https://github.com/sgl-project/sglang
 
 [infinity](https://github.com/michaelfeil/infinity) ： https://github.com/michaelfeil/infinity
 
