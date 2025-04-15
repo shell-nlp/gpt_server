@@ -6,7 +6,6 @@ from vllm.sampling_params import GuidedDecodingParams
 from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
-import vllm
 from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
 from vllm.lora.request import LoRARequest
 from transformers import AutoTokenizer

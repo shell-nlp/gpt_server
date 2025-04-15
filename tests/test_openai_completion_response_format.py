@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 # 方式一
 output = client.chat.completions.create(
-    model="qwen-3b",
+    model="qwen",
     messages=[{"role": "user", "content": "南京到北京多远"}],
     response_format={"type": "text"},
 )
@@ -13,7 +13,7 @@ print(output.choices[0].message.content)
 print("-" * 100)
 # 方式二
 output = client.chat.completions.create(
-    model="qwen-3b",
+    model="qwen",
     messages=[
         {"role": "system", "content": "用json进行回答"},
         {"role": "user", "content": "南京到北京多远"},
@@ -31,7 +31,7 @@ class Distance(BaseModel):
 
 
 output = client.beta.chat.completions.parse(
-    model="qwen-3b",
+    model="qwen",
     messages=[{"role": "user", "content": "南京到北京多远"}],
     response_format=Distance,
 )

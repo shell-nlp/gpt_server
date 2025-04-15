@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.4.0"
+version = "0.4.1"
 description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -12,14 +12,14 @@ dependencies = [
     "ffmpy",
     "fschat==0.2.36",
     "infinity-emb[all]==0.0.73",
-    "lmdeploy==0.7.2.post1",
+    "lmdeploy==0.7.3",
     "loguru>=0.7.2",
     "openai==1.55.3",
     "setuptools==75.2.0",
     "streamlit==1.39.0",
     "torch==2.5.1",
     "torchvision==0.20.1",
-    "vllm==0.8.3",
+    "vllm==0.8.4",
     "qwen_vl_utils",
     "evalscope[perf]==0.10.1",
     "modelscope==1.20.1",
@@ -39,6 +39,7 @@ override-dependencies = [
     "outlines==0.1.11",
     "transformers==4.50.0",
     "soundfile==0.13.1", # infinity
+    "xgrammar==0.1.18", #  sglang[all]==0.4.5 depends on xgrammar==0.1.17
 ]
 
 [project.scripts]
