@@ -24,6 +24,7 @@ if "config" not in st.session_state:
                 if (
                     model_config["model_type"] != "embedding"
                     and model_config["model_type"] != "embedding_infinity"
+                    and model_config["model_type"] != "funasr"
                 ):
                     support_models.append(model_name)
     port = config["serve_args"]["port"]
@@ -53,7 +54,7 @@ def init_chat_history():
 
 
 def main():
-    st.title(f"GPT_SERVER")
+    st.title(f"Chat  UI")
     models = [i.id for i in client.models.list() if i.id in support_models]
     model = st.sidebar.selectbox(label="选择模型", options=models)
     temperature = st.sidebar.slider(
