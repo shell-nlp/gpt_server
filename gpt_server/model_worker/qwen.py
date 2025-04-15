@@ -98,6 +98,7 @@ class QwenWorker(ModelWorkerBase):
                     )
                     params["prompt"] = text
                     # 多模态不需要传入input_ids
+                    params["multimodal"] = True
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
             params["stop"].extend(self.stop)

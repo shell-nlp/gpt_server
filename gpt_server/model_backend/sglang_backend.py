@@ -84,10 +84,9 @@ class SGLangBackend(ModelBackend):
             stop.add(stop_str)
         elif isinstance(stop_str, list) and stop_str != []:
             stop.update(stop_str)
-        input_ids = params.get("input_ids", None)
         base64_images = []
-        # 支持多模型模型
-        if input_ids is None:  # 多模态模型
+        multimodal = params.get("multimodal", False)
+        if multimodal:  # 多模态模型
             _messages = _transform_messages(messages)
             images, video_inputs = process_vision_info(_messages)
             if video_inputs:

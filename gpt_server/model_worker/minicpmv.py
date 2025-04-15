@@ -47,7 +47,7 @@ class MiniCPMVWorker(ModelWorkerBase):
                 pass
             elif isinstance(messages, str):
                 text = messages
-
+            params["multimodal"] = True
             # input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             params["messages"] = messages
             # params["prompt"] = text

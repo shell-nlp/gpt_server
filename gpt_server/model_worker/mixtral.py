@@ -29,13 +29,7 @@ class MixtralWorker(ModelWorkerBase):
             model_type="AutoModelForCausalLM",
         )
         # from tokenizer_config.json
-        self.stop_words_ids = [
-            0,  # <unk>
-            1,  # <s>
-            2,  # </s>
-            32001,  # <|im_start|>
-            32000,  # <|im_end|>
-        ]
+        self.stop_words_ids = []
 
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids

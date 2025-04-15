@@ -130,8 +130,8 @@ class LMDeployBackend(ModelBackend):
             messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
         if self.messages_type_select:
             messages = prompt or messages
-        input_ids = params.get("input_ids", None)
-        if input_ids is None:  # 多模态模型
+        multimodal = params.get("multimodal", False)
+        if multimodal:  # 多模态模型
             messages = params["messages"]
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config

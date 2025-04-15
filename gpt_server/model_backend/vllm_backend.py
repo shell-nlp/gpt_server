@@ -86,8 +86,8 @@ class VllmBackend(ModelBackend):
         elif isinstance(stop_str, list) and stop_str != []:
             stop.update(stop_str)
 
-        input_ids = params.get("input_ids", None)
-        if input_ids is None:  # 多模态模型
+        multimodal = params.get("multimodal", False)
+        if multimodal:  # 多模态模型
             # ----------------------------------------------------------------
             tokenizer = await self.engine.get_tokenizer()
             model_config = await self.engine.get_model_config()
@@ -103,8 +103,11 @@ class VllmBackend(ModelBackend):
             mm_data = await mm_data_future
             inputs = {"multi_modal_data": mm_data, "prompt": prompt}
         else:
-            prompt_token_ids = input_ids.tolist()[0]
-            inputs = {"prompt": prompt, "prompt_token_ids": prompt_token_ids}
+            input_ids = params.get("input_ids", None)
+            inputs = {"prompt": prompt}
+            if not input_ids:
+                prompt_token_ids = input_ids.tolist()[0]
+                inputs["prompt_token_ids"] = prompt_token_ids
         # ----------------------------------------------------------------
         # make sampling params in vllm
         top_p = max(top_p, 1e-5)
