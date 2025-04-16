@@ -199,7 +199,17 @@ Chat UI界面:
 
 ## 支持的模型以及推理后端
 
-**推理速度：** LMDeploy TurboMind > vllm > LMDeploy PyTorch > HF
+**推理速度：** LMDeploy TurboMind > SGLang > vllm > LMDeploy PyTorch > HF
+
+### 推理后端官方支持模型情况
+
+[LMDeploy](https://lmdeploy.readthedocs.io/en/latest/supported_models/supported_models.html) 
+
+[vLLM](https://docs.vllm.ai/en/latest/models/supported_models.html) 
+
+[SGLang](https://docs.sglang.ai/supported_models/generative_models.html) 
+
+官方支持的模型本项目可以五分钟之内进行兼容,但由于本人时间关系,暂时本项目只支持了常用的一些模型,如果想要支持其它模型,请提Issue.
 
 ### **LLM**
 
