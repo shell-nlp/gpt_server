@@ -16,7 +16,7 @@ addict==2.4.0
     #   modelscope
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.11.16
+aiohttp==3.11.18
     # via
     #   datasets
     #   edge-tts
@@ -42,7 +42,7 @@ altair==5.5.0
     # via streamlit
 annotated-types==0.7.0
     # via pydantic
-anthropic==0.49.0
+anthropic==0.50.0
     # via sglang
 antlr4-python3-runtime==4.9.3
     # via
@@ -113,13 +113,13 @@ colorama==0.4.6
     # via sacrebleu
 coloredlogs==15.0.1
     # via onnxruntime
-colpali-engine==0.3.9
+colpali-engine==0.3.10
     # via infinity-emb
 compressed-tensors==0.9.3
     # via
     #   sglang
     #   vllm
-contourpy==1.3.1
+contourpy==1.3.2
     # via matplotlib
 crcmod==1.7
     # via oss2
@@ -173,7 +173,7 @@ distro==1.9.0
     #   posthog
 dnspython==2.7.0
     # via email-validator
-edge-tts==7.0.0
+edge-tts==7.0.1
     # via gpt-server (pyproject.toml)
 editdistance==0.8.1
     # via
@@ -185,7 +185,10 @@ einops==0.8.1
     #   lmdeploy
     #   modelscope
     #   sglang
+    #   snac
     #   vllm
+einx==0.3.0
+    # via gpt-server (pyproject.toml)
 email-validator==2.2.0
     # via fastapi
 evalscope==0.10.1
@@ -231,7 +234,9 @@ flatbuffers==25.2.10
     # via onnxruntime
 fonttools==4.57.0
     # via matplotlib
-frozenlist==1.5.0
+frozendict==2.4.6
+    # via einx
+frozenlist==1.6.0
     # via
     #   aiohttp
     #   aiosignal
@@ -246,7 +251,9 @@ fsspec==2024.6.1
     #   torch
 funasr==1.2.6
     # via gpt-server (pyproject.toml)
-gguf==0.14.0
+future==1.0.0
+    # via pyloudnorm
+gguf==0.16.2
     # via vllm
 gitdb==4.0.12
     # via gitpython
@@ -256,8 +263,6 @@ googleapis-common-protos==1.70.0
     # via
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-gputil==1.4.0
-    # via colpali-engine
 grpcio==1.71.0
     # via opentelemetry-exporter-otlp-proto-grpc
 h11==0.14.0
@@ -291,6 +296,7 @@ huggingface-hub==0.30.2
     #   peft
     #   sentence-transformers
     #   sglang
+    #   snac
     #   timm
     #   tokenizers
     #   transformers
@@ -361,7 +367,7 @@ jsonschema==4.23.0
     #   outlines
     #   outlines-core
     #   ray
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.4.1
     # via jsonschema
 kaldiio==2.18.1
     # via funasr
@@ -379,7 +385,7 @@ librosa==0.11.0
     # via funasr
 litellm==1.60.0
     # via sglang
-llguidance==0.7.14
+llguidance==0.7.18
     # via
     #   sglang
     #   vllm
@@ -393,7 +399,7 @@ lmdeploy==0.7.3
     # via gpt-server (pyproject.toml)
 loguru==0.7.3
     # via gpt-server (pyproject.toml)
-lxml==5.3.2
+lxml==5.4.0
     # via sacrebleu
 markdown-it-py==3.0.0
     # via rich
@@ -421,6 +427,8 @@ modelscope==1.20.1
     #   sglang
 monotonic==1.6
     # via posthog
+more-itertools==10.7.0
+    # via openai-whisper
 mpmath==1.3.0
     # via sympy
 msgpack==1.1.0
@@ -437,7 +445,7 @@ multiprocess==0.70.16
     # via
     #   datasets
     #   evaluate
-narwhals==1.35.0
+narwhals==1.36.0
     # via
     #   altair
     #   plotly
@@ -459,6 +467,7 @@ nltk==3.9.1
 numba==0.61.2
     # via
     #   librosa
+    #   openai-whisper
     #   pynndescent
     #   umap-learn
     #   vllm
@@ -471,6 +480,7 @@ numpy==1.26.4
     #   cupy-cuda12x
     #   datasets
     #   decord
+    #   einx
     #   evalscope
     #   evaluate
     #   fschat
@@ -485,12 +495,14 @@ numpy==1.26.4
     #   numba
     #   onnx
     #   onnxruntime
+    #   openai-whisper
     #   opencv-python-headless
     #   optimum
     #   outlines
     #   pandas
     #   peft
     #   pydeck
+    #   pyloudnorm
     #   pytorch-wpe
     #   rouge-score
     #   sacrebleu
@@ -498,6 +510,7 @@ numpy==1.26.4
     #   scipy
     #   seaborn
     #   sglang
+    #   snac
     #   soundfile
     #   soxr
     #   streamlit
@@ -555,7 +568,7 @@ omegaconf==2.3.0
     # via hydra-core
 onnx==1.17.0
     # via optimum
-onnxruntime==1.21.0
+onnxruntime==1.21.1
     # via optimum
 openai==1.55.3
     # via
@@ -565,6 +578,8 @@ openai==1.55.3
     #   lmdeploy
     #   sglang
     #   vllm
+openai-whisper==20240930
+    # via gpt-server (pyproject.toml)
 opencv-python-headless==4.11.0.86
     # via
     #   mistral-common
@@ -686,7 +701,7 @@ pooch==1.8.2
     # via librosa
 portalocker==3.1.1
     # via sacrebleu
-posthog==3.24.1
+posthog==3.25.0
     # via infinity-emb
 prometheus-client==0.21.1
     # via
@@ -765,6 +780,8 @@ pygments==2.19.1
     #   ipython
     #   markdown2
     #   rich
+pyloudnorm==0.1.1
+    # via gpt-server (pyproject.toml)
 pympler==1.1
     # via evalscope
 pynndescent==0.5.13
@@ -818,7 +835,7 @@ pyzmq==26.4.0
     # via
     #   sglang
     #   vllm
-qwen-vl-utils==0.0.10
+qwen-vl-utils==0.0.11
     # via gpt-server (pyproject.toml)
 ray==2.43.0
     # via
@@ -902,6 +919,7 @@ scipy==1.15.2
     #   funasr
     #   librosa
     #   modelscope
+    #   pyloudnorm
     #   pynndescent
     #   scikit-learn
     #   sentence-transformers
@@ -931,9 +949,9 @@ setuptools==75.2.0
     #   torch
     #   triton
     #   vllm
-sgl-kernel==0.0.8
+sgl-kernel==0.0.9.post2
     # via sglang
-sglang==0.4.5
+sglang==0.4.5.post3
     # via gpt-server (pyproject.toml)
 shellingham==1.5.4
     # via typer
@@ -955,6 +973,8 @@ six==1.17.0
     #   wavedrom
 smmap==5.0.2
     # via gitdb
+snac==1.2.1
+    # via gpt-server (pyproject.toml)
 sniffio==1.3.1
     # via
     #   anthropic
@@ -989,6 +1009,7 @@ svgwrite==1.4.3
     # via wavedrom
 sympy==1.13.1
     # via
+    #   einx
     #   onnxruntime
     #   torch
 tabulate==0.9.0
@@ -1013,6 +1034,7 @@ tiktoken==0.9.0
     #   litellm
     #   lmdeploy
     #   mistral-common
+    #   openai-whisper
     #   sglang
     #   vllm
     #   xgrammar
@@ -1038,11 +1060,13 @@ torch==2.6.0
     #   flashinfer-python
     #   infinity-emb
     #   lmdeploy
+    #   openai-whisper
     #   optimum
     #   outlines
     #   peft
     #   sentence-transformers
     #   sglang
+    #   snac
     #   timm
     #   torchaudio
     #   torchvision
@@ -1061,6 +1085,7 @@ torchvision==0.21.0
     #   gpt-server (pyproject.toml)
     #   infinity-emb
     #   lmdeploy
+    #   sglang
     #   timm
     #   vllm
 tornado==6.4.2
@@ -1076,6 +1101,7 @@ tqdm==4.67.1
     #   modelscope
     #   nltk
     #   openai
+    #   openai-whisper
     #   outlines
     #   peft
     #   sentence-transformers
@@ -1108,6 +1134,7 @@ triton==3.3.0
     # via
     #   --override (workspace)
     #   lmdeploy
+    #   openai-whisper
     #   torch
     #   xgrammar
 typer==0.12.5
@@ -1194,7 +1221,7 @@ xxhash==3.5.0
     #   evaluate
 yapf==0.43.0
     # via mmengine-lite
-yarl==1.19.0
+yarl==1.20.0
     # via aiohttp
 zipp==3.21.0
     # via importlib-metadata

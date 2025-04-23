@@ -22,8 +22,8 @@ class OpenAISpeechRequest(BaseModel):
     )
     input: str = Field(..., description="The text to generate audio for")
     voice: str = Field(
-        default=None,
-        description="The voice to use for generation. Can be a base voice or a combined voice name.",
+        default="新闻联播女声",
+        description="暂时仅支持 新闻联播女声",
     )
     response_format: Literal["mp3", "opus", "aac", "flac", "wav", "pcm"] = Field(
         default="mp3",

@@ -89,11 +89,12 @@ class SparkTTSWorker(ModelWorkerBase):
     async def generate_voice_stream(self, params):
         text = params["text"]
         response_format = params["response_format"]
+        voice = params.get("voice", "新闻联播女声")
         audio_writer = StreamingAudioWriter(
             format=response_format, sample_rate=self.engine.SAMPLE_RATE
         )
         async for chunk_data in generate_voice_stream(
-            engine=self.engine, text=text, name="新闻联播女声"
+            engine=self.engine, text=text, name=voice
         ):
             audio = audio_writer.write_chunk(chunk_data, finalize=False)
             yield audio
