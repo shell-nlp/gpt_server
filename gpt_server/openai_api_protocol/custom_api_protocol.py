@@ -14,6 +14,27 @@ from fastchat.protocol.openai_api_protocol import (
 from pydantic import Field, BaseModel
 
 
+# copy from https://github.com/remsky/Kokoro-FastAPI/blob/master/api/src/routers/openai_compatible.py
+class OpenAISpeechRequest(BaseModel):
+    model: str = Field(
+        default=None,
+        description="The model to use for generation.",
+    )
+    input: str = Field(..., description="The text to generate audio for")
+    voice: str = Field(
+        default=None,
+        description="The voice to use for generation. Can be a base voice or a combined voice name.",
+    )
+    response_format: Literal["mp3", "opus", "aac", "flac", "wav", "pcm"] = Field(
+        default="mp3",
+        description="The format to return audio in. Supported formats: mp3, opus, flac, wav, pcm. PCM format returns raw 16-bit samples without headers. AAC is not currently supported.",
+    )
+    stream: bool = Field(
+        default=True,
+        description="If true, audio will be streamed as it's generated. Each chunk will be a complete sentence.",
+    )
+
+
 class SpeechRequest(BaseModel):
     "TTS"
 

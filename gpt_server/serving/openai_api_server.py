@@ -699,6 +699,7 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     RerankRequest,
     ModerationsRequest,
     SpeechRequest,
+    OpenAISpeechRequest,
 )
 import edge_tts
 import uuid
@@ -706,7 +707,65 @@ import uuid
 OUTPUT_DIR = "./edge_tts_cache"
 
 
+async def generate_voice_stream(payload: Dict[str, Any], worker_addr: str):
+    async with httpx.AsyncClient() as client:
+        async with client.stream(
+            "POST",
+            worker_addr,
+            headers=headers,
+            json=payload,
+            timeout=WORKER_API_TIMEOUT,
+        ) as response:
+            if response.status_code != 200:
+                error_detail = await response.aread()
+                raise Exception(f"API请求失败: {response.status_code},  {error_detail}")
+            async for chunk in response.aiter_bytes():  # 流式迭代器
+                yield chunk
+
+
 @app.post("/v1/audio/speech", dependencies=[Depends(check_api_key)])
+async def speech(request: OpenAISpeechRequest):
+    controller_address = app_settings.controller_address
+    error_check_ret = None
+    models = await fetch_remote(controller_address + "/list_models", None, "models")
+    if request.model not in models:
+        error_check_ret = create_error_response(
+            ErrorCode.INVALID_MODEL,
+            f"Only {'&&'.join(models)} allowed now, your model {request.model}",
+        )
+    if error_check_ret is not None:
+        return error_check_ret
+    payload = {
+        "model": request.model,
+    }
+    model_name = payload["model"]
+    worker_addr = await get_worker_address(model_name)
+    response_format = request.response_format
+    content_type = {
+        "mp3": "audio/mpeg",
+        "opus": "audio/opus",
+        "aac": "audio/aac",
+        "flac": "audio/flac",
+        "wav": "audio/wav",
+        "pcm": "audio/pcm",
+    }.get(response_format, f"audio/{response_format}")
+    if request.stream:
+        stream_output = await generate_voice_stream(
+            payload, worker_addr + "/worker_generate_voice_stream"
+        )
+        return StreamingResponse(
+            stream_output,
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"attachment; filename=speech.{response_format}",
+                "X-Accel-Buffering": "no",
+                "Cache-Control": "no-cache",
+                "Transfer-Encoding": "chunked",
+            },
+        )
+
+
+@app.post("/v1/audio/speech2", dependencies=[Depends(check_api_key)])
 async def speech(request: SpeechRequest):
     os.makedirs(OUTPUT_DIR, exist_ok=True)  # 即使存在也不会报错
     list_voices = await edge_tts.list_voices()

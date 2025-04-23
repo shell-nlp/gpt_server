@@ -188,6 +188,9 @@ class BaseModelWorker:
     def transcription(self, params):
         raise NotImplementedError
 
+    def generate_voice_stream(self, params):
+        raise NotImplementedError
+
 
 def release_worker_semaphore():
     worker.semaphore.release()

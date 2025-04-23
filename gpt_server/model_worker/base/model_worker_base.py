@@ -306,6 +306,37 @@ async def api_generate_stream(request: Request):
     return StreamingResponse(generator, background=background_tasks)
 
 
+@app.post("/worker_generate_voice_stream")
+async def api_generate_stream(request: Request):
+    params = await request.json()
+    await acquire_worker_semaphore()
+    request_id = gen_request_id()
+    params["request_id"] = request_id
+    params["request"] = request
+    generator = worker.generate_voice_stream(params)
+    background_tasks = create_background_tasks(request_id)
+    response_format = params["response_format"]
+    content_type = {
+        "mp3": "audio/mpeg",
+        "opus": "audio/opus",
+        "aac": "audio/aac",
+        "flac": "audio/flac",
+        "wav": "audio/wav",
+        "pcm": "audio/pcm",
+    }.get(response_format, f"audio/{response_format}")
+    return StreamingResponse(
+        generator,
+        background=background_tasks,
+        media_type=content_type,
+        headers={
+            "Content-Disposition": f"attachment; filename=speech.{response_format}",
+            "X-Accel-Buffering": "no",
+            "Cache-Control": "no-cache",
+            "Transfer-Encoding": "chunked",
+        },
+    )
+
+
 @app.post("/worker_generate")
 async def api_generate(request: Request):
     params = await request.json()
