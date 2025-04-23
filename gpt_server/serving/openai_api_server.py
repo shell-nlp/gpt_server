@@ -742,6 +742,7 @@ async def speech(request: OpenAISpeechRequest):
         "model": request.model,
         "text": request.input,
         "response_format": response_format,
+        "voice": request.voice,
     }
     content_type = {
         "mp3": "audio/mpeg",
