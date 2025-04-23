@@ -26,7 +26,11 @@ dependencies = [
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
     "sglang[all]>=0.4.5",
-    "flashinfer-python"
+    "flashinfer-python",
+    "einx>=0.3.0",
+    "snac>=1.2.1",
+    "pyloudnorm>=0.1.1",
+    "openai-whisper>=20240930"
 ]
 
 [tool.uv]

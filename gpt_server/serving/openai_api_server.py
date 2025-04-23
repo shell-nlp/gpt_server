@@ -735,12 +735,14 @@ async def speech(request: OpenAISpeechRequest):
         )
     if error_check_ret is not None:
         return error_check_ret
+
+    worker_addr = await get_worker_address(request.model)
+    response_format = request.response_format
     payload = {
         "model": request.model,
+        "text": request.input,
+        "response_format": response_format,
     }
-    model_name = payload["model"]
-    worker_addr = await get_worker_address(model_name)
-    response_format = request.response_format
     content_type = {
         "mp3": "audio/mpeg",
         "opus": "audio/opus",
@@ -750,7 +752,7 @@ async def speech(request: OpenAISpeechRequest):
         "pcm": "audio/pcm",
     }.get(response_format, f"audio/{response_format}")
     if request.stream:
-        stream_output = await generate_voice_stream(
+        stream_output = generate_voice_stream(
             payload, worker_addr + "/worker_generate_voice_stream"
         )
         return StreamingResponse(

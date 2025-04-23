@@ -38,6 +38,9 @@ async def generate_voice_stream(engine: AutoEngine, text: str, name: str = None)
         yield chunk_data
 
 
+os.environ["VLLM_USE_V1"] = "0"
+
+
 class SparkTTSWorker(ModelWorkerBase):
     def __init__(
         self,
@@ -83,9 +86,9 @@ class SparkTTSWorker(ModelWorkerBase):
         )
         logger.info(f"模型：{model_names[0]}")
 
-    async def tts(self, params):
+    async def generate_voice_stream(self, params):
         text = params["text"]
-        response_format = params["params"]
+        response_format = params["response_format"]
         audio_writer = StreamingAudioWriter(
             format=response_format, sample_rate=self.engine.SAMPLE_RATE
         )
