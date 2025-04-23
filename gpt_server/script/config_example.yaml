@@ -130,3 +130,15 @@ models:
     workers:
     - gpus:
       - 2
+- tts:
+    # TTS 模型的配置方式
+    alias: null
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/SparkAudio/Spark-TTS-0___5B/
+    model_type: spark_tts
+    work_mode: vllm
+    device: gpu
+    workers:
+    - gpus:
+      - 6
