@@ -54,7 +54,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         multimodal: bool = False,
     ):
         is_vision = False
-        if model_type != "asr":
+        if model_type != "asr" and model_type != "tts":
             try:
                 self.model_config = AutoConfig.from_pretrained(
                     model_path, trust_remote_code=True
@@ -116,7 +116,11 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
     def load_model_tokenizer(self, model_path):
         """加载 模型 和 分词器 直接对 self.model 和 self.tokenizer 进行赋值"""
-        if self.model_type == "embedding" or self.model_type == "asr":
+        if (
+            self.model_type == "embedding"
+            or self.model_type == "asr"
+            or self.model_type == "tts"
+        ):
             return 1
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,

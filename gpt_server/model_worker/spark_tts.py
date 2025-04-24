@@ -60,7 +60,7 @@ class SparkTTSWorker(ModelWorkerBase):
             model_names,
             limit_worker_concurrency,
             conv_template,
-            model_type="asr",
+            model_type="tts",
         )
 
         self.engine = AutoEngine(
