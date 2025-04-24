@@ -17,7 +17,7 @@
 1. 支持多种推理后端引擎，vLLM、LMDeploy和SGLang
 2.  **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
 
-（仓库初步构建中，构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
+（构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
 
 ## 最新消息
 本项目将在下一个版本将Python版本环境管理工具由pip切换到 uv(https://github.com/astral-sh/uv)
@@ -32,7 +32,7 @@
 6. 支持了**cohere**库接口规范的 /v1/rerank 接口
 7. 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
 8. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
-9. 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）,自带edge-tts(免费的TTS)(代码样例见gpt_server/tests/test_openai_tts.py)
+9. 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
 10. 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
 11. 支持多模态大模型
 12. 与FastChat相同的分布式架构
@@ -44,6 +44,7 @@
 ## 更新信息
 
 ```plaintext
+2025-4-24  支持了 Spark-TTS后端的 TTS
 2025-4-14  支持了 SGLang后端以及部分VL模型
 2025-4-2   支持了 OpenAI的ASR接口 /v1/audio/transcriptions
 2025-4-1   支持了 internvl2.5模型
@@ -82,6 +83,10 @@
 * [X] 支持HF后端
 * [X] 支持vLLM后端
 * [X] 支持LMDeploy后端
+* [X] 支持SGLang后端
+* [X] 支持 文本转语音 TTS 模型
+* [X] 支持 语音转文本 ASR 模型
+* [X] 支持 文本审核 模型
 * [X] 支持 function call 功能 (tools)（Qwen系列、ChatGLM系列已经支持,后面有需求再继续扩展）
 * [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
