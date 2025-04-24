@@ -41,14 +41,23 @@
 <br>
 **配置文件的详细说明信息位于：[config_example.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")**
 
-## 更新信息
-
+## 最新进展🎉
+<details open>
+<summary><b>2025</b></summary>
+ 
 ```plaintext
 2025-4-24  支持了 Spark-TTS后端的 TTS
 2025-4-14  支持了 SGLang后端以及部分VL模型
 2025-4-2   支持了 OpenAI的ASR接口 /v1/audio/transcriptions
 2025-4-1   支持了 internvl2.5模型
 2025-2-9   支持了 QVQ
+```
+</details>
+
+<details close>
+<summary><b>2024</b></summary>
+ 
+```plaintext
 2024-12-22 支持了 tts, /v1/audio/speech TTS模型
 2024-12-21 支持了 text-moderation, /v1/moderations 文本审核模型 
 2024-12-14 支持了 phi-4
@@ -73,10 +82,18 @@
 2024-3-2   支持了 qwen-1.5 0.5B, 1.8B, 4B, 7B, 14B, and 72B
 2024-2-4   支持了 vllm 实现
 2024-1-6   支持了 Yi-34B
+```
+</details>
+
+<details close>
+<summary><b>2023</b></summary>
+ 
+```plaintext
 2023-12-31 支持了 qwen-7b, qwen-14b
 2023-12-30 支持了 all-embedding(理论上支持所有的词嵌入模型)
 2023-12-24 支持了 chatglm3-6b 
 ```
+</details>
 
 ## 路线
 
