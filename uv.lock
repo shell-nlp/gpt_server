@@ -1280,6 +1280,33 @@ wheels = [
 ]
 
 [[package]]
+name = "flashtts"
+version = "0.1.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "av" },
+    { name = "einops" },
+    { name = "einx" },
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "librosa" },
+    { name = "omegaconf" },
+    { name = "openai-whisper" },
+    { name = "pyloudnorm" },
+    { name = "python-multipart" },
+    { name = "snac" },
+    { name = "soundfile" },
+    { name = "soxr" },
+    { name = "transformers" },
+    { name = "uvicorn" },
+    { name = "wetextprocessing" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/44/8d/23ef7c31470fe23038a08734313edf01219be99fcb7c4fa58470e49e86c3/flashtts-0.1.0.tar.gz", hash = "sha256:5634689d89f9a599470de5e2bb38fdbc623b37226dc250bbd967ef9de8e28b1c", size = 125487 }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/73/78/a7f96704c1f54c59affdd413cb6d5677c0f8b1c5589b4d521d9effc6563e/flashtts-0.1.0-py3-none-any.whl", hash = "sha256:dd0022dc8972ef96792d5df94402823b8e8d87f0e7b243aed90d6952c7775387", size = 162768 },
+]
+
+[[package]]
 name = "flatbuffers"
 version = "24.3.25"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
@@ -1535,11 +1562,11 @@ source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
     { name = "edge-tts" },
-    { name = "einx" },
     { name = "evalscope", extra = ["perf"] },
     { name = "fastapi" },
     { name = "ffmpy" },
     { name = "flashinfer-python" },
+    { name = "flashtts" },
     { name = "fschat" },
     { name = "funasr" },
     { name = "infinity-emb", extra = ["all"] },
@@ -1547,12 +1574,9 @@ dependencies = [
     { name = "loguru" },
     { name = "modelscope" },
     { name = "openai" },
-    { name = "openai-whisper" },
-    { name = "pyloudnorm" },
     { name = "qwen-vl-utils" },
     { name = "setuptools" },
     { name = "sglang", extra = ["all"] },
-    { name = "snac" },
     { name = "streamlit" },
     { name = "torch" },
     { name = "torchvision" },
@@ -1563,11 +1587,11 @@ dependencies = [
 requires-dist = [
     { name = "accelerate", specifier = ">=1.0.1" },
     { name = "edge-tts", specifier = ">=7.0.0" },
-    { name = "einx", specifier = ">=0.3.0" },
     { name = "evalscope", extras = ["perf"], specifier = "==0.10.1" },
     { name = "fastapi", specifier = "==0.115.0" },
     { name = "ffmpy" },
     { name = "flashinfer-python", index = "https://flashinfer.ai/whl/cu124/torch2.5" },
+    { name = "flashtts", specifier = ">=0.1.0" },
     { name = "fschat", specifier = "==0.2.36" },
     { name = "funasr", specifier = ">=1.2.6" },
     { name = "infinity-emb", extras = ["all"], specifier = "==0.0.73" },
@@ -1575,12 +1599,9 @@ requires-dist = [
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "modelscope", specifier = "==1.20.1" },
     { name = "openai", specifier = "==1.55.3" },
-    { name = "openai-whisper", specifier = ">=20240930" },
-    { name = "pyloudnorm", specifier = ">=0.1.1" },
     { name = "qwen-vl-utils" },
     { name = "setuptools", specifier = "==75.2.0" },
     { name = "sglang", extras = ["all"], specifier = ">=0.4.5" },
-    { name = "snac", specifier = ">=1.2.1" },
     { name = "streamlit", specifier = "==1.39.0" },
     { name = "torch", specifier = "==2.5.1" },
     { name = "torchvision", specifier = "==0.20.1" },
@@ -1835,6 +1856,15 @@ dependencies = [
 sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/20/ff/bd28f70283b9cca0cbf0c2a6082acbecd822d1962ae7b2a904861b9965f8/importlib_metadata-8.0.0.tar.gz", hash = "sha256:188bd24e4c346d3f0a933f275c2fec67050326a856b9a359881d7c2a697e8812", size = 52667 }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/dc/ef/38766b2edb096260d9b1b6ad35adaa0bce3b0567abb452b21eb074af88c4/importlib_metadata-8.0.0-py3-none-any.whl", hash = "sha256:15584cf2b1bf449d98ff8a6ff1abef57bf20f3ac6454f431736cd3e660921b2f", size = 24769 },
+]
+
+[[package]]
+name = "importlib-resources"
+version = "6.5.2"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/cf/8c/f834fbf984f691b4f7ff60f50b514cc3de5cc08abfc3295564dd89c5e2e7/importlib_resources-6.5.2.tar.gz", hash = "sha256:185f87adef5bcc288449d98fb4fba07cea78bc036455dd44c5fc4a2fe78fed2c", size = 44693 }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/a4/ed/1f1afb2e9e7f38a545d628f864d562a5ae64fe6f7a10e28ffb9b185b4e89/importlib_resources-6.5.2-py3-none-any.whl", hash = "sha256:789cfdc3ed28c78b67a06acb8126751ced69a3d5f79c095a98298cd8a760ccec", size = 37461 },
 ]
 
 [[package]]
@@ -4145,6 +4175,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pynini"
+version = "2.1.6"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/9b/69/4b59968b0fd351a153d7a3c2feaa6e7514c903c063bbd7f7e1e3f1c079b0/pynini-2.1.6.tar.gz", hash = "sha256:b09b6dda73608cedf962dbfbcfa5826b0984d1b43a8f995761972e6e032921c6", size = 789830 }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/56/81/4bb768d67943088a0bc12d9f3581e7edc9addf4b29b91f65b4ed733c0a0f/pynini-2.1.6-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:d04d3000cda1cd006c791d8c08ecf9472e3710430024b3130eac3fad26afee60", size = 154541768 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6c/83/801b61aba6e089209387bf47e4bde5201acea990bb8311ddabca9e547e92/pynini-2.1.6-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:a9c2b168bc2b5c6cee82a77515122ad14cbdcd9292cb050eb2824b1b48be1b37", size = 154760794 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b3/34/403a5e792a8454168c9b9e8b7d8141027e9fb5453013d2f9320e0b083333/pynini-2.1.6-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:f32d1c0b3aa05a76153c7e0e395e553e93acddf4a436cbec5d50d1eb1d354bcd", size = 154695139 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f3/25/e5c69822c420a9fbde5f76df6e482e370d24bcebd6cacd9e12c829aaabaf/pynini-2.1.6-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:bb6bef42826b015d778ae6874e3972e8d06417c7f48c7d7635a2bef7d13eb840", size = 98750429 },
+]
+
+[[package]]
 name = "pynndescent"
 version = "0.5.13"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
@@ -6060,6 +6102,19 @@ wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b5/94/ac47552208583d5dbcce468430c1eb2ae18962f6b3a694a2b7727cc60d4a/websockets-11.0.3-cp311-cp311-win32.whl", hash = "sha256:e1459677e5d12be8bbc7584c35b992eea142911a6236a3278b9b5ce3326f282c", size = 124149 },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e1/7c/0ad6e7ef0a054d73092f616d20d3d9bd3e1b837554cb20a52d8dd9f5b049/websockets-11.0.3-cp311-cp311-win_amd64.whl", hash = "sha256:e7837cb169eca3b3ae94cc5787c4fed99eef74c0ab9506756eea335e0d6f3ed8", size = 124670 },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/47/96/9d5749106ff57629b54360664ae7eb9afd8302fad1680ead385383e33746/websockets-11.0.3-py3-none-any.whl", hash = "sha256:6681ba9e7f8f3b19440921e99efbb40fc89f26cd71bf539e45d8c8a25c976dc6", size = 118056 },
+]
+
+[[package]]
+name = "wetextprocessing"
+version = "1.0.4.1"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "importlib-resources" },
+    { name = "pynini" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0f/94/25f1ec447bbe801de9dfb5c9e35775709d551c0d2364b83c2c1bf08eede5/WeTextProcessing-1.0.4.1.tar.gz", hash = "sha256:95eabf1b1c4c102e886b234ee70b13e11ff19ac57ea18d6581aae0cc814f7801", size = 1846631 }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/c2/e3/19e847398a2863d8c72a1f4f0082fa2a614a7b654d5bad161f03134e5fb7/WeTextProcessing-1.0.4.1-py3-none-any.whl", hash = "sha256:2080c4788ae9de4e8cda07a9cd100003e951b8f2ecee64ad14afa34a79b0dfb4", size = 1972683 },
 ]
 
 [[package]]

@@ -27,10 +27,7 @@ dependencies = [
     "funasr>=1.2.6",
     "sglang[all]>=0.4.5",
     "flashinfer-python",
-    "einx>=0.3.0",
-    "snac>=1.2.1",
-    "pyloudnorm>=0.1.1",
-    "openai-whisper>=20240930"
+    "flashtts>=0.1.0",
 ]
 
 [tool.uv]

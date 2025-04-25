@@ -1,13 +1,11 @@
 import asyncio
 import os
 from typing import List
-import base64
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from io import BytesIO
 
-from gpt_server.fast_tts.engine import AutoEngine
-from gpt_server.fast_tts.server.utils.audio_writer import StreamingAudioWriter
+from flashtts.engine import AutoEngine
+from flashtts.server.utils.audio_writer import StreamingAudioWriter
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
