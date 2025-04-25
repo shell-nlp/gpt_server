@@ -127,12 +127,6 @@ class SGLangBackend(ModelBackend):
             "json_schema": json_schema,
         }
         image_data = base64_images if base64_images else None
-        # generator = await self.async_engine.async_generate(
-        #     prompt=prompt,
-        #     sampling_params=sampling_params,
-        #     stream=True,
-        #     image_data=base64_images if base64_images else None,
-        # )
 
         obj = GenerateReqInput(
             text=prompt,

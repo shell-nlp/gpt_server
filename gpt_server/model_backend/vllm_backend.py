@@ -167,12 +167,7 @@ class VllmBackend(ModelBackend):
             current_text = request_output.outputs[0].text
             delta_text = current_text[len(previous_text) :]
             aborted = False
-            # if request and await request.is_disconnected():
-            #     await self.engine.abort(request_id)
-            #     request_output.finished = True
-            #     aborted = True
-            #     for output in request_output.outputs:
-            #         output.finish_reason = "abort"
+
             prompt_tokens = len(request_output.prompt_token_ids)
             completion_tokens = sum(
                 len(output.token_ids) for output in request_output.outputs
