@@ -143,9 +143,9 @@ class LMDeployBackend(ModelBackend):
         current_token_ids = []
         delta_token_ids = []
         async for request_output in results_generator:
-            if await request.is_disconnected():
-                # Abort the request if the client disconnects.
-                await self.async_engine.stop_session(session_id=request_id)
+            # if await request.is_disconnected():
+            #     # Abort the request if the client disconnects.
+            #     await self.async_engine.stop_session(session_id=request_id)
             current_text = current_text + request_output.response
 
             usage = {

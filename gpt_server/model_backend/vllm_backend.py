@@ -166,18 +166,13 @@ class VllmBackend(ModelBackend):
         async for request_output in results_generator:
             current_text = request_output.outputs[0].text
             delta_text = current_text[len(previous_text) :]
-            partial_stop = any(is_partial_stop(current_text, i) for i in stop)
-            # prevent yielding partial stop sequence
-            if partial_stop:
-                continue
-
             aborted = False
-            if request and await request.is_disconnected():
-                await self.engine.abort(request_id)
-                request_output.finished = True
-                aborted = True
-                for output in request_output.outputs:
-                    output.finish_reason = "abort"
+            # if request and await request.is_disconnected():
+            #     await self.engine.abort(request_id)
+            #     request_output.finished = True
+            #     aborted = True
+            #     for output in request_output.outputs:
+            #         output.finish_reason = "abort"
             prompt_tokens = len(request_output.prompt_token_ids)
             completion_tokens = sum(
                 len(output.token_ids) for output in request_output.outputs

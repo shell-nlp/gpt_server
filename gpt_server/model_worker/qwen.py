@@ -44,17 +44,11 @@ class QwenWorker(ModelWorkerBase):
             model_type="AutoModelForCausalLM",
         )
 
-        self.stop_words_ids = [
-            151643,  # <|endoftext|>
-            151644,  # <|im_start|>
-            151645,  # <|im_end|>
-        ]
+        self.stop_words_ids = []
 
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        # 拓展额外的stop
-        self.stop.extend(["Observation"])
         logger.info(f"{model_names[0]} 停用词: {self.stop}")
 
         self.chat_template = MODELS.module_dict["qwen2_5"]()

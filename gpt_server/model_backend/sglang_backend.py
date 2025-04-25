@@ -130,18 +130,13 @@ class SGLangBackend(ModelBackend):
             stream=True,
             image_data=base64_images if base64_images else None,
         )
-
         previous_text = ""
+        aborted = False
         async for chunk in generator:
             current_text = chunk["text"]
             meta_info = chunk["meta_info"]
             delta_text = current_text[len(previous_text) :]
-            partial_stop = any(is_partial_stop(current_text, i) for i in stop)
-            # prevent yielding partial stop sequence
-            if partial_stop:
-                continue
 
-            aborted = False
             prompt_tokens = meta_info["prompt_tokens"]
             completion_tokens = meta_info["completion_tokens"]
             usage = {
