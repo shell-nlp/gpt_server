@@ -1,3 +1,4 @@
+import asyncio
 import base64
 from io import BytesIO
 import os
@@ -11,6 +12,7 @@ from sglang.utils import convert_json_schema_to_str
 from sglang.srt.conversation import generate_chat_conv
 
 from qwen_vl_utils import process_vision_info
+from sglang.srt.managers.io_struct import GenerateReqInput
 
 
 def _transform_messages(
@@ -124,41 +126,62 @@ class SGLangBackend(ModelBackend):
             "top_p": top_p if top_p != 0 else 0.01,
             "json_schema": json_schema,
         }
-        generator = await self.async_engine.async_generate(
-            prompt=prompt,
+        image_data = base64_images if base64_images else None
+        # generator = await self.async_engine.async_generate(
+        #     prompt=prompt,
+        #     sampling_params=sampling_params,
+        #     stream=True,
+        #     image_data=base64_images if base64_images else None,
+        # )
+
+        obj = GenerateReqInput(
+            text=prompt,
+            input_ids=None,
             sampling_params=sampling_params,
+            image_data=image_data,
+            return_logprob=False,
+            logprob_start_len=None,
+            top_logprobs_num=None,
+            token_ids_logprob=None,
+            lora_path=None,
             stream=True,
-            image_data=base64_images if base64_images else None,
+            custom_logit_processor=None,
+            rid=request_id,
         )
+        generator = self.async_engine.tokenizer_manager.generate_request(obj, None)
         previous_text = ""
         aborted = False
-        async for chunk in generator:
-            current_text = chunk["text"]
-            meta_info = chunk["meta_info"]
-            delta_text = current_text[len(previous_text) :]
+        try:
+            async for chunk in generator:
+                current_text = chunk["text"]
+                meta_info = chunk["meta_info"]
+                delta_text = current_text[len(previous_text) :]
 
-            prompt_tokens = meta_info["prompt_tokens"]
-            completion_tokens = meta_info["completion_tokens"]
-            usage = {
-                "prompt_tokens": prompt_tokens,
-                "completion_tokens": completion_tokens,
-                "total_tokens": prompt_tokens + completion_tokens,
-            }
-            ret = {
-                "text": delta_text,
-                "error_code": 0,
-                "usage": usage,
-                "finish_reason": (
-                    meta_info["finish_reason"]["type"]
-                    if meta_info["finish_reason"]
-                    else None
-                ),
-            }
-            if not ret["text"]:
-                continue
-            yield ret
-            previous_text = current_text
-            if aborted:
-                break
-        logger.info(current_text)
-        logger.info(usage)
+                prompt_tokens = meta_info["prompt_tokens"]
+                completion_tokens = meta_info["completion_tokens"]
+                usage = {
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                    "total_tokens": prompt_tokens + completion_tokens,
+                }
+                ret = {
+                    "text": delta_text,
+                    "error_code": 0,
+                    "usage": usage,
+                    "finish_reason": (
+                        meta_info["finish_reason"]["type"]
+                        if meta_info["finish_reason"]
+                        else None
+                    ),
+                }
+                if not ret["text"]:
+                    continue
+                yield ret
+                previous_text = current_text
+                if aborted:
+                    break
+            logger.info(current_text)
+            logger.info(usage)
+        except asyncio.CancelledError as e:
+            self.async_engine.tokenizer_manager.abort_request(request_id)
+            logger.warning(f"request_id : {request_id} 已中断！")
