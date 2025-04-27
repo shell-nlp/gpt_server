@@ -10,32 +10,6 @@ from flashtts.server.utils.audio_writer import StreamingAudioWriter
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
-async def generate_voice_stream(engine: AutoEngine, text: str, name: str = None):
-    """
-    流式音频合成
-    """
-
-    if engine.engine_name != "spark":
-        raise ValueError("仅Spark-TTS支持`generate_voice_stream`功能.")
-    stream_coro = None
-    if name:
-        stream_coro = engine.speak_stream_async(
-            name=name,
-            text=text,
-            length_threshold=50,
-            window_size=50,
-        )
-    else:
-        stream_coro = engine.generate_voice_stream_async(
-            text=text,
-            gender="male",
-            length_threshold=50,
-            window_size=50,
-        )
-    async for chunk_data in stream_coro:
-        yield chunk_data
-
-
 os.environ["VLLM_USE_V1"] = "0"
 
 
@@ -91,11 +65,17 @@ class SparkTTSWorker(ModelWorkerBase):
         audio_writer = StreamingAudioWriter(
             format=response_format, sample_rate=self.engine.SAMPLE_RATE
         )
-        async for chunk_data in generate_voice_stream(
-            engine=self.engine, text=text, name=voice
+        if self.engine.engine_name != "spark":
+            raise ValueError("仅Spark-TTS支持`generate_voice_stream`功能.")
+        async for chunk_data in self.engine.speak_stream_async(
+            name=voice,
+            text=text,
+            length_threshold=50,
+            window_size=50,
         ):
             audio = audio_writer.write_chunk(chunk_data, finalize=False)
             yield audio
+
         yield audio_writer.write_chunk(finalize=True)
 
 
