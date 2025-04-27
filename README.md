@@ -308,21 +308,26 @@ Chat UI界面:
 
 <br>
 
+### **TTS** 模型
+
+|    Models / BackEnd    | model_type |
+| :--------------------: | :--------: |
+|    Spark-TTS           |  spark_tts |
+
+
+<br>
+
 ## 架构
 
 ![gpt_server_archs.png](assets/gpt_server_archs.png)
 
 ## 致谢
-
- [FastChat](https://github.com/lm-sys/FastChat) : https://github.com/lm-sys/FastChat
-
- [vLLM](https://github.com/vllm-project/vllm)   : https://github.com/vllm-project/vllm
-
-[LMDeploy ](https://github.com/InternLM/lmdeploy)： https://github.com/InternLM/lmdeploy
-
-[SGLang ](https://github.com/sgl-project/sglang)： https://github.com/sgl-project/sglang
-
-[infinity](https://github.com/michaelfeil/infinity) ： https://github.com/michaelfeil/infinity
+- [FastChat](https://github.com/lm-sys/FastChat) 
+- [vLLM](https://github.com/vllm-project/vllm)  
+- [LMDeploy ](https://github.com/InternLM/lmdeploy)
+- [SGLang ](https://github.com/sgl-project/sglang)
+- [infinity](https://github.com/michaelfeil/infinity) 
+- [FlashTTS](https://github.com/HuiResearch/FlashTTS) 
 
 ## 与我联系(会邀请进入交流群)
 

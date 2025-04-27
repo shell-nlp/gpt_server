@@ -64,9 +64,9 @@ class SparkTTSWorker(ModelWorkerBase):
         self.engine = AutoEngine(
             model_path=model_path,
             max_length=32768,
-            llm_device="cuda:0",
-            tokenizer_device="cuda:0",
-            detokenizer_device="cuda:0",
+            llm_device="auto",
+            tokenizer_device="auto",
+            detokenizer_device="auto",
             backend="vllm",
             wav2vec_attn_implementation="sdpa",  # 使用flash attn加速wav2vec
             llm_gpu_memory_utilization=0.6,
