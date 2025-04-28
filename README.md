@@ -14,22 +14,23 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
-1. 支持多种推理后端引擎，vLLM、LMDeploy和SGLang
-2.  **降低了模型适配的难度和项目使用的难度**(新模型的适配仅需修改低于5行代码)，从而更容易的部署自己最新的模型。
+1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS** 模型的 **openai**规范 接口服务。
+2. 支持**vLLM**、**LMDeploy**和**SGLang** 多种加速推理后端引擎。
 
-（构建过程中没有经过完善的回归测试，可能会发生已适配的模型不可用的Bug,欢迎提出改进或者适配模型的建议意见。）
+如果 GPT Server 对您有帮助，欢迎留下一个 ⭐ Star！
+<br>
 
 ## 最新消息
-本项目将在下一个版本将Python版本环境管理工具由pip切换到 uv(https://github.com/astral-sh/uv)
+本项目使用 uv 进行项目管理。(https://github.com/astral-sh/uv)
 
-## 特色
+## 特色✨
 
-1. 支持多种推理后端引擎，vLLM、LMDeploy和SGLang，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
-2. 支持了Infinity后端，推理速度大于onnx/tensorrt，支持动态组批
+1. 支持多种推理后端引擎，**vLLM**、**LMDeploy**和**SGLang**，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
+2. 支持了Infinity后端，**Embedding**推理速度大于onnx/tensorrt，支持动态组批
 3. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 4. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
 5. 支持了**Tools（Function Calling）**功能,并优化Tools解析方式，大大提高tools的调用成功率。兼容**LangChain**的 **bind_tools**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
-6. 支持了**cohere**库接口规范的 /v1/rerank 接口
+6. 支持了**cohere**库接口规范的 /v1/rerank 接口,在dify中可用。
 7. 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
 8. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
 9. 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
