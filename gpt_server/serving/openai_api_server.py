@@ -156,32 +156,6 @@ async def check_model(request) -> Optional[JSONResponse]:
     return ret
 
 
-async def check_length(request, prompt, max_tokens, worker_addr):
-    if (
-        not isinstance(max_tokens, int) or max_tokens <= 0
-    ):  # model worker not support max_tokens=None
-        max_tokens = 1024 * 1024
-
-    context_len = await fetch_remote(
-        worker_addr + "/model_details", {"model": request.model}, "context_length"
-    )
-    token_num = await fetch_remote(
-        worker_addr + "/count_token",
-        {"model": request.model, "prompt": prompt},
-        "count",
-    )
-    length = min(max_tokens, context_len - token_num)
-    # TODO 覆盖 fastchat 的 length
-    length = max_tokens
-    if length <= 0:
-        return None, create_error_response(
-            ErrorCode.CONTEXT_OVERFLOW,
-            f"This model's maximum context length is {context_len} tokens. However, your messages resulted in {token_num} tokens. Please reduce the length of the messages.",
-        )
-
-    return length, None
-
-
 def check_requests(request) -> Optional[JSONResponse]:
     # Check all params
     if request.max_tokens is not None and request.max_tokens <= 0:
@@ -543,13 +517,8 @@ async def create_completion(request: CompletionRequest):
     request.prompt = process_input(request.model, request.prompt)
 
     worker_addr = await get_worker_address(request.model)
+    max_tokens = request.max_tokens
     for text in request.prompt:
-        max_tokens, error_check_ret = await check_length(
-            request, text, request.max_tokens, worker_addr
-        )
-        if error_check_ret is not None:
-            return error_check_ret
-
         if isinstance(max_tokens, int) and max_tokens < request.max_tokens:
             request.max_tokens = max_tokens
     if request.stream:
@@ -1064,18 +1033,6 @@ async def create_chat_completion(request: APIChatCompletionRequest):
 
     if request.repetition_penalty is not None:
         gen_params["repetition_penalty"] = request.repetition_penalty
-
-    max_new_tokens, error_check_ret = await check_length(
-        request,
-        gen_params["prompt"],
-        gen_params["max_new_tokens"],
-        worker_addr,
-    )
-
-    if error_check_ret is not None:
-        return error_check_ret
-
-    gen_params["max_new_tokens"] = max_new_tokens
 
     if request.stream:
         generator = chat_completion_stream_generator(
