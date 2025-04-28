@@ -1,21 +1,26 @@
+# 这容器的目的是为了方便直接在容器内使用项目的用户
 version: '3.8'
-
+# 定义锚点卷配置 
+x-shared-volumes: &shared-volumes 
+  volumes:
+    - ./gpt_server:/gpt_server/gpt_server # 将最新代码直接映射到容器中，以运行最新的代码
+    - /home/dev/model/:/home/dev/model/ # 映射模型路径
 services:
   gpt_server_bash:
     # ------ 从项目构建最新代码镜像 ------
-    build:
-      context: .
-      dockerfile: Dockerfile.copy
-    image: gpt_server:bash
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.copy
+    # image: gpt_server:bash
+    image: docker.1ms.run/506610466/gpt_server:latest
+    container_name: bash
     # ------ 从项目构建最新代码镜像 ------
     # image: docker.1ms.run/506610466/gpt_server:latest # 如果只是用docker hub发布的镜像,则去掉这个注释,将上面从项目构建最新代码镜像的注释掉
     command: /bin/bash
-    container_name: bash
     tty: true              # 对应 -it 的交互模式
     stdin_open: true       # 允许标准输入
     network_mode: "host"   # --network=host
-    volumes:
-      - "/home/dev/model/:/home/dev/model/"
+    <<: *shared-volumes
     shm_size: "100gb"      # --shm-size 100gb
     deploy:
       resources:
