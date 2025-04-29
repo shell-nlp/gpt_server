@@ -128,11 +128,15 @@ class HFBackend(ModelBackend):
         with context_manager:
             thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
             thread.start()
-        generated_text = ""
         prompt_tokens = len(input_ids.tolist()[0])
         completion_tokens = 0
         stop_flag = False
         try:
+            current_text = ""
+            previous_text = ""
+            previous_token_ids = []
+            current_token_ids = []
+            delta_token_ids = []
             for new_text in streamer:
                 for stop_word in stop:
                     if stop_word in new_text:
@@ -147,15 +151,15 @@ class HFBackend(ModelBackend):
                         )
                         new_text = new_text[:idx]
                         break
+                current_text = current_text + new_text
                 completion_tokens += 1
-                generated_text += new_text
                 usage = {
                     "prompt_tokens": prompt_tokens,
                     "completion_tokens": completion_tokens,
                     "total_tokens": prompt_tokens + completion_tokens,
                 }
                 ret = {
-                    "text": generated_text,
+                    "text": new_text,
                     "error_code": 0,
                     "usage": usage,
                 }
@@ -164,6 +168,6 @@ class HFBackend(ModelBackend):
                     break
                 # 用来解决输出卡顿的问题
                 await asyncio.sleep(0.02)
-            logger.info(generated_text)
+            logger.info(current_text)
         except asyncio.CancelledError as e:
             stop_specific_token_criteria.stop = True
