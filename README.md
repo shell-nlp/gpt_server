@@ -14,7 +14,7 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
-1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS** 模型的 **openai**规范 接口服务。
+1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS（支持声音克隆）** 模型的 **openai**规范 接口服务。
 2. 支持**vLLM**、**LMDeploy**和**SGLang** 多种加速推理后端引擎。
 
 如果 GPT Server 对您有帮助，欢迎留下一个 ⭐ Star！
@@ -237,34 +237,34 @@ Chat UI界面:
 
 ### **LLM**
 
-|   Models / BackEnd    | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |SGLang|
-| :-------------------: | :--------: | :---: | :---: | :----------------: | :--------------: |:--------------: |
-|      chatglm4-9b      |  chatglm   |   √   |   √   |         √          |        √         |        √         |
-|      chatglm3-6b      |  chatglm   |   √   |   √   |         ×          |        √         |        √         |
-| Qwen (7B, 14B, etc.)) |    qwen    |   √   |   √   |         √          |        √         |        √         |
-| Qwen-1.5 (0.5B--72B)  |    qwen    |   √   |   √   |         √          |        √         |        √         |
-|        Qwen-2         |    qwen    |   √   |   √   |         √          |        √         |        √         |
-|       Qwen-2.5        |    qwen    |   √   |   √   |         √          |        √         |        √         |
-|        Qwen-3         |    qwen    |   ×   |   ×   |         √          |        ×         |        ×         |
-|        Yi-34B         |     yi     |   √   |   √   |         √          |        √         |        √         |
-|     Internlm-1.0      |  internlm  |   √   |   √   |         √          |        √         |        √         |
-|     Internlm-2.0      |  internlm  |   √   |   √   |         √          |        √         |        √         |
-|       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |        √         |
-|        Llama-3        |   llama    |   √   |   √   |         √          |        √         |        √         |
-|      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |        √         |
-|        QWQ-32B        |    qwen    |   √   |   √   |         √          |        √         |        √         |
-|         Phi-4         |    phi     |   √   |   √   |         ×          |        ×         |        √         |
+|   Models / BackEnd    | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch | SGLang |
+| :-------------------: | :--------: | :---: | :---: | :----------------: | :--------------: | :----: |
+|      chatglm4-9b      |  chatglm   |   √   |   √   |         √          |        √         |   √    |
+|      chatglm3-6b      |  chatglm   |   √   |   √   |         ×          |        √         |   √    |
+| Qwen (7B, 14B, etc.)) |    qwen    |   √   |   √   |         √          |        √         |   √    |
+| Qwen-1.5 (0.5B--72B)  |    qwen    |   √   |   √   |         √          |        √         |   √    |
+|        Qwen-2         |    qwen    |   √   |   √   |         √          |        √         |   √    |
+|       Qwen-2.5        |    qwen    |   √   |   √   |         √          |        √         |   √    |
+|        Qwen-3         |    qwen    |   ×   |   ×   |         √          |        ×         |   ×    |
+|        Yi-34B         |     yi     |   √   |   √   |         √          |        √         |   √    |
+|     Internlm-1.0      |  internlm  |   √   |   √   |         √          |        √         |   √    |
+|     Internlm-2.0      |  internlm  |   √   |   √   |         √          |        √         |   √    |
+|       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |   √    |
+|        Llama-3        |   llama    |   √   |   √   |         √          |        √         |   √    |
+|      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |   √    |
+|        QWQ-32B        |    qwen    |   √   |   √   |         √          |        √         |   √    |
+|         Phi-4         |    phi     |   √   |   √   |         ×          |        ×         |   √    |
 ### **VLM** (视觉大模型榜单 https://rank.opencompass.org.cn/leaderboard-multimodal)
 
-| Models / BackEnd | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch |SGLang|
-| :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: | :--------------: |
-|    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |        ×         |
-|    InternVL2     |  internvl  |   ×   |   ×   |         √          |        √         |        ×         |
-|   InternVL2.5    |  internvl  |   ×   |   ×   |         √          |        √         |        ×         |
-|  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |        ×         |
-|     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |        √         |
-|    Qwen2.5-VL    |    qwen    |   ×   |   ×   |         ×          |        √         |        √         |
-|       QVQ        |    qwen    |   ×   |   √   |         ×          |        ×         |        ×         |
+| Models / BackEnd | model_type |  HF   | vllm  | LMDeploy TurboMind | LMDeploy PyTorch | SGLang |
+| :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: | :----: |
+|    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |   ×    |
+|    InternVL2     |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
+|   InternVL2.5    |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
+|  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |   ×    |
+|     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |   √    |
+|    Qwen2.5-VL    |    qwen    |   ×   |   ×   |         ×          |        √         |   √    |
+|       QVQ        |    qwen    |   ×   |   √   |         ×          |        ×         |   ×    |
 <br>
 
 ### Embedding/Rerank/Classify模型
@@ -313,9 +313,9 @@ Chat UI界面:
 
 ### **TTS** 模型
 
-|    Models / BackEnd    | model_type |
-| :--------------------: | :--------: |
-|    Spark-TTS           |  spark_tts |
+| Models / BackEnd | model_type |
+| :--------------: | :--------: |
+|    Spark-TTS     | spark_tts  |
 
 
 <br>
