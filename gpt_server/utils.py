@@ -353,10 +353,17 @@ model_type_mapping = {
 
 if __name__ == "__main__":
     # /home/dev/model/KirillR/QwQ-32B-Preview-AWQ
-    get_model_types()
+    # get_model_types()
     from lmdeploy.serve.async_engine import get_names_from_model
+    from lmdeploy.archs import get_model_arch
+    from lmdeploy.cli.utils import get_chat_template
 
-    ckpt = "/home/dev/model/KirillR/QwQ-32B-Preview-AWQ"  # internlm2
+    ckpt = "/home/dev/model/Qwen/Qwen3-32B/"  # internlm2
+    chat_template = get_chat_template(ckpt)
     model_type = get_names_from_model(ckpt)
+    arch = get_model_arch(ckpt)
+    print(chat_template)
+    # print(arch)
+    print(model_type)
     print(model_type[1] == "base")
     print()

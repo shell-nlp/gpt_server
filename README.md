@@ -46,6 +46,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-4-29  支持了 Qwen3
 2025-4-24  支持了 Spark-TTS后端的 TTS
 2025-4-14  支持了 SGLang后端以及部分VL模型
 2025-4-2   支持了 OpenAI的ASR接口 /v1/audio/transcriptions
@@ -243,6 +244,7 @@ Chat UI界面:
 | Qwen-1.5 (0.5B--72B)  |    qwen    |   √   |   √   |         √          |        √         |        √         |
 |        Qwen-2         |    qwen    |   √   |   √   |         √          |        √         |        √         |
 |       Qwen-2.5        |    qwen    |   √   |   √   |         √          |        √         |        √         |
+|        Qwen-3         |    qwen    |   ×   |   ×   |         √          |        ×         |        ×         |
 |        Yi-34B         |     yi     |   √   |   √   |         √          |        √         |        √         |
 |     Internlm-1.0      |  internlm  |   √   |   √   |         √          |        √         |        √         |
 |     Internlm-2.0      |  internlm  |   √   |   √   |         √          |        √         |        √         |
