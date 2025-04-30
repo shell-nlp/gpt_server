@@ -104,7 +104,7 @@ class VllmBackend(ModelBackend):
         else:
             input_ids = params.get("input_ids", None)
             inputs = {"prompt": prompt}
-            if not input_ids:
+            if input_ids is not None:
                 prompt_token_ids = input_ids.tolist()[0]
                 inputs["prompt_token_ids"] = prompt_token_ids
         # ----------------------------------------------------------------
