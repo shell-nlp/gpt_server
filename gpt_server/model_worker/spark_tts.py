@@ -68,14 +68,14 @@ class SparkTTSWorker(ModelWorkerBase):
             conv_template,
             model_type="tts",
         )
-
+        backend = os.environ["backend"]
         self.engine = AutoEngine(
             model_path=model_path,
             max_length=32768,
             llm_device="auto",
             tokenizer_device="auto",
             detokenizer_device="auto",
-            backend="vllm",
+            backend=backend,
             wav2vec_attn_implementation="sdpa",  # 使用flash attn加速wav2vec
             llm_gpu_memory_utilization=0.6,
             seed=0,

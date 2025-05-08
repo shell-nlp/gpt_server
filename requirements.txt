@@ -27,9 +27,7 @@ aiohttp==3.11.18
     #   sglang
     #   vllm
 aiosignal==1.3.2
-    # via
-    #   aiohttp
-    #   ray
+    # via aiohttp
 airportsdata==20250224
     # via outlines
 aliyun-python-sdk-core==2.16.0
@@ -42,7 +40,7 @@ altair==5.5.0
     # via streamlit
 annotated-types==0.7.0
     # via pydantic
-anthropic==0.50.0
+anthropic==0.51.0
     # via sglang
 antlr4-python3-runtime==4.9.3
     # via
@@ -81,6 +79,8 @@ blake3==1.0.4
     # via vllm
 blinker==1.9.0
     # via streamlit
+blobfile==3.0.0
+    # via sglang
 cachetools==5.5.2
     # via
     #   evalscope
@@ -96,7 +96,7 @@ cffi==1.17.1
     # via
     #   cryptography
     #   soundfile
-charset-normalizer==3.4.1
+charset-normalizer==3.4.2
     # via requests
 click==8.1.8
     # via
@@ -125,13 +125,13 @@ contourpy==1.3.2
     # via matplotlib
 crcmod==1.7
     # via oss2
-cryptography==44.0.2
+cryptography==44.0.3
     # via aliyun-python-sdk-core
 ctranslate2==4.6.0
     # via infinity-emb
-cuda-bindings==12.8.0
+cuda-bindings==12.9.0
     # via cuda-python
-cuda-python==12.8.0
+cuda-python==12.9.0
     # via sglang
 cupy-cuda12x==13.4.1
     # via ray
@@ -175,7 +175,7 @@ distro==1.9.0
     #   posthog
 dnspython==2.7.0
     # via email-validator
-edge-tts==7.0.1
+edge-tts==7.0.2
     # via gpt-server (pyproject.toml)
 editdistance==0.8.1
     # via
@@ -222,6 +222,7 @@ ffmpy==0.5.0
     # via gpt-server (pyproject.toml)
 filelock==3.18.0
     # via
+    #   blobfile
     #   datasets
     #   huggingface-hub
     #   ray
@@ -230,11 +231,11 @@ filelock==3.18.0
     #   vllm
 fire==0.7.0
     # via lmdeploy
-flashinfer-python==0.2.3+cu124torch2.5
+flashinfer-python==0.2.5+cu124torch2.5
     # via
     #   gpt-server (pyproject.toml)
     #   sglang
-flashtts==0.1.4
+flashtts==0.1.5
     # via gpt-server (pyproject.toml)
 flatbuffers==25.2.10
     # via onnxruntime
@@ -246,7 +247,6 @@ frozenlist==1.6.0
     # via
     #   aiohttp
     #   aiosignal
-    #   ray
 fschat==0.2.36
     # via gpt-server (pyproject.toml)
 fsspec==2024.6.1
@@ -259,7 +259,7 @@ funasr==1.2.6
     # via gpt-server (pyproject.toml)
 future==1.0.0
     # via pyloudnorm
-gguf==0.16.2
+gguf==0.16.3
     # via vllm
 gitdb==4.0.12
     # via gitpython
@@ -279,7 +279,7 @@ hf-transfer==0.1.9
     # via
     #   infinity-emb
     #   sglang
-hf-xet==1.0.5
+hf-xet==1.1.0
     # via huggingface-hub
 httpcore==1.0.9
     # via httpx
@@ -293,7 +293,7 @@ httpx==0.27.2
     #   fschat
     #   litellm
     #   openai
-huggingface-hub==0.30.2
+huggingface-hub==0.31.1
     # via
     #   accelerate
     #   datasets
@@ -326,7 +326,7 @@ importlib-metadata==8.0.0
     #   vllm
 importlib-resources==6.5.2
     # via wetextprocessing
-infinity-emb==0.0.73
+infinity-emb==0.0.76
     # via gpt-server (pyproject.toml)
 interegular==0.3.3
     # via
@@ -360,7 +360,7 @@ jiter==0.9.0
     #   openai
 jmespath==0.10.0
     # via aliyun-python-sdk-core
-joblib==1.4.2
+joblib==1.5.0
     # via
     #   librosa
     #   nltk
@@ -386,7 +386,7 @@ lark==1.2.2
     # via
     #   outlines
     #   vllm
-latex2mathml==3.77.0
+latex2mathml==3.78.0
     # via markdown2
 lazy-loader==0.4
     # via librosa
@@ -406,12 +406,14 @@ llvmlite==0.44.0
     #   pynndescent
 lm-format-enforcer==0.10.11
     # via vllm
-lmdeploy==0.7.3
+lmdeploy==0.8.0
     # via gpt-server (pyproject.toml)
 loguru==0.7.3
     # via gpt-server (pyproject.toml)
 lxml==5.4.0
-    # via sacrebleu
+    # via
+    #   blobfile
+    #   sacrebleu
 markdown-it-py==3.0.0
     # via rich
 markdown2==2.5.3
@@ -454,7 +456,7 @@ multiprocess==0.70.16
     # via
     #   datasets
     #   evaluate
-narwhals==1.37.1
+narwhals==1.38.0
     # via
     #   altair
     #   plotly
@@ -560,7 +562,7 @@ nvidia-cusparse-cu12==12.3.1.170
     #   torch
 nvidia-cusparselt-cu12==0.6.2
     # via torch
-nvidia-ml-py==12.570.86
+nvidia-ml-py==12.575.51
     # via pynvml
 nvidia-nccl-cu12==2.21.5
     # via
@@ -624,11 +626,11 @@ opentelemetry-sdk==1.26.0
     #   vllm
 opentelemetry-semantic-conventions==0.47b0
     # via opentelemetry-sdk
-opentelemetry-semantic-conventions-ai==0.4.3
+opentelemetry-semantic-conventions-ai==0.4.7
     # via vllm
 optimum==1.24.0
     # via infinity-emb
-orjson==3.10.17
+orjson==3.10.18
     # via
     #   infinity-emb
     #   sglang
@@ -678,6 +680,7 @@ parso==0.8.4
     # via jedi
 partial-json-parser==0.2.1.1.post5
     # via
+    #   lmdeploy
     #   sglang
     #   vllm
 peft==0.14.0
@@ -700,7 +703,7 @@ pillow==10.4.0
     #   streamlit
     #   torchvision
     #   vllm
-platformdirs==4.3.7
+platformdirs==4.3.8
     # via
     #   pooch
     #   yapf
@@ -766,7 +769,9 @@ pycparser==2.22
     # via cffi
 pycryptodome==3.22.0
     # via oss2
-pydantic==2.11.3
+pycryptodomex==3.22.0
+    # via blobfile
+pydantic==2.11.4
     # via
     #   anthropic
     #   compressed-tensors
@@ -782,7 +787,7 @@ pydantic==2.11.3
     #   sglang
     #   vllm
     #   xgrammar
-pydantic-core==2.33.1
+pydantic-core==2.33.2
     # via pydantic
 pydeck==0.9.1
     # via streamlit
@@ -851,7 +856,7 @@ pyzmq==26.4.0
     #   vllm
 qwen-vl-utils==0.0.11
     # via gpt-server (pyproject.toml)
-ray==2.43.0
+ray==2.46.0
     # via
     #   lmdeploy
     #   vllm
@@ -901,7 +906,7 @@ rich==13.9.4
     #   rich-toolkit
     #   streamlit
     #   typer
-rich-toolkit==0.14.3
+rich-toolkit==0.14.5
     # via fastapi-cli
 rouge-chinese==1.0.3
     # via evalscope
@@ -963,9 +968,9 @@ setuptools==75.2.0
     #   torch
     #   triton
     #   vllm
-sgl-kernel==0.1.0
+sgl-kernel==0.1.1
     # via sglang
-sglang==0.4.6.post1
+sglang==0.4.6.post2
     # via gpt-server (pyproject.toml)
 shellingham==1.5.4
     # via typer
@@ -1038,7 +1043,7 @@ tenacity==9.1.2
     # via streamlit
 tensorboardx==2.6.2.2
     # via funasr
-termcolor==3.0.1
+termcolor==3.1.0
     # via
     #   fire
     #   mmengine-lite
@@ -1195,6 +1200,7 @@ unicorn==2.1.3
     # via evalscope
 urllib3==2.4.0
     # via
+    #   blobfile
     #   modelscope
     #   requests
 uvicorn==0.32.1
@@ -1211,7 +1217,7 @@ uvloop==0.21.0
     # via
     #   sglang
     #   uvicorn
-vllm==0.8.5
+vllm==0.8.5.post1
     # via gpt-server (pyproject.toml)
 watchdog==5.0.3
     # via streamlit
