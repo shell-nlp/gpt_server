@@ -105,6 +105,7 @@ class LMDeployBackend(ModelBackend):
         stop_token_ids = params.get("stop_words_ids", None) or []
         presence_penalty = float(params.get("presence_penalty", 0.0))
         frequency_penalty = float(params.get("frequency_penalty", 0.0))
+        reasoning_parser_type = params.get("reasoning_parser", None)
         request = params.get("request", None)
         # Handle stop_str
         stop = set()
@@ -157,7 +158,7 @@ class LMDeployBackend(ModelBackend):
                 "usage": usage,
                 "finish_reason": request_output.finish_reason,
             }
-            reasoning_parser_type = params.get("reasoning_parser", None)
+            
             if reasoning_parser_type:
                 reasoning_parser = None
                 delta_token_ids = (

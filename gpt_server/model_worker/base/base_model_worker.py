@@ -1,4 +1,3 @@
-import asyncio
 import threading
 import time
 from typing import List
@@ -106,12 +105,12 @@ class BaseModelWorker:
         assert r.status_code == 200
 
     def send_heart_beat(self):
-        logger.info(
-            f"Send heart beat. Models: {self.model_names}. "
-            f"Semaphore: {pretty_print_semaphore(self.semaphore)}. "
-            f"call_ct: {self.call_ct}. "
-            f"worker_id: {self.worker_id}. "
-        )
+        # logger.info(
+        #     f"Send heart beat. Models: {self.model_names}. "
+        #     f"Semaphore: {pretty_print_semaphore(self.semaphore)}. "
+        #     f"call_ct: {self.call_ct}. "
+        #     f"worker_id: {self.worker_id}. "
+        # )
 
         url = self.controller_addr + "/receive_heart_beat"
 
@@ -190,67 +189,3 @@ class BaseModelWorker:
 
     def generate_voice_stream(self, params):
         raise NotImplementedError
-
-
-def release_worker_semaphore():
-    worker.semaphore.release()
-
-
-def acquire_worker_semaphore():
-    if worker.semaphore is None:
-        worker.semaphore = asyncio.Semaphore(worker.limit_worker_concurrency)
-    return worker.semaphore.acquire()
-
-
-def create_background_tasks():
-    background_tasks = BackgroundTasks()
-    background_tasks.add_task(release_worker_semaphore)
-    return background_tasks
-
-
-@app.post("/worker_generate_stream")
-async def api_generate_stream(request: Request):
-    params = await request.json()
-    await acquire_worker_semaphore()
-    generator = worker.generate_stream_gate(params)
-    background_tasks = create_background_tasks()
-    return StreamingResponse(generator, background=background_tasks)
-
-
-@app.post("/worker_generate")
-async def api_generate(request: Request):
-    params = await request.json()
-    await acquire_worker_semaphore()
-    output = await asyncio.to_thread(worker.generate_gate, params)
-    release_worker_semaphore()
-    return JSONResponse(output)
-
-
-@app.post("/worker_get_embeddings")
-async def api_get_embeddings(request: Request):
-    params = await request.json()
-    await acquire_worker_semaphore()
-    embedding = worker.get_embeddings(params)
-    release_worker_semaphore()
-    return JSONResponse(content=embedding)
-
-
-@app.post("/worker_get_status")
-async def api_get_status(request: Request):
-    return worker.get_status()
-
-
-@app.post("/count_token")
-async def api_count_token(request: Request):
-    params = await request.json()
-    return worker.count_token(params)
-
-
-@app.post("/worker_get_conv_template")
-async def api_get_conv(request: Request):
-    return worker.get_conv_template()
-
-
-@app.post("/model_details")
-async def api_model_details(request: Request):
-    return {"context_length": worker.context_len}

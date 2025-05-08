@@ -1,3 +1,4 @@
+import asyncio
 import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
@@ -75,7 +76,10 @@ class QwenWorker(ModelWorkerBase):
 
             if not self.vision_config:
                 if isinstance(messages, list):
-                    text = self.chat_template.messages2prompt(messages, True, tools)
+                    # text = self.chat_template.messages2prompt(messages, True, tools)
+                    text = await asyncio.to_thread(
+                        self.chat_template.messages2prompt, messages, True, tools
+                    )
                 elif isinstance(messages, str):
                     text = messages
 
@@ -84,12 +88,19 @@ class QwenWorker(ModelWorkerBase):
                 params["prompt"] = text
             else:  # 多模态
                 if isinstance(messages, list):
-                    text = self.tokenizer.apply_chat_template(
+                    text = await asyncio.to_thread(
+                        self.tokenizer.apply_chat_template,
                         messages,
                         chat_template=self.vl_chat_template,
                         tokenize=False,
                         add_generation_prompt=True,
                     )
+                    # text = self.tokenizer.apply_chat_template(
+                    #     messages,
+                    #     chat_template=self.vl_chat_template,
+                    #     tokenize=False,
+                    #     add_generation_prompt=True,
+                    # )
                     params["prompt"] = text
                     # 多模态不需要传入input_ids
                     params["multimodal"] = True
