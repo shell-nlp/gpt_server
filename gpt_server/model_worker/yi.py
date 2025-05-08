@@ -56,12 +56,10 @@ class YiWorker(ModelWorkerBase):
             elif task == "completion":
                 text = messages
 
-            input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             params["messages"] = messages
             params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            params["input_ids"] = input_ids
 
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]

@@ -64,7 +64,9 @@ class HFBackend(ModelBackend):
         # presence_penalty = float(params.get("presence_penalty", 0.0))
         # frequency_penalty = float(params.get("frequency_penalty", 0.0))
         stop = params.get("stop", [])  # 停止的 token
-        input_ids = params.get("input_ids")
+        input_ids = params.get("input_ids", None)
+        if input_ids is None:
+            input_ids = self.tokenizer([prompt], return_tensors="pt").input_ids
         stop_words_ids = params.get("stop_words_ids", [])
         if temperature <= 1e-5:
             top_p = 1.0

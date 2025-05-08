@@ -79,8 +79,8 @@ class QwenWorker(ModelWorkerBase):
                 elif isinstance(messages, str):
                     text = messages
 
-                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-                params["input_ids"] = input_ids
+                # input_ids = self.tokenizer([text], return_tensors="pt").input_ids
+                # params["input_ids"] = input_ids
                 params["prompt"] = text
             else:  # 多模态
                 if isinstance(messages, list):

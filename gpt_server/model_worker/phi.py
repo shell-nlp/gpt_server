@@ -59,13 +59,11 @@ class PhiWorker(ModelWorkerBase):
             elif task == "completion":
                 text = messages
 
-            input_ids = self.tokenizer([text], return_tensors="pt").input_ids
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
             params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            params["input_ids"] = input_ids
             # ---------------添加额外的参数------------------------
             async for ret in self.backend.stream_chat(params=params):
                 yield json.dumps(ret).encode() + b"\0"

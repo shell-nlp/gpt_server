@@ -53,8 +53,6 @@ class DeepSeekWorker(ModelWorkerBase):
                     )
                 elif isinstance(messages, str):
                     text = messages
-                input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-                params["input_ids"] = input_ids
                 params["prompt"] = text
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
