@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import time
+import traceback
 from typing import Generator, Optional, Union, Dict, List, Any
 
 import aiohttp
@@ -105,8 +106,47 @@ class AppSettings(BaseSettings):
 
 
 app_settings = AppSettings()
-app = fastapi.FastAPI(docs_url="/")
-headers = {"User-Agent": "FastChat API Server"}
+from contextlib import asynccontextmanager
+
+model_address_map = {}
+
+
+async def timing_tasks():
+    """定时任务"""
+    global model_address_map
+    logger.info("定时任务已启动！")
+    controller_address = app_settings.controller_address
+
+    while True:
+        try:
+            models = await fetch_remote(
+                controller_address + "/list_models", None, "models"
+            )
+            worker_addr_coro_list = []
+            for model in models:
+                worker_addr_coro = fetch_remote(
+                    controller_address + "/get_worker_address",
+                    {"model": model},
+                    "address",
+                )
+                worker_addr_coro_list.append(worker_addr_coro)
+            worker_address_list = await asyncio.gather(*worker_addr_coro_list)
+            for model, worker_addr in zip(models, worker_address_list):
+                model_address_map[model] = worker_addr
+            await asyncio.sleep(6)
+        except Exception:
+            traceback.print_exc()
+            await asyncio.sleep(6)
+
+
+@asynccontextmanager
+async def lifespan(app: fastapi.FastAPI):
+    asyncio.create_task(timing_tasks())
+    yield
+
+
+app = fastapi.FastAPI(docs_url="/", lifespan=lifespan)
+headers = {"User-Agent": "gpt_server API Server"}
 get_bearer_token = HTTPBearer(auto_error=False)
 
 
@@ -143,65 +183,16 @@ async def validation_exception_handler(request, exc):
     return create_error_response(ErrorCode.VALIDATION_TYPE_ERROR, str(exc))
 
 
-async def check_model(request) -> Optional[JSONResponse]:
-    controller_address = app_settings.controller_address
+def check_model(request) -> Optional[JSONResponse]:
+    global model_address_map
     ret = None
-
-    models = await fetch_remote(controller_address + "/list_models", None, "models")
+    models = list(model_address_map.keys())
     if request.model not in models:
         ret = create_error_response(
             ErrorCode.INVALID_MODEL,
             f"Only {'&&'.join(models)} allowed now, your model {request.model}",
         )
     return ret
-
-
-def check_requests(request) -> Optional[JSONResponse]:
-    # Check all params
-    if request.max_tokens is not None and request.max_tokens <= 0:
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.max_tokens} is less than the minimum of 1 - 'max_tokens'",
-        )
-    if request.n is not None and request.n <= 0:
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.n} is less than the minimum of 1 - 'n'",
-        )
-    if request.temperature is not None and request.temperature < 0:
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.temperature} is less than the minimum of 0 - 'temperature'",
-        )
-    if request.temperature is not None and request.temperature > 2:
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.temperature} is greater than the maximum of 2 - 'temperature'",
-        )
-    if request.top_p is not None and request.top_p < 0:
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.top_p} is less than the minimum of 0 - 'top_p'",
-        )
-    if request.top_p is not None and request.top_p > 1:
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.top_p} is greater than the maximum of 1 - 'top_p'",
-        )
-    if request.top_k is not None and (request.top_k > -1 and request.top_k < 1):
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.top_k} is out of Range. Either set top_k to -1 or >=1.",
-        )
-    if request.stop is not None and (
-        not isinstance(request.stop, str) and not isinstance(request.stop, list)
-    ):
-        return create_error_response(
-            ErrorCode.PARAM_OUT_OF_RANGE,
-            f"{request.stop} is not valid under any of the given schemas - 'stop'",
-        )
-
-    return None
 
 
 def process_input(model_name, inp):
@@ -242,7 +233,7 @@ def _add_to_set(s, new_stop):
         new_stop.update(s)
 
 
-async def get_gen_params(
+def get_gen_params(
     model_name: str,
     worker_addr: str,
     messages: Union[str, List[Dict[str, str]]],
@@ -305,7 +296,7 @@ async def get_gen_params(
     return gen_params
 
 
-async def get_worker_address(model_name: str) -> str:
+def get_worker_address(model_name: str) -> str:
     """
     Get worker address based on the requested model
 
@@ -313,10 +304,8 @@ async def get_worker_address(model_name: str) -> str:
     :return: Worker address from the controller
     :raises: :class:`ValueError`: No available worker for requested model
     """
-    controller_address = app_settings.controller_address
-    worker_addr = await fetch_remote(
-        controller_address + "/get_worker_address", {"model": model_name}, "address"
-    )
+    global model_address_map
+    worker_addr = model_address_map[model_name]
 
     # No available worker
     if worker_addr == "":
@@ -366,6 +355,16 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
 )
 
 
+@app.get(
+    "/get_model_address_map",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
+def get_model_address_map():
+    global model_address_map
+    return model_address_map
+
+
 @app.post(
     "/v1/chat/completions",
     dependencies=[Depends(check_api_key)],
@@ -373,18 +372,13 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
 )
 async def create_chat_completion(request: CustomChatCompletionRequest):
     """Creates a completion for the chat message"""
-    error_check_ret = await check_model(request)
+    error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret
-    error_check_ret = check_requests(request)
-    if error_check_ret is not None:
-        return error_check_ret
-
-    worker_addr = await get_worker_address(request.model)
-
-    gen_params = await get_gen_params(
+    worker_addr = get_worker_address(request.model)
+    gen_params = get_gen_params(
         request.model,
-        worker_addr,
+        "",
         request.messages,
         temperature=request.temperature,
         top_p=request.top_p,
@@ -507,16 +501,13 @@ async def chat_completion_stream_generator(
     response_class=responses.ORJSONResponse,
 )
 async def create_completion(request: CompletionRequest):
-    error_check_ret = await check_model(request)
-    if error_check_ret is not None:
-        return error_check_ret
-    error_check_ret = check_requests(request)
+    error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret
 
     request.prompt = process_input(request.model, request.prompt)
 
-    worker_addr = await get_worker_address(request.model)
+    worker_addr = get_worker_address(request.model)
     max_tokens = request.max_tokens
     for text in request.prompt:
         if isinstance(max_tokens, int) and max_tokens < request.max_tokens:
@@ -529,7 +520,7 @@ async def create_completion(request: CompletionRequest):
     else:
         text_completions = []
         for text in request.prompt:
-            gen_params = await get_gen_params(
+            gen_params = get_gen_params(
                 request.model,
                 worker_addr,
                 text,
@@ -587,7 +578,7 @@ async def generate_completion_stream_generator(
     for text in request.prompt:
         for i in range(n):
             previous_text = ""
-            gen_params = await get_gen_params(
+            gen_params = get_gen_params(
                 request.model,
                 worker_addr,
                 text,
@@ -705,7 +696,7 @@ async def speech(request: OpenAISpeechRequest):
     if error_check_ret is not None:
         return error_check_ret
 
-    worker_addr = await get_worker_address(request.model)
+    worker_addr = get_worker_address(request.model)
     response_format = request.response_format
     payload = {
         "model": request.model,
@@ -766,7 +757,7 @@ async def speech(request: SpeechRequest):
 async def get_transcriptions(payload: Dict[str, Any]):
     controller_address = app_settings.controller_address
     model_name = payload["model"]
-    worker_addr = await get_worker_address(model_name)
+    worker_addr = get_worker_address(model_name)
 
     transcription = await fetch_remote(
         worker_addr + "/worker_get_transcription", payload
@@ -812,7 +803,7 @@ async def transcriptions(file: UploadFile, model: str = Form()):
     response_class=responses.ORJSONResponse,
 )
 async def classify(request: ModerationsRequest):
-    error_check_ret = await check_model(request)
+    error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret
     request.input = process_input(request.model, request.input)
@@ -855,7 +846,7 @@ async def classify(request: ModerationsRequest):
     response_class=responses.ORJSONResponse,
 )
 async def rerank(request: RerankRequest):
-    error_check_ret = await check_model(request)
+    error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret
     request.documents = process_input(request.model, request.documents)
@@ -906,7 +897,7 @@ async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = 
     """Creates embeddings for the text"""
     if request.model is None:
         request.model = model_name
-    error_check_ret = await check_model(request)
+    error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret
 
@@ -952,7 +943,7 @@ async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = 
 async def get_classify(payload: Dict[str, Any]):
     controller_address = app_settings.controller_address
     model_name = payload["model"]
-    worker_addr = await get_worker_address(model_name)
+    worker_addr = get_worker_address(model_name)
 
     classify = await fetch_remote(worker_addr + "/worker_get_classify", payload)
     return json.loads(classify)
@@ -961,7 +952,7 @@ async def get_classify(payload: Dict[str, Any]):
 async def get_embedding(payload: Dict[str, Any]):
     controller_address = app_settings.controller_address
     model_name = payload["model"]
-    worker_addr = await get_worker_address(model_name)
+    worker_addr = get_worker_address(model_name)
 
     embedding = await fetch_remote(worker_addr + "/worker_get_embeddings", payload)
     return json.loads(embedding)
@@ -978,7 +969,7 @@ async def count_tokens(request: APITokenCheckRequest):
     """
     checkedList = []
     for item in request.prompts:
-        worker_addr = await get_worker_address(item.model)
+        worker_addr = get_worker_address(item.model)
 
         context_len = await fetch_remote(
             worker_addr + "/model_details",
@@ -1008,16 +999,13 @@ async def count_tokens(request: APITokenCheckRequest):
 @app.post("/api/v1/chat/completions")
 async def create_chat_completion(request: APIChatCompletionRequest):
     """Creates a completion for the chat message"""
-    error_check_ret = await check_model(request)
-    if error_check_ret is not None:
-        return error_check_ret
-    error_check_ret = check_requests(request)
+    error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret
 
-    worker_addr = await get_worker_address(request.model)
+    worker_addr = get_worker_address(request.model)
 
-    gen_params = await get_gen_params(
+    gen_params = get_gen_params(
         request.model,
         worker_addr,
         request.messages,
