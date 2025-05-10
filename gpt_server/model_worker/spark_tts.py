@@ -90,7 +90,7 @@ class SparkTTSWorker(ModelWorkerBase):
                 ),
             )
         )
-        logger.info(f"模型：{model_names[0]}")
+        logger.warning(f"模型：{model_names[0]}")
 
     # 这个是模型主要的方法
     async def generate_voice_stream(self, params):

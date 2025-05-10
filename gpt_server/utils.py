@@ -132,6 +132,7 @@ def start_model_worker(config: dict):
     try:
         host = config["model_worker_args"]["host"]
         controller_address = config["model_worker_args"]["controller_address"]
+        log_level = config["model_worker_args"].get("log_level", "WARNING")
     except KeyError as e:
         error_msg = f"请参照 https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml 设置正确的 model_worker_args"
         logger.error(error_msg)
@@ -238,6 +239,7 @@ def start_model_worker(config: dict):
                         + f" --enable_prefix_caching {enable_prefix_caching}"  # 是否开启 prefix cache
                         + f" --gpu_memory_utilization {gpu_memory_utilization}"  # 占用GPU比例
                         + f" --kv_cache_quant_policy {kv_cache_quant_policy}"  # kv cache 量化策略
+                        + f" --log_level {log_level}"  # 日志水平
                     )
                     # 处理为 None的情况
                     if lora:

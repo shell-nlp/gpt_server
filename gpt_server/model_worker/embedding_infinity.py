@@ -45,7 +45,7 @@ class EmbeddingWorker(ModelWorkerBase):
             device = "cpu"
         else:
             device = "cuda"
-        logger.info(f"使用{device}加载...")
+        logger.warning(f"使用{device}加载...")
         model_type = getattr(self.model_config, "model_type", None)
         bettertransformer = True
         if model_type is not None and "deberta" in model_type:
@@ -71,15 +71,13 @@ class EmbeddingWorker(ModelWorkerBase):
         self.engine: AsyncEmbeddingEngine = AsyncEngineArray.from_args([engine_args])[0]
         loop = asyncio.get_running_loop()
         loop.create_task(self.engine.astart())
-        logger.info(f"模型：{model_names[0]}")
-        logger.info(f"正在使用 {self.mode} 模型...")
+        logger.warning(f"模型：{model_names[0]}")
+        logger.warning(f"正在使用 {self.mode} 模型...")
 
     async def astart(self):
         await self.engine.astart()
 
     async def get_embeddings(self, params):
-        logger.info(f"params {params}")
-        logger.info(f"worker_id: {self.worker_id}")
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts: list = params["input"]

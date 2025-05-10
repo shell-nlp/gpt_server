@@ -56,12 +56,12 @@ class EmbeddingWorker(ModelWorkerBase):
             self.client = sentence_transformers.CrossEncoder(
                 model_name=model_path, **model_kwargs
             )
-            logger.info("正在使用 rerank 模型...")
+            logger.warning("正在使用 rerank 模型...")
         elif self.mode == "embedding":
             self.client = sentence_transformers.SentenceTransformer(
                 model_path, **model_kwargs
             )
-            logger.info("正在使用 embedding 模型...")
+            logger.warning("正在使用 embedding 模型...")
         self.warm_up()
 
     def warm_up(self):
@@ -140,8 +140,6 @@ class EmbeddingWorker(ModelWorkerBase):
         await self.add_request(params, future)
 
     async def get_embeddings(self, params):
-        logger.info(f"params {params}")
-        logger.info(f"worker_id: {self.worker_id}")
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]

@@ -1,6 +1,7 @@
 import asyncio
 from typing import List
 import json
+import sys
 from abc import ABC, abstractmethod
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -20,6 +21,9 @@ from gpt_server.model_worker.base.base_model_worker import BaseModelWorker
 
 worker = None
 app = FastAPI()
+logger.remove(0)
+log_level = os.getenv("log_level", "WARNING")
+logger.add(sys.stderr, level=log_level)
 
 
 def get_context_length_(config):
@@ -220,6 +224,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--kv_cache_quant_policy", type=str, default="0")
         # vad_model
         parser.add_argument("--vad_model", type=str, default="")
+        # log_level
+        parser.add_argument("--log_level", type=str, default="WARNING")
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -244,6 +250,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         os.environ["gpu_memory_utilization"] = args.gpu_memory_utilization
         os.environ["kv_cache_quant_policy"] = args.kv_cache_quant_policy
         os.environ["dtype"] = args.dtype
+        os.environ["log_level"] = args.log_level
 
         host = args.host
         controller_address = args.controller_address
@@ -305,6 +312,7 @@ async def api_generate_stream(request: Request):
     params["request_id"] = request_id
     params["request"] = request
     params.pop("prompt")
+    logger.info(f"params {params}")
     generator = worker.generate_stream_gate(params)
     background_tasks = create_background_tasks(request_id)
     return StreamingResponse(generator, background=background_tasks)

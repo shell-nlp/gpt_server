@@ -24,6 +24,10 @@ backend_map = {
     "lmdeploy-pytorch": "pytorch",  # pytorch后端
     "lmdeploy-turbomind": "turbomind",  # turbomind后端
 }
+from lmdeploy.utils import get_logger
+
+get_logger("lmdeploy").setLevel("WARNING")
+os.environ["TM_LOG_LEVEL"] = "ERROR"
 
 
 def is_stop(output: str, stop_str: str):
@@ -126,7 +130,6 @@ class LMDeployBackend(ModelBackend):
             skip_special_tokens=True,
             response_format=params["response_format"],
         )
-        logger.info(f"request_id {int(request_id)}")
         if params.get("tools", None) or is_messages_with_tool(messages=messages):
             messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
         if self.messages_type_select:
@@ -158,7 +161,7 @@ class LMDeployBackend(ModelBackend):
                 "usage": usage,
                 "finish_reason": request_output.finish_reason,
             }
-            
+
             if reasoning_parser_type:
                 reasoning_parser = None
                 delta_token_ids = (

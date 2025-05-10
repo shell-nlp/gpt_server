@@ -38,15 +38,13 @@ class InternlmWorker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        logger.info(f"{model_names[0]} 停用词: {self.stop}")
+        logger.warning(f"{model_names[0]} 停用词: {self.stop}")
         self.other_config = {
             "chat_template": "{{ bos_token }}{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
         }
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
-        logger.info(f"params {params}")
-        logger.info(f"worker_id: {self.worker_id}")
         try:
             model_type = getattr(self.model_config, "model_type", "internlm")
             messages = params["messages"]

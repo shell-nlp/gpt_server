@@ -38,7 +38,7 @@ class ChatGLMWorker(ModelWorkerBase):
                 self.stop_words_ids.append(self.tokenizer.convert_tokens_to_ids(i))
             except Exception as e:
                 pass
-        logger.info(f"{model_names[0]} 停用词: {self.stop}")
+        logger.warning(f"{model_names[0]} 停用词: {self.stop}")
 
     def build_chat_input(self, query, history=None, role="user"):
         if history is None:
@@ -60,8 +60,6 @@ class ChatGLMWorker(ModelWorkerBase):
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
-        logger.info(f"params {params}")
-        logger.info(f"worker_id: {self.worker_id}")
         try:
             # ----------------添加对工具的支持-----------------------------------
             messages = add_tools2messages(params=params, model_adapter="chatglm4")

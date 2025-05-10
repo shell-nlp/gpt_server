@@ -33,7 +33,7 @@ class FunASRWorker(ModelWorkerBase):
             device = "cpu"
         else:
             device = "cuda"
-        logger.info(f"使用{device}加载...")
+        logger.warning(f"使用{device}加载...")
         vad_model = os.environ.get("vad_model", None)
         self.model = AutoModel(
             model=model_path,
@@ -41,7 +41,7 @@ class FunASRWorker(ModelWorkerBase):
             vad_kwargs={"max_single_segment_time": 30000},
             device="cuda",
         )
-        logger.info(f"模型：{model_names[0]}")
+        logger.warning(f"模型：{model_names[0]}")
 
     async def transcription(self, params):
         file_input = base64.b64decode(params["file"])  # Base64 → bytes
