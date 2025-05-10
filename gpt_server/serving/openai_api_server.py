@@ -10,6 +10,7 @@
 import asyncio
 import argparse
 import json
+import orjson
 import os
 import time
 import traceback
@@ -629,7 +630,9 @@ async def generate_completion_stream_generator(
 
 
 async def generate_completion_stream(payload: Dict[str, Any], worker_addr: str):
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(
+        limits=httpx.Limits(max_connections=1000, max_keepalive_connections=100)
+    ) as client:
         delimiter = b"\0"
         async with client.stream(
             "POST",
@@ -646,7 +649,7 @@ async def generate_completion_stream(payload: Dict[str, Any], worker_addr: str):
                     chunk, buffer = buffer[:chunk_end], buffer[chunk_end + 1 :]
                     if not chunk:
                         continue
-                    yield json.loads(chunk.decode())
+                    yield orjson.loads(chunk.decode())
 
 
 async def generate_completion(payload: Dict[str, Any], worker_addr: str):
