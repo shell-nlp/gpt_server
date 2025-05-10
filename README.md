@@ -15,7 +15,7 @@
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
 1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS（支持声音克隆）** 模型的 **openai**规范 接口服务。
-2. 支持**vLLM**、**LMDeploy**和**SGLang** 多种加速推理后端引擎。
+2. 支持**HF**、**vLLM**、**LMDeploy**和**SGLang** 多种加速推理后端引擎。
 
 如果 GPT Server 对您有帮助，欢迎留下一个 ⭐ Star！
 <br>
@@ -25,7 +25,7 @@
 
 ## 特色✨
 
-1. 支持多种推理后端引擎，**vLLM**、**LMDeploy**和**SGLang**，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
+1. 支持多种推理后端引擎，**HF**、**vLLM**、**LMDeploy**和**SGLang**，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
 2. 支持了Infinity后端，**Embedding**推理速度大于onnx/tensorrt，支持动态组批
 3. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
 4. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
