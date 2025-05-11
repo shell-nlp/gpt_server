@@ -61,7 +61,7 @@ def run_cmd(cmd: str, *args, **kwargs):
 
 def start_controller(controller_host, controller_port, dispatch_method):
     """启动fastchat控制器"""
-    cmd = f"python -m fastchat.serve.controller --host {controller_host} --port {controller_port} --dispatch-method {dispatch_method} "
+    cmd = f"python -m gpt_server.serving.controller --host {controller_host} --port {controller_port} --dispatch-method {dispatch_method} "
     cmd += "> /dev/null 2>&1"  # 完全静默（Linux/macOS）
     controller_process = Process(target=run_cmd, args=(cmd,))
     controller_process.start()
