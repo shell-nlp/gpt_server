@@ -1146,12 +1146,19 @@ if __name__ == "__main__":
     args = create_openai_api_server()
     if args.ssl:
         uvicorn.run(
-            app,
+            "gpt_server.serving.openai_api_server:app",
             host=args.host,
             port=args.port,
             log_level="info",
             ssl_keyfile=os.environ["SSL_KEYFILE"],
             ssl_certfile=os.environ["SSL_CERTFILE"],
+            workers=10,
         )
     else:
-        uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+        uvicorn.run(
+            "gpt_server.serving.openai_api_server:app",
+            host=args.host,
+            port=args.port,
+            log_level="info",
+            workers=10,
+        )
