@@ -111,11 +111,12 @@ app_settings = AppSettings()
 from contextlib import asynccontextmanager
 
 model_address_map = {}
+models_ = []
 
 
 async def timing_tasks():
     """定时任务"""
-    global model_address_map
+    global model_address_map, models_
     logger.info("定时任务已启动！")
     controller_address = app_settings.controller_address
 
@@ -135,6 +136,7 @@ async def timing_tasks():
             worker_address_list = await asyncio.gather(*worker_addr_coro_list)
             for model, worker_addr in zip(models, worker_address_list):
                 model_address_map[model] = worker_addr
+            models_ = list(model_address_map.keys())
             await asyncio.sleep(6)
         except Exception:
             traceback.print_exc()
@@ -186,10 +188,10 @@ async def validation_exception_handler(request, exc):
 
 
 def check_model(request) -> Optional[JSONResponse]:
-    global model_address_map
+    global model_address_map, models_
     ret = None
-    models = list(model_address_map.keys())
-    if request.model not in models:
+    models = models_
+    if request.model not in models_:
         ret = create_error_response(
             ErrorCode.INVALID_MODEL,
             f"Only {'&&'.join(models)} allowed now, your model {request.model}",
