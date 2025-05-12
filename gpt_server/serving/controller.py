@@ -154,58 +154,66 @@ class Controller:
 
         return list(model_names)
 
+    # def get_worker_address_old(self, model_name: str):
+    #     if self.dispatch_method == DispatchMethod.LOTTERY:
+    #         worker_names = []
+    #         worker_speeds = []
+    #         for w_name, w_info in self.worker_info.items():
+    #             if model_name in w_info.model_names:
+    #                 worker_names.append(w_name)
+    #                 worker_speeds.append(w_info.speed)
+    #         worker_speeds = np.array(worker_speeds, dtype=np.float32)
+    #         norm = np.sum(worker_speeds)
+    #         if norm < 1e-4:
+    #             return ""
+    #         worker_speeds = worker_speeds / norm
+    #         if True:  # Directly return address
+    #             pt = np.random.choice(np.arange(len(worker_names)), p=worker_speeds)
+    #             worker_name = worker_names[pt]
+    #             return worker_name
+
+    #         # Check status before returning
+    #         while True:
+    #             pt = np.random.choice(np.arange(len(worker_names)), p=worker_speeds)
+    #             worker_name = worker_names[pt]
+
+    #             if self.get_worker_status(worker_name):
+    #                 break
+    #             else:
+    #                 self.remove_worker(worker_name)
+    #                 worker_speeds[pt] = 0
+    #                 norm = np.sum(worker_speeds)
+    #                 if norm < 1e-4:
+    #                     return ""
+    #                 worker_speeds = worker_speeds / norm
+    #                 continue
+    #         return worker_name
+    #     elif self.dispatch_method == DispatchMethod.SHORTEST_QUEUE:
+    #         worker_names = []
+    #         worker_qlen = []
+    #         for w_name, w_info in self.worker_info.items():
+    #             if model_name in w_info.model_names:
+    #                 worker_names.append(w_name)
+    #                 worker_qlen.append(w_info.queue_length / w_info.speed)
+    #         if len(worker_names) == 0:
+    #             return ""
+    #         min_index = np.argmin(worker_qlen)
+    #         w_name = worker_names[min_index]
+    #         self.worker_info[w_name].queue_length += 1
+    #         logger.info(
+    #             f"names: {worker_names}, queue_lens: {worker_qlen}, ret: {w_name}"
+    #         )
+    #         return w_name
+    #     else:
+    #         raise ValueError(f"Invalid dispatch method: {self.dispatch_method}")
+
     def get_worker_address(self, model_name: str):
-        if self.dispatch_method == DispatchMethod.LOTTERY:
-            worker_names = []
-            worker_speeds = []
-            for w_name, w_info in self.worker_info.items():
-                if model_name in w_info.model_names:
-                    worker_names.append(w_name)
-                    worker_speeds.append(w_info.speed)
-            worker_speeds = np.array(worker_speeds, dtype=np.float32)
-            norm = np.sum(worker_speeds)
-            if norm < 1e-4:
-                return ""
-            worker_speeds = worker_speeds / norm
-            if True:  # Directly return address
-                pt = np.random.choice(np.arange(len(worker_names)), p=worker_speeds)
-                worker_name = worker_names[pt]
-                return worker_name
 
-            # Check status before returning
-            while True:
-                pt = np.random.choice(np.arange(len(worker_names)), p=worker_speeds)
-                worker_name = worker_names[pt]
-
-                if self.get_worker_status(worker_name):
-                    break
-                else:
-                    self.remove_worker(worker_name)
-                    worker_speeds[pt] = 0
-                    norm = np.sum(worker_speeds)
-                    if norm < 1e-4:
-                        return ""
-                    worker_speeds = worker_speeds / norm
-                    continue
-            return worker_name
-        elif self.dispatch_method == DispatchMethod.SHORTEST_QUEUE:
-            worker_names = []
-            worker_qlen = []
-            for w_name, w_info in self.worker_info.items():
-                if model_name in w_info.model_names:
-                    worker_names.append(w_name)
-                    worker_qlen.append(w_info.queue_length / w_info.speed)
-            if len(worker_names) == 0:
-                return ""
-            min_index = np.argmin(worker_qlen)
-            w_name = worker_names[min_index]
-            self.worker_info[w_name].queue_length += 1
-            logger.info(
-                f"names: {worker_names}, queue_lens: {worker_qlen}, ret: {w_name}"
-            )
-            return w_name
-        else:
-            raise ValueError(f"Invalid dispatch method: {self.dispatch_method}")
+        worker_names = []
+        for w_name, w_info in self.worker_info.items():
+            if model_name in w_info.model_names:
+                worker_names.append(w_name)
+        return ",".join(worker_names)
 
     def receive_heart_beat(self, worker_name: str, queue_length: int):
         if worker_name not in self.worker_info:

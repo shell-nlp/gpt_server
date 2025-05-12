@@ -10,6 +10,7 @@
 import asyncio
 import argparse
 import json
+import threading
 import orjson
 import os
 import time
@@ -297,6 +298,34 @@ def get_gen_params(
     return gen_params
 
 
+class AddressManager:
+    def __init__(self):
+
+        self.lock = threading.Lock()
+        self.last_index = -1  # 轮询索引
+
+    def get_address(self, model):
+        global model_address_map
+        ips = model_address_map[model]
+        self.worker_addr_list = ips.split(",")
+        with self.lock:
+            current_list = self.worker_addr_list.copy()
+
+        if not current_list:
+            return None
+
+        n = len(current_list)
+        if n == 1:
+            return current_list[0]
+
+        # 计算下一个索引（若列表长度变化，自动取模）
+        self.last_index = (self.last_index + 1) % n
+        return current_list[self.last_index]
+
+
+address_manager = AddressManager()
+
+
 def get_worker_address(model_name: str) -> str:
     """
     Get worker address based on the requested model
@@ -305,8 +334,9 @@ def get_worker_address(model_name: str) -> str:
     :return: Worker address from the controller
     :raises: :class:`ValueError`: No available worker for requested model
     """
-    global model_address_map
-    worker_addr = model_address_map[model_name]
+    # global model_address_map
+    # worker_addr = model_address_map[model_name]
+    worker_addr = address_manager.get_address(model=model_name)
 
     # No available worker
     if worker_addr == "":
