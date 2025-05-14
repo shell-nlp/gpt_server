@@ -224,6 +224,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--kv_cache_quant_policy", type=str, default="0")
         # vad_model
         parser.add_argument("--vad_model", type=str, default="")
+        # punc_model
+        parser.add_argument("--punc_model", type=str, default="")
         # log_level
         parser.add_argument("--log_level", type=str, default="WARNING")
         args = parser.parse_args()
@@ -245,6 +247,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["max_model_len"] = args.max_model_len
         if args.vad_model:
             os.environ["vad_model"] = args.vad_model
+        if args.punc_model:
+            os.environ["punc_model"] = args.punc_model
 
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching
         os.environ["gpu_memory_utilization"] = args.gpu_memory_utilization

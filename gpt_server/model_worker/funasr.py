@@ -35,9 +35,11 @@ class FunASRWorker(ModelWorkerBase):
             device = "cuda"
         logger.warning(f"使用{device}加载...")
         vad_model = os.environ.get("vad_model", None)
+        punc_model = os.environ.get("punc_model", None)
         self.model = AutoModel(
             model=model_path,
             vad_model=vad_model,
+            punc_model=punc_model,
             vad_kwargs={"max_single_segment_time": 30000},
             device="cuda",
         )

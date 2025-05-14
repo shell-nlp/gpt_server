@@ -163,6 +163,7 @@ def start_model_worker(config: dict):
                         "kv_cache_quant_policy", 0
                     )
                     vad_model = engine_config.get("vad_model", "")
+                    punc_model = engine_config.get("punc_model", "")
 
                 else:
                     logger.error(
@@ -248,6 +249,8 @@ def start_model_worker(config: dict):
                         cmd += f" --max_model_len '{max_model_len}'"
                     if vad_model:
                         cmd += f" --vad_model '{vad_model}'"
+                    if punc_model:
+                        cmd += f" --vad_model '{punc_model}'"
                     p = Process(target=run_cmd, args=(cmd,))
                     p.start()
                     process.append(p)
