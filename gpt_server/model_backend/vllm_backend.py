@@ -93,11 +93,13 @@ class VllmBackend(ModelBackend):
             conversation, mm_data_future = parse_chat_messages_futures(
                 messages, model_config, tokenizer, content_format="string"
             )
+            tools = params.get("tools", None)
             prompt = apply_hf_chat_template(
                 tokenizer,
                 conversation=conversation,
                 chat_template=tokenizer.get_chat_template(),
                 add_generation_prompt=True,
+                tools=tools,
             )
             mm_data = await mm_data_future
             inputs = {"multi_modal_data": mm_data, "prompt": prompt}
