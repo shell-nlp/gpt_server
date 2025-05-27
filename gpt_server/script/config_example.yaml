@@ -21,7 +21,7 @@ model_worker_args:
   # model worker 的配置参数
   host: 0.0.0.0
   controller_address: http://localhost:21001 # # 将模型注册到 控制器的 地址
-  log_level: WARNING
+  log_level: WARNING # DEBUG INFO WARNING ERROR
 
 models:
 - qwen:

@@ -21,9 +21,6 @@ from gpt_server.model_worker.base.base_model_worker import BaseModelWorker
 
 worker = None
 app = FastAPI()
-logger.remove(0)
-log_level = os.getenv("log_level", "WARNING")
-logger.add(sys.stderr, level=log_level)
 
 
 def get_context_length_(config):
@@ -255,7 +252,10 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         os.environ["kv_cache_quant_policy"] = args.kv_cache_quant_policy
         os.environ["dtype"] = args.dtype
         os.environ["log_level"] = args.log_level
-
+        logger.remove(0)
+        log_level = os.getenv("log_level", "WARNING")
+        logger.add(sys.stderr, level=log_level)
+        
         host = args.host
         controller_address = args.controller_address
 
@@ -329,6 +329,7 @@ async def api_generate_stream(request: Request):
     request_id = gen_request_id()
     params["request_id"] = request_id
     params["request"] = request
+    logger.info(f"params {params}")
     generator = worker.generate_voice_stream(params)
     background_tasks = create_background_tasks(request_id)
     response_format = params["response_format"]
@@ -361,6 +362,7 @@ async def api_generate(request: Request):
     params["request_id"] = request_id
     params["request"] = request
     params.pop("prompt")
+    logger.info(f"params {params}")
     output = await worker.generate_gate(params)
     release_worker_semaphore()
     if os.getenv("backend") == "vllm":

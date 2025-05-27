@@ -22,6 +22,10 @@ with client.audio.speech.with_streaming_response.create(
     model="tts",
     voice=voice,  # 内置 新闻联播女声， 支持声音克隆，voice 可以是base64  或者 一个 url
     input="本期节目主要内容： 一.习近平在参加北京市区人大代表换届选举投票时强调 不断发展全过程人民民主 加强选举全过程监督",
+    speed="very_high",  # ["very_low", "low", "moderate", "high", "very_high"]
+    extra_body={
+        "pitch": "high"
+    },  # ["very_low", "low", "moderate", "high", "very_high"]
 ) as response:
     with open(speech_file_path, mode="wb") as f:
         for chunk in response.iter_bytes():
