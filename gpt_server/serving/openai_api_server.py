@@ -738,6 +738,8 @@ async def speech(request: OpenAISpeechRequest):
         "text": request.input,
         "response_format": response_format,
         "voice": request.voice,
+        "speed": request.speed,
+        "pitch": request.pitch,
     }
     content_type = {
         "mp3": "audio/mpeg",

@@ -393,6 +393,7 @@ async def api_model_details(request: Request):
 async def api_get_embeddings(request: Request):
     params = await request.json()
     await acquire_worker_semaphore()
+    logger.info(f"params {params}")
     embedding = await worker.get_embeddings(params)
     release_worker_semaphore()
     return JSONResponse(content=embedding)
@@ -401,6 +402,7 @@ async def api_get_embeddings(request: Request):
 @app.post("/worker_get_classify")
 async def api_get_classify(request: Request):
     params = await request.json()
+    logger.info(f"params {params}")
     await acquire_worker_semaphore()
     outputs = await worker.classify(params)
     release_worker_semaphore()
@@ -410,6 +412,7 @@ async def api_get_classify(request: Request):
 @app.post("/worker_get_transcription")
 async def api_get_transcription(request: Request):
     params = await request.json()
+    logger.info(f"params {params}")
     await acquire_worker_semaphore()
     outputs = await worker.transcription(params)
     release_worker_semaphore()

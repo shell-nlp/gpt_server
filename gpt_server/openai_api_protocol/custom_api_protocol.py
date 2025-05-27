@@ -33,6 +33,18 @@ class OpenAISpeechRequest(BaseModel):
         default=True,
         description="If true, audio will be streamed as it's generated. Each chunk will be a complete sentence.",
     )
+    pitch: Optional[Literal["very_low", "low", "moderate", "high", "very_high"]] = (
+        Field(
+            default="moderate",
+            description="Specifies the pitch level for the generated audio. Valid options: 'very_low', 'low', 'moderate', 'high', 'very_high'.",
+        )
+    )
+    speed: Optional[Literal["very_low", "low", "moderate", "high", "very_high"]] = (
+        Field(
+            default="moderate",
+            description="Specifies the speed level of the audio output. Valid options: 'very_low', 'low', 'moderate', 'high', 'very_high'.",
+        )
+    )
 
 
 class SpeechRequest(BaseModel):

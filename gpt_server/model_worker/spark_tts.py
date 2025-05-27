@@ -103,6 +103,8 @@ class SparkTTSWorker(ModelWorkerBase):
         text = params["text"]
         voice = params.get("voice", "新闻联播女声")
         response_format = params["response_format"]
+        speed = params["speed"]
+        pitch = params["pitch"]
         audio_writer = StreamingAudioWriter(
             format=response_format, sample_rate=self.engine.SAMPLE_RATE
         )
@@ -113,6 +115,8 @@ class SparkTTSWorker(ModelWorkerBase):
                 text=text,
                 length_threshold=50,
                 window_size=50,
+                speed=speed,
+                pitch=pitch,
             )
         else:  # clone
             reference_audio = await load_base64_or_url(voice)
@@ -121,6 +125,8 @@ class SparkTTSWorker(ModelWorkerBase):
                 reference_audio=reference_audio,
                 length_threshold=50,
                 window_size=50,
+                speed=speed,
+                pitch=pitch,
             )
         async for chunk_data in generator:
             audio = audio_writer.write_chunk(chunk_data, finalize=False)
