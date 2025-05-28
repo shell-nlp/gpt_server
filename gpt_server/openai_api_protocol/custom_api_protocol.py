@@ -104,6 +104,7 @@ class CustomChatCompletionRequest(ChatCompletionRequest):
     ]
     response_format: Optional[Any] = None
     reasoning_parser: Optional[str] = None
+    max_completion_tokens: Optional[int] = None
 
 
 class CustomChatMessage(ChatMessage):

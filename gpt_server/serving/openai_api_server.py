@@ -409,6 +409,11 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
     if error_check_ret is not None:
         return error_check_ret
     worker_addr = get_worker_address(request.model)
+    max_tokens = 1024 * 8
+    if request.max_completion_tokens:
+        max_tokens = request.max_completion_tokens
+    if request.max_tokens:
+        max_tokens = request.max_tokens
     gen_params = get_gen_params(
         request.model,
         "",
@@ -418,7 +423,7 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         top_k=request.top_k,
         presence_penalty=request.presence_penalty,
         frequency_penalty=request.frequency_penalty,
-        max_tokens=request.max_tokens,
+        max_tokens=max_tokens,
         echo=False,
         stop=request.stop,
         tools=request.tools,
