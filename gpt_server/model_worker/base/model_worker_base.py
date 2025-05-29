@@ -316,7 +316,7 @@ async def api_generate_stream(request: Request):
     params["request_id"] = request_id
     params["request"] = request
     params.pop("prompt")
-    logger.info(f"params {params}")
+    logger.debug(f"params {params}")
     generator = worker.generate_stream_gate(params)
     background_tasks = create_background_tasks(request_id)
     return StreamingResponse(generator, background=background_tasks)
@@ -329,7 +329,7 @@ async def api_generate_stream(request: Request):
     request_id = gen_request_id()
     params["request_id"] = request_id
     params["request"] = request
-    logger.info(f"params {params}")
+    logger.debug(f"params {params}")
     generator = worker.generate_voice_stream(params)
     background_tasks = create_background_tasks(request_id)
     response_format = params["response_format"]
@@ -362,7 +362,7 @@ async def api_generate(request: Request):
     params["request_id"] = request_id
     params["request"] = request
     params.pop("prompt")
-    logger.info(f"params {params}")
+    logger.debug(f"params {params}")
     output = await worker.generate_gate(params)
     release_worker_semaphore()
     if os.getenv("backend") == "vllm":
@@ -395,7 +395,7 @@ async def api_model_details(request: Request):
 async def api_get_embeddings(request: Request):
     params = await request.json()
     await acquire_worker_semaphore()
-    logger.info(f"params {params}")
+    logger.debug(f"params {params}")
     embedding = await worker.get_embeddings(params)
     release_worker_semaphore()
     return JSONResponse(content=embedding)
@@ -404,7 +404,7 @@ async def api_get_embeddings(request: Request):
 @app.post("/worker_get_classify")
 async def api_get_classify(request: Request):
     params = await request.json()
-    logger.info(f"params {params}")
+    logger.debug(f"params {params}")
     await acquire_worker_semaphore()
     outputs = await worker.classify(params)
     release_worker_semaphore()
@@ -414,7 +414,7 @@ async def api_get_classify(request: Request):
 @app.post("/worker_get_transcription")
 async def api_get_transcription(request: Request):
     params = await request.json()
-    logger.info(f"params {params}")
+    logger.debug(f"params {params}")
     await acquire_worker_semaphore()
     outputs = await worker.transcription(params)
     release_worker_semaphore()
