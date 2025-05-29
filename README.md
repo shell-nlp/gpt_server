@@ -261,6 +261,7 @@ Chat UI界面:
 |    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |   ×    |
 |    InternVL2     |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
 |   InternVL2.5    |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
+|   InternVL3      |  internvl  |   ×   |   √   |         √          |        √         |   ×    |
 |  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |   ×    |
 |     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |   √    |
 |    Qwen2.5-VL    |    qwen    |   ×   |   √   |         ×          |        √         |   √    |
