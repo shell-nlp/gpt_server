@@ -27,7 +27,7 @@ from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 import httpx
 
 try:
-    from pydantic.v1 import BaseSettings
+    from pydantic.v1 import BaseSettings, validator
 except ImportError:
     from pydantic import BaseSettings
 import shortuuid
@@ -106,6 +106,18 @@ class AppSettings(BaseSettings):
     controller_address: str = "http://localhost:21001"
     api_keys: Optional[List[str]] = None
 
+    @validator("api_keys", pre=True)
+    def split_api_keys(cls, v):
+        if isinstance(v, str):
+            return v.split(",") if v else None
+        return v
+
+    class Config:
+        # 关闭默认 JSON 解析行为
+        @classmethod
+        def parse_env_var(cls, field_name: str, raw_val: str):
+            return raw_val  # 返回原始字符串，不解析成 JSON
+
 
 app_settings = AppSettings()
 from contextlib import asynccontextmanager
@@ -145,6 +157,7 @@ async def timing_tasks():
 
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI):
+    logger.info(f"app_settings: {app_settings}")
     asyncio.create_task(timing_tasks())
     yield
 
@@ -1123,7 +1136,8 @@ def create_openai_api_server():
     )
     parser.add_argument(
         "--api-keys",
-        type=lambda s: s.split(","),
+        type=str,
+        default=None,
         help="Optional list of comma separated API keys",
     )
     parser.add_argument(
@@ -1142,8 +1156,9 @@ def create_openai_api_server():
         allow_methods=args.allowed_methods,
         allow_headers=args.allowed_headers,
     )
-    app_settings.controller_address = args.controller_address
-    app_settings.api_keys = args.api_keys
+    os.environ["controller_address"] = args.controller_address
+    if args.api_keys:
+        os.environ["api_keys"] = args.api_keys
 
     logger.info(f"args: {args}")
     return args
