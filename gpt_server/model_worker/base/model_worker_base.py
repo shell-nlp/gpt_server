@@ -318,8 +318,8 @@ async def api_generate_stream(request: Request):
     params.pop("prompt")
     logger.debug(f"params {params}")
     generator = worker.generate_stream_gate(params)
-    background_tasks = create_background_tasks(request_id)
-    return StreamingResponse(generator, background=background_tasks)
+    # background_tasks = create_background_tasks(request_id)
+    return StreamingResponse(generator, background=None)
 
 
 @app.post("/worker_generate_voice_stream")
@@ -331,7 +331,7 @@ async def api_generate_stream(request: Request):
     params["request"] = request
     logger.debug(f"params {params}")
     generator = worker.generate_voice_stream(params)
-    background_tasks = create_background_tasks(request_id)
+    # background_tasks = create_background_tasks(request_id)
     response_format = params["response_format"]
     content_type = {
         "mp3": "audio/mpeg",
@@ -343,7 +343,7 @@ async def api_generate_stream(request: Request):
     }.get(response_format, f"audio/{response_format}")
     return StreamingResponse(
         generator,
-        background=background_tasks,
+        background=None,
         media_type=content_type,
         headers={
             "Content-Disposition": f"attachment; filename=speech.{response_format}",
@@ -365,8 +365,8 @@ async def api_generate(request: Request):
     logger.debug(f"params {params}")
     output = await worker.generate_gate(params)
     release_worker_semaphore()
-    if os.getenv("backend") == "vllm":
-        await worker.backend.engine.abort(request_id)
+    # if os.getenv("backend") == "vllm":
+    #     await worker.backend.engine.abort(request_id)
     return JSONResponse(output)
 
 

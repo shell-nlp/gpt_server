@@ -131,7 +131,9 @@ class SparkTTSWorker(ModelWorkerBase):
         async for chunk_data in generator:
             audio = audio_writer.write_chunk(chunk_data, finalize=False)
             yield audio
-        yield audio_writer.write_chunk(finalize=True)
+        end_chunk_data = audio_writer.write_chunk(finalize=True)
+        yield end_chunk_data
+        logger.debug(f"end_chunk_data 长度：{len(end_chunk_data)}")
 
 
 if __name__ == "__main__":
