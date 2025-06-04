@@ -2,12 +2,15 @@ version: '3'
 services:
   gpt_server:
     # 构建
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile.copy
-    image: docker.1ms.run/506610466/gpt_server:latest
+    # 为什么每次构建更好？而不是直接使用 image: docker.1ms.run/506610466/gpt_server:latest
+    # 如果使用 volumes 映射的方式，虽然启动更快，但会影响已启动容器的runtime稳定性，物理机修改的代码会在容器runtime中立马生效。
+    build:
+      context: .
+      dockerfile: Dockerfile.copy
+    # image: docker.1ms.run/506610466/gpt_server:latest
+    image: gpt_server:latest_
     container_name: gpt_server
-    shm_size: '4g' # 设置共享内存为4GB 
+    shm_size: '8g' # 设置共享内存为4GB 
     restart: always
     # network_mode: host
     ports:
@@ -15,7 +18,7 @@ services:
     environment:
       - TZ:Asia/Shanghai  # 设置中国时区
     volumes:
-      - ./gpt_server:/gpt_server/gpt_server # 将最新代码直接映射到容器中，以运行最新的代码
+      # - ./gpt_server:/gpt_server/gpt_server # 将最新代码直接映射到容器中，以运行最新的代码
       - /home/dev/model/:/home/dev/model/ # 映射模型路径
     deploy:
       resources:

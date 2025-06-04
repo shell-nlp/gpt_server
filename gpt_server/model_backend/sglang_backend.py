@@ -8,6 +8,7 @@ from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 from PIL import Image
 import sglang as sgl
+from transformers import PreTrainedTokenizerBase
 from sglang.utils import convert_json_schema_to_str
 from sglang.srt.conversation import generate_chat_conv
 
@@ -44,7 +45,7 @@ def _transform_messages(
 
 
 class SGLangBackend(ModelBackend):
-    def __init__(self, model_path) -> None:
+    def __init__(self, model_path, tokenizer: PreTrainedTokenizerBase) -> None:
         lora = os.getenv("lora", None)
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
         max_model_len = os.getenv("max_model_len", None)

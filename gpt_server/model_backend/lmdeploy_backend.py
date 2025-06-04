@@ -5,6 +5,7 @@ from lmdeploy import (
     TurbomindEngineConfig,
     PytorchEngineConfig,
 )
+from transformers import PreTrainedTokenizerBase
 from typing import Any, Dict, AsyncGenerator
 from lmdeploy.archs import get_task
 from gpt_server.model_handler.reasoning_parser import ReasoningParserManager
@@ -55,7 +56,7 @@ def is_messages_with_tool(messages: list):
 
 
 class LMDeployBackend(ModelBackend):
-    def __init__(self, model_path) -> None:
+    def __init__(self, model_path, tokenizer: PreTrainedTokenizerBase) -> None:
         backend = backend_map[os.getenv("backend")]
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
         max_model_len = os.getenv("max_model_len", None)

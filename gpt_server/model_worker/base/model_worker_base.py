@@ -139,12 +139,16 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             from gpt_server.model_backend.sglang_backend import SGLangBackend
 
             logger.info(f"{self.worker_name} 使用 SGLang 后端")
-            self.backend = SGLangBackend(model_path=self.model_path)
+            self.backend = SGLangBackend(
+                model_path=self.model_path, tokenizer=self.tokenizer
+            )
         elif "lmdeploy" in os.getenv("backend"):
             from gpt_server.model_backend.lmdeploy_backend import LMDeployBackend
 
             logger.info(f"{self.worker_name} 使用 LMDeploy 后端")
-            self.backend = LMDeployBackend(model_path=self.model_path)
+            self.backend = LMDeployBackend(
+                model_path=self.model_path, tokenizer=self.tokenizer
+            )
 
         elif os.getenv("backend") == "hf":
             from gpt_server.model_backend.hf_backend import HFBackend
@@ -255,7 +259,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         logger.remove(0)
         log_level = os.getenv("log_level", "WARNING")
         logger.add(sys.stderr, level=log_level)
-        
+
         host = args.host
         controller_address = args.controller_address
 
