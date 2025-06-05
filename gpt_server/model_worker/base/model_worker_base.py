@@ -259,6 +259,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         logger.remove(0)
         log_level = os.getenv("log_level", "WARNING")
         logger.add(sys.stderr, level=log_level)
+        os.environ["VLLM_USE_V1"] = "0"
 
         host = args.host
         controller_address = args.controller_address

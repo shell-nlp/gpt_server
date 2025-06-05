@@ -19,9 +19,7 @@ from vllm.entrypoints.chat_utils import (
 # 解决vllm中 ray集群在 TP>1时死的Bug
 import ray
 
-ray.init(ignore_reinit_error=True, num_cpus=4)
-
-os.environ["VLLM_USE_V1"] = "1"
+ray.init(ignore_reinit_error=True, num_cpus=8)
 
 
 class VllmBackend(ModelBackend):

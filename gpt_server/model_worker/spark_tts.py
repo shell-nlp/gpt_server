@@ -10,8 +10,6 @@ from flashtts.server.utils.audio_writer import StreamingAudioWriter
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-
-os.environ["VLLM_USE_V1"] = "1"
 import httpx
 from fastapi import HTTPException
 import base64
@@ -69,6 +67,7 @@ class SparkTTSWorker(ModelWorkerBase):
             model_type="tts",
         )
         backend = os.environ["backend"]
+        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.6))
         self.engine = AutoEngine(
             model_path=model_path,
             max_length=32768,
@@ -79,6 +78,7 @@ class SparkTTSWorker(ModelWorkerBase):
             wav2vec_attn_implementation="sdpa",  # 使用flash attn加速wav2vec
             llm_gpu_memory_utilization=0.6,
             seed=0,
+            llm_gpu_memory_utilization=gpu_memory_utilization,
         )
         loop = asyncio.get_running_loop()
         # ------------- 添加声音 -------------
