@@ -135,7 +135,7 @@ cupy-cuda12x==13.4.1
     # via ray
 cycler==0.12.1
     # via matplotlib
-datasets==3.0.1
+datasets==3.2.0
     # via
     #   evalscope
     #   modelscope
@@ -235,7 +235,7 @@ frozenlist==1.6.2
     #   aiosignal
 fschat==0.2.36
     # via gpt-server (pyproject.toml)
-fsspec==2024.6.1
+fsspec==2024.9.0
     # via
     #   datasets
     #   huggingface-hub
@@ -421,7 +421,7 @@ mistral-common==1.5.6
     # via vllm
 mmengine-lite==0.10.7
     # via lmdeploy
-modelscope==1.20.1
+modelscope==1.26.0
     # via
     #   gpt-server (pyproject.toml)
     #   evalscope
@@ -624,9 +624,7 @@ orjson==3.10.18
     #   infinity-emb
     #   sglang
 oss2==2.19.1
-    # via
-    #   funasr
-    #   modelscope
+    # via funasr
 outlines==0.1.11
     # via
     #   --override (workspace)

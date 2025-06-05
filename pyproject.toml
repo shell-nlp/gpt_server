@@ -22,7 +22,7 @@ dependencies = [
     "vllm==0.9.0.1",
     "qwen_vl_utils",
     "evalscope[perf]==0.16.1",
-    "modelscope==1.20.1",
+    "modelscope==1.26.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
     "sglang[all]>=0.4.6.post5",

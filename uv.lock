@@ -1608,7 +1608,7 @@ requires-dist = [
     { name = "infinity-emb", extras = ["all"], specifier = "==0.0.76" },
     { name = "lmdeploy", specifier = "==0.8.0" },
     { name = "loguru", specifier = ">=0.7.2" },
-    { name = "modelscope", specifier = "==1.20.1" },
+    { name = "modelscope", specifier = "==1.26.0" },
     { name = "openai", specifier = "==1.55.3" },
     { name = "qwen-vl-utils" },
     { name = "setuptools", specifier = "==75.2.0" },
@@ -2720,16 +2720,16 @@ wheels = [
 
 [[package]]
 name = "modelscope"
-version = "1.20.1"
+version = "1.26.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "requests" },
     { name = "tqdm" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6b/bb/116825b54ea98119046f33f31cad8a5f50529f4033c36d1b73e664499723/modelscope-1.20.1.tar.gz", hash = "sha256:2670e58cb71f745f78bee9b541cc9e6bdeca82430e2b79a9c3649e394adde95e", size = 4362370 }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/48/3c/76d1701761590012b331742d6c67babc3b048df166d5ef99a8c6b0c80c2f/modelscope-1.26.0.tar.gz", hash = "sha256:3178d82ce795ba1a5472eacefda517e1f2162186e4f9f9641cf6587d2c368bc1", size = 4390303 }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/a9/fc/46c33ce27bf0bd12bc66822a12c033b3658d1d9289b276f653fd4b0b5da5/modelscope-1.20.1-py3-none-any.whl", hash = "sha256:168f4594f44943fb6364cca7385dc4a07ddb7958726111ef370607f8ac22d6ac", size = 5824158 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/8e/6e/50fed6b37503accb0199153d3c18884380797b40491b11bd03279cd2d698/modelscope-1.26.0-py3-none-any.whl", hash = "sha256:fdb23191cdf8d5811accefc09ef4594f3b7c5f1d165af9194dc64eba96780c3a", size = 5855598 },
 ]
 
 [package.optional-dependencies]
@@ -2738,7 +2738,6 @@ framework = [
     { name = "attrs" },
     { name = "datasets" },
     { name = "einops" },
-    { name = "oss2" },
     { name = "pillow" },
     { name = "python-dateutil" },
     { name = "scipy" },
