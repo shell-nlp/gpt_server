@@ -11,7 +11,7 @@ from flashtts.server.utils.audio_writer import StreamingAudioWriter
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
-os.environ["VLLM_USE_V1"] = "0"
+os.environ["VLLM_USE_V1"] = "1"
 import httpx
 from fastapi import HTTPException
 import base64
@@ -91,6 +91,7 @@ class SparkTTSWorker(ModelWorkerBase):
             )
         )
         logger.warning(f"模型：{model_names[0]}")
+        logger.info(f"list_speakers: {self.engine.list_speakers()}")
 
     # 这个是模型主要的方法
     async def generate_voice_stream(self, params):
@@ -109,7 +110,7 @@ class SparkTTSWorker(ModelWorkerBase):
             format=response_format, sample_rate=self.engine.SAMPLE_RATE
         )
         generator = None
-        if voice in self.engine.list_roles():
+        if voice in self.engine.list_speakers():
             generator = self.engine.speak_stream_async(
                 name=voice,
                 text=text,

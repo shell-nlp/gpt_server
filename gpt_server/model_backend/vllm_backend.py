@@ -21,7 +21,7 @@ import ray
 
 ray.init(ignore_reinit_error=True, num_cpus=4)
 
-os.environ["VLLM_USE_V1"] = "0"
+os.environ["VLLM_USE_V1"] = "1"
 
 
 class VllmBackend(ModelBackend):
@@ -100,6 +100,7 @@ class VllmBackend(ModelBackend):
                 chat_template=tokenizer.get_chat_template(),
                 add_generation_prompt=True,
                 tools=tools,
+                model_config=await self.engine.get_model_config(),
             )
             mm_data = await mm_data_future
             inputs = {"multi_modal_data": mm_data, "prompt": prompt}
