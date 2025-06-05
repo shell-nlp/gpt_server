@@ -20,29 +20,34 @@
 如果 GPT Server 对您有帮助，欢迎留下一个 ⭐ Star！
 <br>
 
-## 最新消息
-本项目使用 uv 进行项目管理。(https://github.com/astral-sh/uv)
+## ✨ 功能亮点
+|     | 功能          | 说明                                                                |
+|-----|-------------|-------------------------------------------------------------------|
+| 🎨  | **OpenAI服务接口**     | 支持 `OpenAI` 服务接口规范，兼容所有支持 OpenAI的项目工程                                          |
+| 🚀  | **多后端引擎推理** | 支持 `vLLM`、`SGLang`、`LMDeploy`、`HF`多种高性能推理引擎 |
+| 🎯  | **Embedding/Reranker** | 支持所有兼容`Sentence_Transformers`的语义向量或重排模型，支持了Infinity后端，**Embedding**推理速度大于onnx/tensorrt，支持动态组批 |
+| 🎛️ | **Text-moderation（文本审核，分类）**   | 支持`OpenAI` 服务接口规范的文本审核，分类                                                |
+| 📱  | **ASR(语音转文本)**    | 支持基于`FunASR`的ASR模型                                        |
+| 🔊  | **TTS(文本转语音)**   | 支持基于`SparkTTS`的TTS模型，支持基于`vLLM`、`SGLang`后端对齐加速，`RTF<<1`,支持流式音频流输出                                          |
+| 🔄  | **支持LM/VL模型**  | 支持多种大语言模型或多模态语言模型                                              |
+| 🎭  | **推理服务性能测试**   | 基于`Evalscope`实现`Throughput`、`TTFT`、`TPOT`等服务性能指标                                                  |
 
-## 特色✨
+<br>
 
-1. 支持多种推理后端引擎，**HF**、**vLLM**、**LMDeploy**和**SGLang**，**LMDeploy**后端引擎，每秒处理的请求数是 vLLM 的 1.36 ~ 1.85 倍
-2. 支持了Infinity后端，**Embedding**推理速度大于onnx/tensorrt，支持动态组批
-3. 支持所有兼容sentence_transformers的语义向量模型（Embedding和Reranker）
-4. 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
-5. 支持了**Tools（Function Calling）**功能,并优化Tools解析方式，大大提高tools的调用成功率。兼容**LangChain**的 **bind_tools**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
-6. 支持了**cohere**库接口规范的 /v1/rerank 接口,在dify中可用。
-7. 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
-8. 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
-9. 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
-10. 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
-11. 支持多模态大模型
-12. 与FastChat相同的分布式架构
-## 配置文档
+- 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
+- 支持了**Tools（Function Calling）**功能,并优化Tools解析方式，大大提高tools的调用成功率。兼容**LangChain**的 **bind_tools**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
+- 支持了**cohere**库接口规范的 /v1/rerank 接口,在dify中可用。
+- 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
+- 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
+- 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
+- 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
+
+## 🖼️ 配置文档
 通过这个样例文件，可以很快的掌握项目的配置方式。
 <br>
 **配置文件的详细说明信息位于：[config_example.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")**
 
-## 最新进展🎉
+## 🎉 最新进展
 <details open>
 <summary><b>2025</b></summary>
  
@@ -97,7 +102,7 @@
 ```
 </details>
 
-## 路线
+## 🧭 路线
 
 * [X] 支持HF后端
 * [X] 支持vLLM后端
@@ -115,7 +120,7 @@
 * [ ] 支持 pip install 方式进行安装
 
 
-## 快速开始
+## ⚙️ 快速开始
 
 ### 1. 配置python环境
 
@@ -221,7 +226,7 @@ Chat UI界面:
 
 
 
-## 支持的模型以及推理后端
+## ⚡ 支持的模型以及推理后端
 
 **推理速度：** LMDeploy TurboMind > SGLang > vllm > LMDeploy PyTorch > HF
 
@@ -321,11 +326,11 @@ Chat UI界面:
 
 <br>
 
-## 架构
+## 🏗️ 架构
 
 ![gpt_server_archs.png](assets/gpt_server_archs.png)
 
-## 致谢
+## 🤝 致谢
 - [FastChat](https://github.com/lm-sys/FastChat) 
 - [vLLM](https://github.com/vllm-project/vllm)  
 - [LMDeploy ](https://github.com/InternLM/lmdeploy)
@@ -333,11 +338,11 @@ Chat UI界面:
 - [infinity](https://github.com/michaelfeil/infinity) 
 - [FlashTTS](https://github.com/HuiResearch/FlashTTS) 
 
-## 与我联系(会邀请进入交流群)
+## 📲 与我联系(会邀请进入交流群)
 
 ![wechat.png](assets/wechat.png)
 
-## Star History
+## 🌟 Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=shell-nlp/gpt_server&type=Date)](https://star-history.com/#shell-nlp/gpt_server&Date)
 
