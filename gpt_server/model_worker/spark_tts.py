@@ -76,9 +76,8 @@ class SparkTTSWorker(ModelWorkerBase):
             detokenizer_device="auto",
             backend=backend,
             wav2vec_attn_implementation="sdpa",  # 使用flash attn加速wav2vec
-            llm_gpu_memory_utilization=0.6,
-            seed=0,
             llm_gpu_memory_utilization=gpu_memory_utilization,
+            seed=0,
         )
         loop = asyncio.get_running_loop()
         # ------------- 添加声音 -------------
