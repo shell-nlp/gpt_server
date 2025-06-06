@@ -52,6 +52,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-6-6   支持了 ritrieve_zh_v1
 2025-4-29  支持了 Qwen3
 2025-4-24  支持了 Spark-TTS后端的 TTS
 2025-4-14  支持了 SGLang后端以及部分VL模型
@@ -294,10 +295,11 @@ Chat UI界面:
 | zpoint_large_embedding_zh                                                           | √   | √        |
 | xiaobu-embedding                                                                    | √   | √        |
 | Conan-embedding-v1                                                                  | √   | √        |
+| ritrieve_zh_v1                                                                   | √   | √        |
 | KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）            | ×   | √        |
 | protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入） | ×   | √        |
 
-目前 TencentBAC的 **Conan-embedding-v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
+目前 **ritrieve_zh_v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
 <br>
 
