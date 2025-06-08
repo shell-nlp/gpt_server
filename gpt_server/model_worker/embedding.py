@@ -1,9 +1,13 @@
+import asyncio
 import os
 from typing import List
 
 import sentence_transformers
+import torch
+from transformers import AutoConfig, AutoModel
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
+from gpt_server.model_worker.utils import load_base64_or_url
 
 
 class EmbeddingWorker(ModelWorkerBase):
@@ -33,23 +37,38 @@ class EmbeddingWorker(ModelWorkerBase):
             device = "cuda"
         logger.warning(f"使用{device}加载...")
         model_kwargs = {"device": device}
-        self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
+        # TODO
         self.mode = "embedding"
-        # rerank
-        for model_name in model_names:
-            if "rerank" in model_name:
-                self.mode = "rerank"
-                break
-        if self.mode == "rerank":
-            self.client = sentence_transformers.CrossEncoder(
-                model_name=model_path, **model_kwargs
-            )
-            logger.warning("正在使用 rerank 模型...")
-        elif self.mode == "embedding":
-            self.client = sentence_transformers.SentenceTransformer(
-                model_path, **model_kwargs
-            )
-            logger.warning("正在使用 embedding 模型...")
+        model_type = getattr(
+            getattr(self.model_config, "text_config", {}), "model_type", None
+        )
+        logger.warning(f"model_type: {model_type}")
+        if "clip_text_model" in model_type:  # clip text 模型
+            self.mode = "clip_text_model"
+            self.client = AutoModel.from_pretrained(
+                model_path, trust_remote_code=True
+            )  # You must set trust_remote_code=True
+            self.client.set_processor(model_path)
+            self.client.eval()
+        else:
+            self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
+
+            # rerank
+            for model_name in model_names:
+                if "rerank" in model_name:
+                    self.mode = "rerank"
+                    break
+            if self.mode == "rerank":
+                self.client = sentence_transformers.CrossEncoder(
+                    model_name=model_path, **model_kwargs
+                )
+                logger.warning("正在使用 rerank 模型...")
+            elif self.mode == "embedding":
+                self.client = sentence_transformers.SentenceTransformer(
+                    model_path, **model_kwargs
+                )
+                logger.warning("正在使用 embedding 模型...")
+        logger.warning(f"模型：{model_names[0]}")
 
     async def get_embeddings(self, params):
         self.call_ct += 1
@@ -69,6 +88,38 @@ class EmbeddingWorker(ModelWorkerBase):
             sentence_pairs = [[query, inp] for inp in texts]
             scores = self.client.predict(sentence_pairs)
             embedding = [[float(score)] for score in scores]
+        elif self.mode == "clip_text_model":
+            token_num = 0
+            if isinstance(texts[0], dict):
+                text = [i["text"] for i in texts]
+                text = list(map(lambda x: x.replace("\n", " "), text))
+
+                images = [i["image"] for i in texts]
+                coro_list = []
+                for i in images:
+                    coro = load_base64_or_url(base64_or_url=i)
+                    coro_list.append(coro)
+                result_images = await asyncio.gather(*coro_list)
+
+                embedding = self.client.encode(
+                    images=result_images,
+                    text=text,
+                ).tolist()
+            elif isinstance(texts[0], str):
+                if "http" in texts[0] or "data:image" in texts[0]:  # 图片
+                    images = texts
+                    coro_list = []
+                    for i in images:
+                        coro = load_base64_or_url(base64_or_url=i)
+                        coro_list.append(coro)
+                    result_images = await asyncio.gather(*coro_list)
+                    embedding = self.client.encode(
+                        images=result_images,
+                    ).tolist()
+                else:  # 文本
+                    embedding = self.client.encode(
+                        text=texts,
+                    ).tolist()
         ret["embedding"] = embedding
         ret["token_num"] = token_num
         return ret

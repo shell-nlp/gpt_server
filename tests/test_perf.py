@@ -5,9 +5,9 @@ from rich import print
 if __name__ == "__main__":
     args = Arguments(
         url="http://localhost:8082/v1/chat/completions",  # 请求的URL地址
-        parallel=20,  # 并行请求的任务数量
+        parallel=100,  # 并行请求的任务数量
         model="qwen",  # 使用的模型名称
-        number=20,  # 请求数量
+        number=100,  # 请求数量
         api="openai",  # 使用的API服务
         dataset="openqa",  # 数据集名称
         stream=True,  #  是否启用流式处理

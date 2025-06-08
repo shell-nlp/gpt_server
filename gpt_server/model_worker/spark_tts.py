@@ -4,45 +4,11 @@ import os
 from typing import List
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-
+from gpt_server.model_worker.utils import load_base64_or_url
 from flashtts.engine import AutoEngine
 from flashtts.server.utils.audio_writer import StreamingAudioWriter
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-
-import httpx
-from fastapi import HTTPException
-import base64
-import io
-
-
-async def get_audio_bytes_from_url(url: str) -> bytes:
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="无法从指定 URL 下载参考音频")
-        return response.content
-
-
-async def load_base64_or_url(audio):
-    # 根据 reference_audio 内容判断读取方式
-    if audio.startswith("http://") or audio.startswith("https://"):
-        audio_bytes = await get_audio_bytes_from_url(audio)
-    else:
-        try:
-            audio_bytes = base64.b64decode(audio)
-        except Exception as e:
-            logger.warning("无效的 base64 音频数据: " + str(e))
-            raise HTTPException(
-                status_code=400, detail="无效的 base64 音频数据: " + str(e)
-            )
-    # 利用 BytesIO 包装字节数据，然后使用 soundfile 读取为 numpy 数组
-    try:
-        bytes_io = io.BytesIO(audio_bytes)
-    except Exception as e:
-        logger.warning("读取参考音频失败: " + str(e))
-        raise HTTPException(status_code=400, detail="读取参考音频失败: " + str(e))
-    return bytes_io
 
 
 class SparkTTSWorker(ModelWorkerBase):

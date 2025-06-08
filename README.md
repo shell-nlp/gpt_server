@@ -52,6 +52,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-6-6   支持了 bge-vl 系列 (代码样例见gpt_server/tests/test_openai_embedding_vl.py)
 2025-6-6   支持了 ritrieve_zh_v1
 2025-4-29  支持了 Qwen3
 2025-4-24  支持了 Spark-TTS后端的 TTS
@@ -278,11 +279,11 @@ Chat UI界面:
 
 **原则上支持所有的Embedding/Rerank/Classify模型**
 
-**推理速度：** Infinity >> HF
+**推理速度：** embedding_infinity > embedding
 
 以下模型经过测试可放心使用：
 
-| Embedding/Rerank/Classify                                                           | HF  | Infinity |
+| Models / model_type                                                           | embedding  | embedding_infinity |
 | ----------------------------------------------------------------------------------- | --- | -------- |
 | bge-reranker                                                                        | √   | √        |
 | bce-reranker                                                                        | √   | √        |
@@ -296,6 +297,7 @@ Chat UI界面:
 | xiaobu-embedding                                                                    | √   | √        |
 | Conan-embedding-v1                                                                  | √   | √        |
 | ritrieve_zh_v1                                                                   | √   | √        |
+| bge-vl                                                                   | √   | ×        |
 | KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）            | ×   | √        |
 | protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入） | ×   | √        |
 
