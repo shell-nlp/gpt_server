@@ -48,6 +48,11 @@ class EmbeddingWorker(ModelWorkerBase):
             self.client = AutoModel.from_pretrained(
                 model_path, trust_remote_code=True
             )  # You must set trust_remote_code=True
+            if device == "cuda":
+                self.client.to(
+                    torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                )
+                logger.info(f"device: {self.client.device}")
             self.client.set_processor(model_path)
             self.client.eval()
         else:
