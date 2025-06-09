@@ -106,13 +106,26 @@ models:
     - gpus:
       - 2
 
+- bge-vl:
+    # vl-embedding 模型
+    alias: null
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/BAAI/BGE-VL-base/
+    model_type: embedding # 这里仅支持 embedding
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 2
+
 - text-moderation:
     # 文本审核模型
     alias: omni-moderation-latest
     enable: true
     model_config:
       model_name_or_path: /home/dev/model/KoalaAI/Text-Moderation
-    model_type: embedding_infinity # embedding_infinity/embedding 
+    model_type: embedding_infinity # embedding_infinity
     work_mode: hf
     device: gpu
     workers:

@@ -39,9 +39,45 @@ async def load_base64_or_url(base64_or_url):
     return bytes_io
 
 
+def get_embedding_mode(model_path: str):
+    from infinity_emb import EngineArgs
+    from transformers import AutoConfig
+    from infinity_emb.inference.select_model import get_engine_type_from_config
+
+    model_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+    model_type_text = getattr(
+        getattr(model_config, "text_config", {}), "model_type", None
+    )
+    model_type_vison = getattr(
+        getattr(model_config, "vision_config", {}), "model_type", None
+    )
+    print(model_type_vison, model_type_text)
+    model_type = model_type_vison or model_type_text
+
+    mode = "embedding"
+    engine_args = EngineArgs(
+        model_name_or_path=model_path,
+        engine="torch",
+        embedding_dtype="float32",
+        dtype="float32",
+        bettertransformer=True,
+    )
+    engine_type = get_engine_type_from_config(engine_args)
+    engine_type_str = str(engine_type)
+
+    if "EmbedderEngine" in engine_type_str:
+        mode = "embedding"
+    elif "RerankEngine" in engine_type_str:
+        mode = "rerank"
+    elif "ImageEmbedEngine" in engine_type_str:
+        mode = model_type or "image"
+    elif "PredictEngine" in engine_type_str:
+        mode = "classify"
+    return mode
+
+
 if __name__ == "__main__":
 
     # 示例用法
-    data_url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg..."
-    pure_base64 = extract_base64(data_url)
-    print(pure_base64)  # 输出: iVBORw0KGgoAAAANSUhEUg...
+    r = get_embedding_mode("BAAI/BGE-VL-MLLM-S1")
+    print(r)
