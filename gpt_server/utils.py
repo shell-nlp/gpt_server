@@ -137,7 +137,7 @@ def start_model_worker(config: dict):
         error_msg = f"请参照 https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml 设置正确的 model_worker_args"
         logger.error(error_msg)
         raise KeyError(error_msg)
-
+    exist_model_names = []  # 记录已经存在的model_name
     for model_config_ in config["models"]:
         for model_name, model_config in model_config_.items():
             # 启用的模型
@@ -202,7 +202,15 @@ def start_model_worker(config: dict):
                     if lora:  # 如果使用lora,将lora的name添加到 model_names 中
                         lora_names = list(lora.keys())
                         model_names += "," + ",".join(lora_names)
-
+                intersection = list(
+                    set(exist_model_names) & set(model_names.split(","))
+                )  # 获取交集
+                if intersection:  # 如果有交集 则返回True
+                    logger.error(
+                        f"存在重名的模型名称或别名：{intersection} ,请检查 config.yaml 文件"
+                    )
+                    sys.exit()
+                exist_model_names.extend(model_names.split(","))
                 # 获取 worker 数目 并获取每个 worker 的资源
                 workers = model_config["workers"]
 
@@ -252,8 +260,10 @@ def start_model_worker(config: dict):
                     if punc_model:
                         cmd += f" --vad_model '{punc_model}'"
                     p = Process(target=run_cmd, args=(cmd,))
-                    p.start()
+                    # p.start()
                     process.append(p)
+    for p in process:
+        p.start()
     for p in process:
         p.join()
 
