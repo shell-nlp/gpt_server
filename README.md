@@ -285,9 +285,11 @@ Chat UI界面:
 
 | Models / model_type                                                           | embedding  | embedding_infinity |
 | ----------------------------------------------------------------------------------- | --- | -------- |
+| bge-m3                                                                        | √   | √        |
+| bge-vl                                                                   | √   | ×        |
 | bge-reranker                                                                        | √   | √        |
-| bce-reranker                                                                        | √   | √        |
 | bge-embedding                                                                       | √   | √        |
+| bce-reranker                                                                        | √   | √        |
 | bce-embedding                                                                       | √   | √        |
 | puff                                                                                | √   | √        |
 | piccolo-base-zh-embedding                                                           | √   | √        |
@@ -297,7 +299,6 @@ Chat UI界面:
 | xiaobu-embedding                                                                    | √   | √        |
 | Conan-embedding-v1                                                                  | √   | √        |
 | ritrieve_zh_v1                                                                   | √   | √        |
-| bge-vl                                                                   | √   | ×        |
 | KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）            | ×   | √        |
 | protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入） | ×   | √        |
 
