@@ -7,7 +7,7 @@ import torch
 from transformers import AutoConfig, AutoModel
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_worker.utils import load_base64_or_url
+from gpt_server.model_worker.utils import load_base64_or_url, get_embedding_mode
 
 
 class EmbeddingWorker(ModelWorkerBase):
@@ -38,16 +38,10 @@ class EmbeddingWorker(ModelWorkerBase):
         logger.warning(f"使用{device}加载...")
         model_kwargs = {"device": device}
         # TODO
-        self.mode = "embedding"
-        model_type = getattr(
-            getattr(self.model_config, "text_config", {}), "model_type", None
-        )
-        logger.warning(f"model_type: {model_type}")
-        if "clip_text_model" in model_type:  # clip text 模型
-            self.mode = "clip_text_model"
-            self.client = AutoModel.from_pretrained(
-                model_path, trust_remote_code=True
-            )  # You must set trust_remote_code=True
+        self.mode = get_embedding_mode(model_path=model_path)
+        self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
+        if "clip_text_model" in self.mode:  # clip text 模型
+            self.client = AutoModel.from_pretrained(model_path, trust_remote_code=True)
             if device == "cuda":
                 self.client.to(
                     torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -55,24 +49,16 @@ class EmbeddingWorker(ModelWorkerBase):
                 logger.info(f"device: {self.client.device}")
             self.client.set_processor(model_path)
             self.client.eval()
-        else:
-            self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
-
-            # rerank
-            for model_name in model_names:
-                if "rerank" in model_name:
-                    self.mode = "rerank"
-                    break
-            if self.mode == "rerank":
-                self.client = sentence_transformers.CrossEncoder(
-                    model_name=model_path, **model_kwargs
-                )
-                logger.warning("正在使用 rerank 模型...")
-            elif self.mode == "embedding":
-                self.client = sentence_transformers.SentenceTransformer(
-                    model_path, **model_kwargs
-                )
-                logger.warning("正在使用 embedding 模型...")
+        elif "rerank" in self.mode:
+            self.client = sentence_transformers.CrossEncoder(
+                model_name=model_path, **model_kwargs
+            )
+            logger.warning("正在使用 rerank 模型...")
+        elif "embedding" in self.mode:
+            self.client = sentence_transformers.SentenceTransformer(
+                model_path, **model_kwargs
+            )
+            logger.warning("正在使用 embedding 模型...")
         logger.warning(f"模型：{model_names[0]}")
 
     async def get_embeddings(self, params):

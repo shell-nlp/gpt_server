@@ -48,11 +48,12 @@ def get_embedding_mode(model_path: str):
     model_type_text = getattr(
         getattr(model_config, "text_config", {}), "model_type", None
     )
-    model_type_vison = getattr(
-        getattr(model_config, "vision_config", {}), "model_type", None
-    )
-    print(model_type_vison, model_type_text)
-    model_type = model_type_vison or model_type_text
+    logger.warning(f"model_type: {model_type_text}")
+    # model_type_vison = getattr(
+    #     getattr(model_config, "vision_config", {}), "model_type", None
+    # )
+    # print(model_type_vison, model_type_text)
+    model_type = model_type_text
 
     mode = "embedding"
     engine_args = EngineArgs(
@@ -79,5 +80,5 @@ def get_embedding_mode(model_path: str):
 if __name__ == "__main__":
 
     # 示例用法
-    r = get_embedding_mode("BAAI/BGE-VL-MLLM-S1")
+    r = get_embedding_mode("/home/dev/model/BAAI/bge-m3/")
     print(r)
