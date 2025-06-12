@@ -14,7 +14,7 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
-1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS（支持声音克隆）** 模型的 **openai**规范 接口服务。
+1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS（支持声音克隆）**、 **SD(Stable Diffusion,文生图)** 模型的 **openai**规范 接口服务。
 2. 支持**HF**、**vLLM**、**LMDeploy**和**SGLang** 多种加速推理后端引擎。
 3. 多个模型共用**openai server**的同一个端口进行调用，自动进行模型调度。
 
@@ -30,6 +30,7 @@
 | 🎛️ | **Text-moderation（文本审核，分类）**   | 支持`OpenAI` 服务接口规范的文本审核，分类                                                |
 | 📱  | **ASR(语音转文本)**    | 支持基于`FunASR`的ASR模型                                        |
 | 🔊  | **TTS(文本转语音)**   | 支持基于`SparkTTS`的TTS模型，支持基于`vLLM`、`SGLang`后端对齐加速，`RTF<<1`,支持流式音频流输出                                          |
+| 🖌️  | **SD(Stable Diffusion,文生图)**    | 支持基于`diffusers`的 `文生图` 模型                                        |
 | 🔄  | **支持LM/VL模型**  | 支持多种大语言模型或多模态语言模型                                              |
 | 🎭  | **推理服务性能测试**   | 基于`Evalscope`实现`Throughput`、`TTFT`、`TPOT`等服务性能指标                                                  |
 
@@ -42,6 +43,7 @@
 - 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
 - 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
 - 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
+- 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/generations）,基于diffusers后端(代码样例见gpt_server/tests/test_image_gen.py)
 
 ## 🖼️ 配置文档
 通过这个样例文件，可以很快的掌握项目的配置方式。
@@ -53,6 +55,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-6-12  支持了 文生图模型 flux (代码样例见gpt_server/tests/test_image_gen.py)
 2025-6-6   支持了 bge-vl 系列 (代码样例见gpt_server/tests/test_openai_embedding_vl.py)
 2025-6-6   支持了 ritrieve_zh_v1
 2025-4-29  支持了 Qwen3
@@ -120,7 +123,7 @@
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
 * [X] 可视化启动界面(不稳定,对开发人员来说比较鸡肋，后期将弃用！)
 * [X] 并行的function call功能（tools）
-* [ ] 支持 文生图模型
+* [X] 支持 文生图 模型
 * [ ] 支持 pip install 方式进行安装
 
 

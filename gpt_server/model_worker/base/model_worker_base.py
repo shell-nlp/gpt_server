@@ -119,11 +119,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
     def load_model_tokenizer(self, model_path):
         """加载 模型 和 分词器 直接对 self.model 和 self.tokenizer 进行赋值"""
-        if (
-            self.model_type == "embedding"
-            or self.model_type == "asr"
-            or self.model_type == "tts"
-        ):
+        if self.model_type in ["embedding", "asr", "tts", "image"]:
             return 1
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,

@@ -17,7 +17,10 @@ from pydantic import Field, BaseModel
 class ImagesGenRequest(BaseModel):
     prompt: str
     model: str
-    output_format: str  # png, jpeg, or webp
+    output_format: Literal["png", "jpeg", "webp"] = Field(
+        default="png",
+        description="png, jpeg, or webp",
+    )
 
 
 # copy from https://github.com/remsky/Kokoro-FastAPI/blob/master/api/src/routers/openai_compatible.py

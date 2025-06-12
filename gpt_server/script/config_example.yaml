@@ -156,3 +156,16 @@ models:
     workers:
     - gpus:
       - 6
+
+- flux:
+    #文生图模型
+    alias: null
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/MusePublic/489_ckpt_FLUX_1/
+    model_type: flux
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 7
