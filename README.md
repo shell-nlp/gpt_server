@@ -16,6 +16,7 @@
 
 1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS（支持声音克隆）** 模型的 **openai**规范 接口服务。
 2. 支持**HF**、**vLLM**、**LMDeploy**和**SGLang** 多种加速推理后端引擎。
+3. 多个模型共用**openai server**的同一个端口进行调用，自动进行模型调度。
 
 如果 GPT Server 对您有帮助，欢迎留下一个 ⭐ Star！
 <br>
@@ -119,6 +120,7 @@
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
 * [X] 可视化启动界面(不稳定,对开发人员来说比较鸡肋，后期将弃用！)
 * [X] 并行的function call功能（tools）
+* [ ] 支持 文生图模型
 * [ ] 支持 pip install 方式进行安装
 
 
