@@ -6,7 +6,7 @@ RUN apt-get update -y && apt-get install -y build-essential && rm -rf /var/lib/a
 COPY ./ /gpt_server
 WORKDIR /gpt_server
 # RUN uv sync && uv cache clean
-
+ENV UV_HTTP_TIMEOUT=120
 RUN uv venv --seed && uv sync && uv cache clean && \
     echo '[[ -f .venv/bin/activate ]] && source .venv/bin/activate' >> ~/.bashrc
 ENV PATH=/gpt_server/.venv/bin:$PATH
