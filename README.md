@@ -336,6 +336,16 @@ Chat UI界面:
 
 <br>
 
+### **文生图** 模型
+[Flux 模型地址](https://huggingface.co/black-forest-labs/FLUX.1-dev)
+
+| Models / BackEnd | model_type |
+| :--------------: | :--------: |
+|    flux     | flux  |
+
+
+<br>
+
 ## 🏗️ 架构
 
 ![gpt_server_archs.png](assets/gpt_server_archs.png)
