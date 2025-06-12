@@ -202,6 +202,8 @@ docker build --rm -f "Dockerfile" -t gpt_server:latest "."
 docker-compose  -f "docker-compose.yml" up -d --build gpt_server
 ```
 
+<details close>
+<summary> <b> 3.3 可视化UI方式启动服务（有Bug，已弃用，欢迎大佬优化代码）</b></summary>
 
 #### 3.3 可视化UI方式启动服务（可选,有Bug，不建议使用，欢迎大佬优化代码）
 
@@ -214,6 +216,7 @@ streamlit run server_ui.py
 
 ![server_ui_demo.png](assets/server_ui_demo.png)
 
+</details>
 
 ### 4. 使用 openai 库 进行调用
 
