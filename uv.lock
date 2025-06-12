@@ -958,6 +958,25 @@ wheels = [
 ]
 
 [[package]]
+name = "diffusers"
+version = "0.33.1"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "filelock" },
+    { name = "huggingface-hub" },
+    { name = "importlib-metadata" },
+    { name = "numpy" },
+    { name = "pillow" },
+    { name = "regex" },
+    { name = "requests" },
+    { name = "safetensors" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/82/cc/1ef6bdc99d3864f6d1ee11bdbe3708b9d33ce35e7671557f641897480956/diffusers-0.33.1.tar.gz", hash = "sha256:fc7f140295d2ec82b1e7474b77bb7057fc0686c14eadc54ca0e52a66527e18a2", size = 2896103 }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e7/7a/f08f610cea8a3395ad3b4f586db23bedb43c68db6c3261145a15e7b63126/diffusers-0.33.1-py3-none-any.whl", hash = "sha256:027469e74f289338eb24127409f8d60d840b1b7ce4b27ffcd3134fd3b8431567", size = 3554612 },
+]
+
+[[package]]
 name = "dill"
 version = "0.3.7"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
@@ -1568,10 +1587,11 @@ wheels = [
 
 [[package]]
 name = "gpt-server"
-version = "0.4.7"
+version = "0.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
+    { name = "diffusers" },
     { name = "edge-tts" },
     { name = "evalscope", extra = ["perf"] },
     { name = "fastapi" },
@@ -1597,6 +1617,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate", specifier = ">=1.0.1" },
+    { name = "diffusers", specifier = ">=0.33.1" },
     { name = "edge-tts", specifier = ">=7.0.0" },
     { name = "evalscope", extras = ["perf"], specifier = "==0.16.1" },
     { name = "fastapi", specifier = "==0.115.0" },
@@ -5562,9 +5583,9 @@ dependencies = [
     { name = "packaging" },
     { name = "protobuf" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/02/9b/c2b5aba53f5e27ffcf249fc38485836119638f97d20b978664b15f97c8a6/tensorboardX-2.6.2.2.tar.gz", hash = "sha256:c6476d7cd0d529b0b72f4acadb1269f9ed8b22f441e87a84f2a3b940bb87b666" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/02/9b/c2b5aba53f5e27ffcf249fc38485836119638f97d20b978664b15f97c8a6/tensorboardX-2.6.2.2.tar.gz", hash = "sha256:c6476d7cd0d529b0b72f4acadb1269f9ed8b22f441e87a84f2a3b940bb87b666", size = 4778030 }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/44/71/f3e7c9b2ab67e28c572ab4e9d5fa3499e0d252650f96d8a3a03e26677f53/tensorboardX-2.6.2.2-py2.py3-none-any.whl", hash = "sha256:160025acbf759ede23fd3526ae9d9bfbfd8b68eb16c38a010ebe326dc6395db8" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/44/71/f3e7c9b2ab67e28c572ab4e9d5fa3499e0d252650f96d8a3a03e26677f53/tensorboardX-2.6.2.2-py2.py3-none-any.whl", hash = "sha256:160025acbf759ede23fd3526ae9d9bfbfd8b68eb16c38a010ebe326dc6395db8", size = 101700 },
 ]
 
 [[package]]

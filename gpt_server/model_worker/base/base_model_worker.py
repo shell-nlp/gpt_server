@@ -189,3 +189,6 @@ class BaseModelWorker:
 
     def generate_voice_stream(self, params):
         raise NotImplementedError
+
+    def get_image_output(self, params):
+        raise NotImplementedError

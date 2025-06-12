@@ -55,7 +55,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         multimodal: bool = False,
     ):
         is_vision = False
-        if model_type != "asr" and model_type != "tts":
+        if model_type in ["image"]:
+            pass
+        elif model_type not in ["asr", "tts"]:
             try:
                 self.model_config = AutoConfig.from_pretrained(
                     model_path, trust_remote_code=True
@@ -402,6 +404,16 @@ async def api_get_embeddings(request: Request):
     await acquire_worker_semaphore()
     logger.debug(f"params {params}")
     embedding = await worker.get_embeddings(params)
+    release_worker_semaphore()
+    return JSONResponse(content=embedding)
+
+
+@app.post("/worker_get_image_output")
+async def api_get_embeddings(request: Request):
+    params = await request.json()
+    await acquire_worker_semaphore()
+    logger.debug(f"params {params}")
+    embedding = await worker.get_image_output(params)
     release_worker_semaphore()
     return JSONResponse(content=embedding)
 

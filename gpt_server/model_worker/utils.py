@@ -4,6 +4,15 @@ from fastapi import HTTPException
 import base64
 import io
 
+from PIL.Image import Image
+
+
+# 转换为Base64
+def pil_to_base64(pil_img: Image, format: str = "PNG"):
+    buffered = io.BytesIO()
+    pil_img.save(buffered, format=format)  # 明确指定PNG格式
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
 
 def extract_base64(data_url: str):
     """从Data URL中提取纯Base64数据"""

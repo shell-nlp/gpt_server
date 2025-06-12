@@ -14,6 +14,12 @@ from fastchat.protocol.openai_api_protocol import (
 from pydantic import Field, BaseModel
 
 
+class ImagesGenRequest(BaseModel):
+    prompt: str
+    model: str
+    output_format: str  # png, jpeg, or webp
+
+
 # copy from https://github.com/remsky/Kokoro-FastAPI/blob/master/api/src/routers/openai_compatible.py
 class OpenAISpeechRequest(BaseModel):
     model: str = Field(
