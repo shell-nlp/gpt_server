@@ -3,12 +3,14 @@ import asyncio
 import io
 import os
 from typing import List
+import uuid
 from loguru import logger
 import shortuuid
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_worker.utils import pil_to_base64
 import torch
 from diffusers import FluxPipeline
+from gpt_server.utils import STATIC_DIR
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
@@ -44,6 +46,7 @@ class FluxWorker(ModelWorkerBase):
 
     async def get_image_output(self, params):
         prompt = params["prompt"]
+        response_format = params.get("response_format", "b64_json")
         image = self.pipe(
             prompt,
             height=1024,
@@ -53,17 +56,39 @@ class FluxWorker(ModelWorkerBase):
             max_sequence_length=512,
             generator=torch.Generator(self.device).manual_seed(0),
         ).images[0]
-        base64 = pil_to_base64(pil_img=image)
-        result = {
-            "created": shortuuid.random(),
-            "data": [{"b64_json": base64}],
-            "usage": {
-                "total_tokens": 0,
-                "input_tokens": 0,
-                "output_tokens": 0,
-                "input_tokens_details": {"text_tokens": 0, "image_tokens": 0},
-            },
-        }
+        result = {}
+        if response_format == "b64_json":
+            # Convert PIL image to base64
+            base64 = pil_to_base64(pil_img=image)
+            result = {
+                "created": shortuuid.random(),
+                "data": [{"b64_json": base64}],
+                "usage": {
+                    "total_tokens": 0,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "input_tokens_details": {"text_tokens": 0, "image_tokens": 0},
+                },
+            }
+            return result
+        elif response_format == "url":
+            # 生成唯一文件名（避免冲突）
+            file_name = str(uuid.uuid4()) + ".png"
+            save_path = STATIC_DIR / file_name
+            image.save(save_path, format="PNG")
+            WORKER_PORT = os.environ["WORKER_PORT"]
+            WORKER_HOST = os.environ["WORKER_HOST"]
+            url = f"http://{WORKER_HOST}:{WORKER_PORT}/static/{file_name}"
+            result = {
+                "created": shortuuid.random(),
+                "data": [{"url": url}],
+                "usage": {
+                    "total_tokens": 0,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "input_tokens_details": {"text_tokens": 0, "image_tokens": 0},
+                },
+            }
         return result
 
 

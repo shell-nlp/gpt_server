@@ -736,7 +736,7 @@ async def speech(request: ImagesGenRequest):
         "model": request.model,
         "prompt": request.prompt,
         "output_format": request.output_format,
-        "model_type": request.model_type,
+        "response_format": request.response_format,
     }
     result = await get_images_gen(payload=payload)
     return result

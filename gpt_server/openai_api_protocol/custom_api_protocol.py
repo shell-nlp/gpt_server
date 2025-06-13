@@ -21,9 +21,13 @@ class ImagesGenRequest(BaseModel):
         default="png",
         description="png, jpeg, or webp",
     )
-    model_type: Literal["t2v", "t2i"] = Field(
-        default="t2i",
-        description="t2v: 文生视频 t2i: 文生图",
+    # model_type: Literal["t2v", "t2i"] = Field(
+    #     default="t2i",
+    #     description="t2v: 文生视频 t2i: 文生图",
+    # )
+    response_format: Literal["url", "b64_json"] = Field(
+        default="url",
+        description="生成图像时返回的格式。必须为“ur”或“b64_json”之一。URL仅在图像生成后60分钟内有效。",
     )
 
 
