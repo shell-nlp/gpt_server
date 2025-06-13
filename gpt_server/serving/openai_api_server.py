@@ -811,7 +811,7 @@ async def speech(request: OpenAISpeechRequest):
         )
 
 
-@app.post("/v1/audio/speech2", dependencies=[Depends(check_api_key)])
+@app.post("/v1/audio/speech2", dependencies=[Depends(check_api_key)], deprecated=True)
 async def speech(request: SpeechRequest):
     os.makedirs(OUTPUT_DIR, exist_ok=True)  # 即使存在也不会报错
     list_voices = await edge_tts.list_voices()

@@ -16,7 +16,6 @@ ENV = os.environ
 logger.add("logs/gpt_server.log", rotation="100 MB", level="INFO")
 root_dir = Path(__file__).parent
 STATIC_DIR = root_dir / "static"
-os.makedirs(STATIC_DIR, exist_ok=True)
 
 
 def kill_child_processes(parent_pid, including_parent=False):

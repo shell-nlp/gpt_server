@@ -1,7 +1,9 @@
 import asyncio
+from datetime import datetime
 from typing import List
 import json
 import sys
+import shutil
 from abc import ABC, abstractmethod
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -41,6 +43,22 @@ def get_context_length_(config):
         if val is not None:
             return int(rope_scaling_factor * val)
     return 2048
+
+
+async def cleanup_static_files():
+    """清理静态文件目录并重建"""
+    logger.info(f"{datetime.now()}  开始清理静态文件目录：{STATIC_DIR}")
+    shutil.rmtree(STATIC_DIR, ignore_errors=True)
+    os.makedirs(STATIC_DIR, exist_ok=True)
+    logger.info(f"{datetime.now()}  清理完成")
+    await asyncio.sleep(1)  # 60分钟 = 3600秒
+
+
+async def run_scheduler():
+    """每60分钟执行一定时任务"""
+    while True:
+        await cleanup_static_files()
+        await asyncio.sleep(60 * 60)  # 60分钟 = 3600秒
 
 
 class ModelWorkerBase(BaseModelWorker, ABC):
@@ -272,7 +290,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         @app.on_event("startup")
         async def startup():
             global worker
-
+            asyncio.create_task(run_scheduler())
             worker = cls.get_worker(
                 worker_addr=worker_addr,
                 model_path=args.model_name_or_path,
