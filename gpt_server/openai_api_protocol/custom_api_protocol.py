@@ -21,6 +21,10 @@ class ImagesGenRequest(BaseModel):
         default="png",
         description="png, jpeg, or webp",
     )
+    model_type: Literal["t2v", "t2i"] = Field(
+        default="t2i",
+        description="t2v: 文生视频 t2i: 文生图",
+    )
 
 
 # copy from https://github.com/remsky/Kokoro-FastAPI/blob/master/api/src/routers/openai_compatible.py

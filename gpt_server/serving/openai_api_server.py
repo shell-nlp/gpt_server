@@ -732,11 +732,11 @@ async def speech(request: ImagesGenRequest):
     error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret
-
     payload = {
         "model": request.model,
         "prompt": request.prompt,
         "output_format": request.output_format,
+        "model_type": request.model_type,
     }
     result = await get_images_gen(payload=payload)
     return result

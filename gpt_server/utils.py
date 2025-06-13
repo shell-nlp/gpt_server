@@ -10,8 +10,13 @@ import torch
 import psutil
 from rich import print
 import signal
+from pathlib import Path
 
+ENV = os.environ
 logger.add("logs/gpt_server.log", rotation="100 MB", level="INFO")
+root_dir = Path(__file__).parent
+STATIC_DIR = root_dir / "static"
+os.makedirs(STATIC_DIR, exist_ok=True)
 
 
 def kill_child_processes(parent_pid, including_parent=False):
@@ -111,8 +116,7 @@ def start_api_server(config: dict):
 
 def get_model_types():
     model_types = []
-    root_dir = os.path.dirname(__file__)
-    model_worker_path = os.path.join(root_dir, "model_worker")
+    model_worker_path = root_dir / "model_worker"
     # 遍历目录及其子目录
     for root, dirs, files in os.walk(model_worker_path):
         for file in files:
@@ -352,6 +356,18 @@ def is_port_in_use(port):
             return True
 
 
+def get_physical_ip():
+    import socket
+
+    local_ip = socket.gethostbyname(socket.getfqdn(socket.gethostname()))
+    return local_ip
+
+
+try:
+    local_ip = get_physical_ip()
+except Exception as e:
+    local_ip = ENV.get("local_ip", "127.0.0.1")
+
 model_type_mapping = {
     "yi": "yi",
     "qwen": "qwen",
@@ -374,12 +390,13 @@ if __name__ == "__main__":
     from lmdeploy.archs import get_model_arch
     from lmdeploy.cli.utils import get_chat_template
 
+    print(local_ip)
     ckpt = "/home/dev/model/Qwen/Qwen3-32B/"  # internlm2
     chat_template = get_chat_template(ckpt)
     model_type = get_names_from_model(ckpt)
     arch = get_model_arch(ckpt)
+
     print(chat_template)
     # print(arch)
     print(model_type)
     print(model_type[1] == "base")
-    print()

@@ -5,6 +5,7 @@ import sys
 from abc import ABC, abstractmethod
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastchat.utils import SEQUENCE_LENGTH_KEYS
 from loguru import logger
 import os
@@ -16,11 +17,12 @@ from transformers import (
     AutoConfig,
 )
 import uuid
-from gpt_server.utils import get_free_tcp_port
+from gpt_server.utils import get_free_tcp_port, STATIC_DIR, local_ip
 from gpt_server.model_worker.base.base_model_worker import BaseModelWorker
 
 worker = None
 app = FastAPI()
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 def get_context_length_(config):
@@ -263,6 +265,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         controller_address = args.controller_address
 
         port = get_free_tcp_port()
+        os.environ["WORKER_PORT"] = str(port)
+        os.environ["WORKER_HOST"] = str(local_ip)
         worker_addr = f"http://{host}:{port}"
 
         @app.on_event("startup")
@@ -409,9 +413,9 @@ async def api_get_embeddings(request: Request):
     params = await request.json()
     await acquire_worker_semaphore()
     logger.debug(f"params {params}")
-    embedding = await worker.get_image_output(params)
+    result = await worker.get_image_output(params)
     release_worker_semaphore()
-    return JSONResponse(content=embedding)
+    return JSONResponse(content=result)
 
 
 @app.post("/worker_get_classify")
