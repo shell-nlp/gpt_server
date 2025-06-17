@@ -55,6 +55,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-6-17  支持了 jina-reranker-m0 全球首个支持多模态多语言的重排模型
 2025-6-12  支持了 文生图模型 flux (代码样例见gpt_server/tests/test_image_gen.py)
 2025-6-6   支持了 bge-vl 系列 (代码样例见gpt_server/tests/test_openai_embedding_vl.py)
 2025-6-6   支持了 ritrieve_zh_v1
@@ -295,6 +296,7 @@ Chat UI界面:
 | ----------------------------------------------------------------------------------- | --- | -------- |
 | bge-m3                                                                        | √   | √        |
 | bge-vl                                                                   | √   | ×        |
+| jina-reranker-m0                                                                   | √   | ×        |
 | bge-reranker                                                                        | √   | √        |
 | bge-embedding                                                                       | √   | √        |
 | bce-reranker                                                                        | √   | √        |
