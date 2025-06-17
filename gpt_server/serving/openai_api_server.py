@@ -134,6 +134,7 @@ async def timing_tasks():
 
     while True:
         try:
+            # ret = await fetch_remote(controller_address + "/refresh_all_workers")
             models = await fetch_remote(
                 controller_address + "/list_models", None, "models"
             )

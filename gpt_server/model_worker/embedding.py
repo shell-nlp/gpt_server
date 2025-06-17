@@ -49,12 +49,22 @@ class EmbeddingWorker(ModelWorkerBase):
                 logger.info(f"device: {self.client.device}")
             self.client.set_processor(model_path)
             self.client.eval()
-        elif "rerank" in self.mode:
+        elif "vl_rerank" == self.mode:
+            self.client = AutoModel.from_pretrained(
+                model_path,
+                torch_dtype="auto",
+                trust_remote_code=True,
+                # attn_implementation="flash_attention_2",
+            )
+
+            self.client.to("cuda")  # or 'cpu' if no GPU is available
+            self.client.eval()
+        elif "rerank" == self.mode:
             self.client = sentence_transformers.CrossEncoder(
                 model_name=model_path, **model_kwargs
             )
             logger.warning("正在使用 rerank 模型...")
-        elif "embedding" in self.mode:
+        elif "embedding" == self.mode:
             self.client = sentence_transformers.SentenceTransformer(
                 model_path, **model_kwargs
             )
@@ -78,6 +88,30 @@ class EmbeddingWorker(ModelWorkerBase):
             token_num = 0
             sentence_pairs = [[query, inp] for inp in texts]
             scores = self.client.predict(sentence_pairs)
+            embedding = [[float(score)] for score in scores]
+        elif self.mode == "vl_rerank":
+            query = params.get("query", None)
+            token_num = 0
+            sentence_pairs = [[query, inp] for inp in texts]
+            query_type = doc_type = "text"
+            if (
+                query.startswith("http://")
+                or query.startswith("https://")
+                or "data:" in query
+            ):
+                query_type = "image"
+            if (
+                texts[0].startswith("http://")
+                or texts[0].startswith("https://")
+                or "data:" in texts[0]
+            ):
+                doc_type = "image"
+            scores = self.client.compute_score(
+                sentence_pairs,
+                max_length=1024 * 2,
+                query_type=query_type,
+                doc_type=doc_type,
+            )
             embedding = [[float(score)] for score in scores]
         elif self.mode == "clip_text_model":
             token_num = 0

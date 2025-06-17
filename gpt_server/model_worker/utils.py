@@ -54,6 +54,10 @@ def get_embedding_mode(model_path: str):
     from infinity_emb.inference.select_model import get_engine_type_from_config
 
     model_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+    architectures = getattr(model_config, "architectures", [])
+    if "JinaVLForRanking" in architectures:
+        logger.warning("model_type: JinaVLForRanking")
+        return "vl_rerank"
     model_type_text = getattr(
         getattr(model_config, "text_config", {}), "model_type", None
     )
@@ -76,14 +80,13 @@ def get_embedding_mode(model_path: str):
     engine_type_str = str(engine_type)
 
     if "EmbedderEngine" in engine_type_str:
-        mode = "embedding"
+        return "embedding"
     elif "RerankEngine" in engine_type_str:
-        mode = "rerank"
+        return "rerank"
     elif "ImageEmbedEngine" in engine_type_str:
-        mode = model_type or "image"
+        return model_type or "image"
     elif "PredictEngine" in engine_type_str:
-        mode = "classify"
-    return mode
+        return "classify"
 
 
 if __name__ == "__main__":
