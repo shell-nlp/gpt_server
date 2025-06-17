@@ -24,6 +24,7 @@ from gpt_server.model_worker.base.base_model_worker import BaseModelWorker
 
 worker = None
 app = FastAPI()
+os.makedirs(STATIC_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
@@ -47,11 +48,12 @@ def get_context_length_(config):
 
 async def cleanup_static_files():
     """清理静态文件目录并重建"""
+    await asyncio.sleep(10)  # 60分钟 = 3600秒
     logger.info(f"{datetime.now()}  开始清理静态文件目录：{STATIC_DIR}")
     shutil.rmtree(STATIC_DIR, ignore_errors=True)
     os.makedirs(STATIC_DIR, exist_ok=True)
     logger.info(f"{datetime.now()}  清理完成")
-    await asyncio.sleep(1)  # 60分钟 = 3600秒
+    await asyncio.sleep(10)  # 60分钟 = 3600秒
 
 
 async def run_scheduler():
