@@ -26,10 +26,7 @@ from fastchat.constants import (
     ErrorCode,
     SERVER_ERROR_MSG,
 )
-from fastchat.utils import build_logger
-
-
-logger = build_logger("controller", "controller.log")
+from loguru import logger
 
 
 class DispatchMethod(Enum):
