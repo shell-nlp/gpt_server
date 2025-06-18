@@ -37,16 +37,15 @@ class EmbeddingWorker(ModelWorkerBase):
             device = "cuda"
         logger.warning(f"使用{device}加载...")
         model_kwargs = {"device": device}
+        if device == "cuda":
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # TODO
         self.mode = get_embedding_mode(model_path=model_path)
         self.encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
         if "clip_text_model" in self.mode:  # clip text 模型
             self.client = AutoModel.from_pretrained(model_path, trust_remote_code=True)
-            if device == "cuda":
-                self.client.to(
-                    torch.device("cuda" if torch.cuda.is_available() else "cpu")
-                )
-                logger.info(f"device: {self.client.device}")
+            self.client.to(device)
+            logger.info(f"device: {self.client.device}")
             self.client.set_processor(model_path)
             self.client.eval()
         elif "vl_rerank" == self.mode:
@@ -56,8 +55,7 @@ class EmbeddingWorker(ModelWorkerBase):
                 trust_remote_code=True,
                 # attn_implementation="flash_attention_2",
             )
-
-            self.client.to("cuda")  # or 'cpu' if no GPU is available
+            self.client.to(device)
             self.client.eval()
         elif "rerank" == self.mode:
             self.client = sentence_transformers.CrossEncoder(
