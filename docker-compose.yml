@@ -18,7 +18,7 @@ services:
     environment:
       - TZ:Asia/Shanghai  # 设置中国时区
     volumes:
-      # - ./gpt_server:/gpt_server/gpt_server # 将最新代码直接映射到容器中，以运行最新的代码
+      - ./gpt_server:/gpt_server/gpt_server # 将最新代码以及配置直接映射到容器中，以运行最新的代码
       - /home/dev/model/:/home/dev/model/ # 映射模型路径
     deploy:
       resources:
