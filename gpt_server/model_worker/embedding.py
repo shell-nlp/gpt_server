@@ -112,6 +112,8 @@ class EmbeddingWorker(ModelWorkerBase):
                 query_type=query_type,
                 doc_type=doc_type,
             )
+            if isinstance(scores, float):
+                scores = [scores]
             embedding = [[float(score)] for score in scores]
         elif self.mode == "clip_text_model":
             token_num = 0
