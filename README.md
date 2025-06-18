@@ -308,9 +308,10 @@ Chat UI界面:
 | zpoint_large_embedding_zh                                                           | √   | √        |
 | xiaobu-embedding                                                                    | √   | √        |
 | Conan-embedding-v1                                                                  | √   | √        |
-| ritrieve_zh_v1                                                                   | √   | √        |
-| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）            | ×   | √        |
-| protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入） | ×   | √        |
+| qwen3-embedding                                                                     | √   | √        |
+| ritrieve_zh_v1                                                                      | √   | √        |
+| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）                 | ×   | √        |
+| protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入）    | ×   | √        |
 
 目前 **ritrieve_zh_v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
