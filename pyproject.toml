@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.5.0"
+version = "0.5.1"
 description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -14,14 +14,14 @@ dependencies = [
     "infinity-emb[all]==0.0.76",
     "lmdeploy==0.8.0",
     "loguru>=0.7.2",
-    "openai==1.55.3",
+    "openai==1.86.0",
     "setuptools==75.2.0",
     "streamlit==1.39.0",
     "torch==2.6.0",
     "torchvision==0.20.1",
     "vllm==0.9.0.1",
     "qwen_vl_utils",
-    "evalscope[perf]==0.16.1",
+    "evalscope[perf,rag]==0.16.1",
     "modelscope==1.26.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
