@@ -3,7 +3,7 @@ from loguru import logger
 from fastapi import HTTPException
 import base64
 import io
-
+import os
 from PIL.Image import Image
 
 
@@ -52,6 +52,14 @@ def get_embedding_mode(model_path: str):
     from infinity_emb import EngineArgs
     from transformers import AutoConfig
     from infinity_emb.inference.select_model import get_engine_type_from_config
+
+    task_type = os.environ.get("task_type", "auto")
+    if task_type == "embedding":
+        return "embedding"
+    elif task_type == "reranker":
+        return "rerank"
+    elif task_type == "classify":
+        return "classify"
 
     model_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
     architectures = getattr(model_config, "architectures", [])

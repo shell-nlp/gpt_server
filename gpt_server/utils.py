@@ -167,6 +167,7 @@ def start_model_worker(config: dict):
                     )
                     vad_model = engine_config.get("vad_model", "")
                     punc_model = engine_config.get("punc_model", "")
+                    task_type = engine_config.get("task_type", "auto")
 
                 else:
                     logger.error(
@@ -252,6 +253,7 @@ def start_model_worker(config: dict):
                         + f" --gpu_memory_utilization {gpu_memory_utilization}"  # 占用GPU比例
                         + f" --kv_cache_quant_policy {kv_cache_quant_policy}"  # kv cache 量化策略
                         + f" --log_level {log_level}"  # 日志水平
+                        + f" --task_type {task_type}"  # 日志水平
                     )
                     # 处理为 None的情况
                     if lora:

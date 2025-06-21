@@ -249,6 +249,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--punc_model", type=str, default="")
         # log_level
         parser.add_argument("--log_level", type=str, default="WARNING")
+        # task_type
+        parser.add_argument("--task_type", type=str, default="auto")
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -276,6 +278,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         os.environ["kv_cache_quant_policy"] = args.kv_cache_quant_policy
         os.environ["dtype"] = args.dtype
         os.environ["log_level"] = args.log_level
+        os.environ["task_type"] = args.task_type
         logger.remove(0)
         log_level = os.getenv("log_level", "WARNING")
         logger.add(sys.stderr, level=log_level)
