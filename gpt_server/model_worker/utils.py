@@ -68,7 +68,6 @@ def get_embedding_mode(model_path: str):
     # print(model_type_vison, model_type_text)
     model_type = model_type_text
 
-    mode = "embedding"
     engine_args = EngineArgs(
         model_name_or_path=model_path,
         engine="torch",

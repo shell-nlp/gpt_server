@@ -6,6 +6,7 @@ from loguru import logger
 from infinity_emb import AsyncEngineArray, EngineArgs, AsyncEmbeddingEngine
 from infinity_emb.inference.select_model import get_engine_type_from_config
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
+from gpt_server.model_worker.utils import get_embedding_mode
 
 label_to_category = {
     "S": "sexual",
@@ -58,16 +59,7 @@ class EmbeddingWorker(ModelWorkerBase):
             device=device,
             bettertransformer=bettertransformer,
         )
-        engine_type = get_engine_type_from_config(engine_args)
-        engine_type_str = str(engine_type)
-        if "EmbedderEngine" in engine_type_str:
-            self.mode = "embedding"
-        elif "RerankEngine" in engine_type_str:
-            self.mode = "rerank"
-        elif "ImageEmbedEngine" in engine_type_str:
-            self.mode = "image"
-        elif "PredictEngine" in engine_type_str:
-            self.mode = "classify"
+        self.mode = get_embedding_mode(model_path=model_path)
         self.engine: AsyncEmbeddingEngine = AsyncEngineArray.from_args([engine_args])[0]
         loop = asyncio.get_running_loop()
         loop.create_task(self.engine.astart())

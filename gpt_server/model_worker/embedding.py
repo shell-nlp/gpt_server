@@ -68,6 +68,7 @@ class EmbeddingWorker(ModelWorkerBase):
             )
             logger.warning("正在使用 embedding 模型...")
         logger.warning(f"模型：{model_names[0]}")
+        logger.warning(f"正在使用 {self.mode} 模型...")
 
     async def get_embeddings(self, params):
         self.call_ct += 1
