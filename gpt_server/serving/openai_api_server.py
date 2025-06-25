@@ -686,7 +686,7 @@ async def generate_completion_stream(payload: Dict[str, Any], worker_addr: str):
             worker_addr + "/worker_generate_stream",
             headers=headers,
             json=payload,
-            timeout=30,
+            timeout=60,
         ) as response:
             # content = await response.aread()
             buffer = b""

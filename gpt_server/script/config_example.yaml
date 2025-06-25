@@ -22,6 +22,7 @@ model_worker_args:
   host: 0.0.0.0
   controller_address: http://localhost:21001 # # 将模型注册到 控制器的 地址
   log_level: WARNING # DEBUG INFO WARNING ERROR
+  limit_worker_concurrency: 1024 # worker的最大并发数,默认为 1024
 
 models:
 - qwen:

@@ -203,7 +203,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         controller_addr: str = "http://localhost:21001",
         worker_id: str = str(uuid.uuid4())[:8],
         model_names: List[str] = [""],
-        limit_worker_concurrency: int = 512,
+        limit_worker_concurrency: int = 1024,
         conv_template: str = None,  # type: ignore
     ):
         worker = cls(
@@ -251,6 +251,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--log_level", type=str, default="WARNING")
         # task_type
         parser.add_argument("--task_type", type=str, default="auto")
+        # limit_worker_concurrency
+        parser.add_argument("--limit_worker_concurrency", type=int, default=1024)
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -279,6 +281,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         os.environ["dtype"] = args.dtype
         os.environ["log_level"] = args.log_level
         os.environ["task_type"] = args.task_type
+        limit_worker_concurrency = int(args.limit_worker_concurrency)
         logger.remove(0)
         log_level = os.getenv("log_level", "WARNING")
         logger.add(sys.stderr, level=log_level)
@@ -291,6 +294,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         os.environ["WORKER_PORT"] = str(port)
         os.environ["WORKER_HOST"] = str(local_ip)
         worker_addr = f"http://{host}:{port}"
+        model_names = args.model_names
+        logger.info(f"{model_names[0]} args: \n{args}")
 
         @app.on_event("startup")
         async def startup():
@@ -299,9 +304,10 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             worker = cls.get_worker(
                 worker_addr=worker_addr,
                 model_path=args.model_name_or_path,
-                model_names=args.model_names,
+                model_names=model_names,
                 conv_template="chatglm3",  # TODO 默认是chatglm3用于统一处理
                 controller_addr=controller_address,
+                limit_worker_concurrency=limit_worker_concurrency,
             )
 
         uvicorn.run(app, host=host, port=port)

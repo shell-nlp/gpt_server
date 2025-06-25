@@ -136,6 +136,9 @@ def start_model_worker(config: dict):
         host = config["model_worker_args"]["host"]
         controller_address = config["model_worker_args"]["controller_address"]
         log_level = config["model_worker_args"].get("log_level", "WARNING")
+        limit_worker_concurrency = config["model_worker_args"].get(
+            "limit_worker_concurrency", 1024
+        )
     except KeyError as e:
         error_msg = f"请参照 https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config.yaml 设置正确的 model_worker_args"
         logger.error(error_msg)
@@ -254,6 +257,7 @@ def start_model_worker(config: dict):
                         + f" --kv_cache_quant_policy {kv_cache_quant_policy}"  # kv cache 量化策略
                         + f" --log_level {log_level}"  # 日志水平
                         + f" --task_type {task_type}"  # 日志水平
+                        + f" --limit_worker_concurrency {limit_worker_concurrency}"  # 限制worker并发数
                     )
                     # 处理为 None的情况
                     if lora:
