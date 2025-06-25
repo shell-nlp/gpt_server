@@ -203,7 +203,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         controller_addr: str = "http://localhost:21001",
         worker_id: str = str(uuid.uuid4())[:8],
         model_names: List[str] = [""],
-        limit_worker_concurrency: int = 10000,
+        limit_worker_concurrency: int = 512,
         conv_template: str = None,  # type: ignore
     ):
         worker = cls(
@@ -318,14 +318,9 @@ def acquire_worker_semaphore():
 
 
 def create_background_tasks(request_id):
-    async def abort_request() -> None:
-        await worker.backend.engine.abort(request_id)
-
     background_tasks = BackgroundTasks()
     background_tasks.add_task(release_worker_semaphore)
-    #
-    if os.getenv("backend") == "vllm":
-        background_tasks.add_task(abort_request)
+
     return background_tasks
 
 
@@ -348,8 +343,8 @@ async def api_generate_stream(request: Request):
     params.pop("prompt")
     logger.debug(f"params {params}")
     generator = worker.generate_stream_gate(params)
-    # background_tasks = create_background_tasks(request_id)
-    return StreamingResponse(generator, background=None)
+    background_tasks = create_background_tasks(request_id)
+    return StreamingResponse(generator, background=background_tasks)
 
 
 @app.post("/worker_generate_voice_stream")
@@ -361,7 +356,7 @@ async def api_generate_stream(request: Request):
     params["request"] = request
     logger.debug(f"params {params}")
     generator = worker.generate_voice_stream(params)
-    # background_tasks = create_background_tasks(request_id)
+    background_tasks = create_background_tasks(request_id)
     response_format = params["response_format"]
     content_type = {
         "mp3": "audio/mpeg",
@@ -373,7 +368,7 @@ async def api_generate_stream(request: Request):
     }.get(response_format, f"audio/{response_format}")
     return StreamingResponse(
         generator,
-        background=None,
+        background=background_tasks,
         media_type=content_type,
         headers={
             "Content-Disposition": f"attachment; filename=speech.{response_format}",
@@ -395,8 +390,7 @@ async def api_generate(request: Request):
     logger.debug(f"params {params}")
     output = await worker.generate_gate(params)
     release_worker_semaphore()
-    # if os.getenv("backend") == "vllm":
-    #     await worker.backend.engine.abort(request_id)
+
     return JSONResponse(output)
 
 

@@ -508,7 +508,8 @@ async def chat_completion_stream_generator(
             try:
                 error_code = content["error_code"]
             except Exception as e:
-                print(content)
+                logger.exception(f"发生异常 content：{content}")
+                content["error_code"] = ErrorCode.INTERNAL_ERROR
             if content["error_code"] != 0:
                 yield f"data: {json.dumps(content, ensure_ascii=False)}\n\n"
                 yield "data: [DONE]\n\n"
@@ -678,16 +679,14 @@ async def generate_completion_stream_generator(
 
 
 async def generate_completion_stream(payload: Dict[str, Any], worker_addr: str):
-    async with httpx.AsyncClient(
-        limits=httpx.Limits(max_connections=1000, max_keepalive_connections=100)
-    ) as client:
+    async with httpx.AsyncClient() as client:
         delimiter = b"\0"
         async with client.stream(
             "POST",
             worker_addr + "/worker_generate_stream",
             headers=headers,
             json=payload,
-            timeout=WORKER_API_TIMEOUT,
+            timeout=30,
         ) as response:
             # content = await response.aread()
             buffer = b""
