@@ -308,7 +308,6 @@ def get_gen_params(
     # ------- TODO add messages tools -------
     gen_params["response_format"] = response_format
     gen_params["reasoning_parser"] = reasoning_parser
-    logger.debug(f"==== request ====\n{gen_params}")
     return gen_params
 
 

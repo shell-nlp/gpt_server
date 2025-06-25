@@ -25,10 +25,11 @@ backend_map = {
     "lmdeploy-pytorch": "pytorch",  # pytorch后端
     "lmdeploy-turbomind": "turbomind",  # turbomind后端
 }
+log_level = os.getenv("log_level", "WARNING")
 from lmdeploy.utils import get_logger
 
-get_logger("lmdeploy").setLevel("WARNING")
-os.environ["TM_LOG_LEVEL"] = "ERROR"
+get_logger("lmdeploy").setLevel(log_level)  # 默认WARNING
+os.environ["TM_LOG_LEVEL"] = "WARNING"
 
 
 def is_stop(output: str, stop_str: str):

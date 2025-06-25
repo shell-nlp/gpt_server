@@ -10,7 +10,7 @@ services:
     # image: docker.1ms.run/506610466/gpt_server:latest
     image: gpt_server:latest_
     container_name: gpt_server
-    shm_size: '8g' # 设置共享内存为4GB 
+    shm_size: '32g' # 设置共享内存为4GB 
     restart: always
     # network_mode: host
     ports:
