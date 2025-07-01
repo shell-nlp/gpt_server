@@ -2,7 +2,7 @@
 FROM 506610466/cuda:12.2.2-devel-ubuntu20.04-uv
 # 从基础镜像开始构建，加快构建速度
 # FROM 506610466/gpt_server:base
-RUN apt-get update -y && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y numactl build-essential && rm -rf /var/lib/apt/lists/*
 COPY ./ /gpt_server
 WORKDIR /gpt_server
 # RUN uv sync && uv cache clean
