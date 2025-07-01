@@ -31,6 +31,7 @@ overrides = [
     { name = "setuptools", specifier = "==75.2.0" },
     { name = "soundfile", specifier = "==0.13.1" },
     { name = "torch", specifier = "==2.7.0" },
+    { name = "torchaudio", specifier = "==2.7.1" },
     { name = "torchvision", specifier = "==0.22.1" },
     { name = "transformers", specifier = "==4.51.3" },
     { name = "triton" },
@@ -1355,14 +1356,15 @@ sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6b/b6/82c7e601d6d3c3
 
 [[package]]
 name = "flashinfer-python"
-version = "0.2.5+cu124torch2.5"
-source = { registry = "https://flashinfer.ai/whl/cu124/torch2.5" }
+version = "0.2.6.post1"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
+    { name = "ninja" },
+    { name = "numpy" },
+    { name = "requests" },
     { name = "torch" },
 ]
-wheels = [
-    { url = "https://github.com/flashinfer-ai/flashinfer/releases/download/v0.2.5/flashinfer_python-0.2.5+cu124torch2.5-cp38-abi3-linux_x86_64.whl", hash = "sha256:e6dd9e83ea85a1f135fe35393ae2ff2693e5d8150a3b94d5a7a26a29f73b89fa" },
-]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/34/26/3c6f12ffaefbfa0c453030d6e15941269b3a4ffcd267daec32d1a10dda96/flashinfer_python-0.2.6.post1.tar.gz", hash = "sha256:0cb5b346024b75deb08bd09a1cc6273ceb23f1f5f0d7e40dbe594abc6a67be69", size = 3137122 }
 
 [[package]]
 name = "flashtts"
@@ -1641,7 +1643,7 @@ wheels = [
 
 [[package]]
 name = "gpt-server"
-version = "0.5.2"
+version = "0.5.3"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
@@ -1676,7 +1678,7 @@ requires-dist = [
     { name = "evalscope", extras = ["perf", "rag"], specifier = "==0.16.1" },
     { name = "fastapi", specifier = "==0.115.0" },
     { name = "ffmpy" },
-    { name = "flashinfer-python", index = "https://flashinfer.ai/whl/cu124/torch2.5" },
+    { name = "flashinfer-python" },
     { name = "flashtts", specifier = ">=0.1.7" },
     { name = "fschat", specifier = "==0.2.36" },
     { name = "funasr", specifier = ">=1.2.6" },
@@ -1687,7 +1689,7 @@ requires-dist = [
     { name = "openai", specifier = "==1.86.0" },
     { name = "qwen-vl-utils" },
     { name = "setuptools", specifier = "==75.2.0" },
-    { name = "sglang", extras = ["all"], specifier = ">=0.4.6.post5" },
+    { name = "sglang", extras = ["all"], specifier = ">=0.4.8.post1" },
     { name = "streamlit", specifier = "==1.39.0" },
     { name = "torch", specifier = "==2.6.0" },
     { name = "torchvision", specifier = "==0.20.1" },
@@ -5690,15 +5692,15 @@ wheels = [
 
 [[package]]
 name = "sgl-kernel"
-version = "0.1.4"
+version = "0.1.9"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/da/74/d804e757d7dd85aecdd534429d9335ce87b881a1601341c01a39f9b256fd/sgl_kernel-0.1.4-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:330fb1cdf0952c1e0a77f93540bf2ba2c8b424e75768e4d64438027346d314dc", size = 231504246 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/64/ac/6537b3fb3dd251ed496ccd48dbc5c539daaa87a8b806e18da2b9b51a3c91/sgl_kernel-0.1.9-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:f762e98cfa890313d1f53e00a380b6c81659f9e4c259ddf50919e4858a5554a2", size = 249857872 },
 ]
 
 [[package]]
 name = "sglang"
-version = "0.4.6.post5"
+version = "0.4.8.post1"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -5708,9 +5710,9 @@ dependencies = [
     { name = "setproctitle" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/40/1f/3ac1eb0ea3962e0281b368a97b1f85c0735cce31c6a6efb22b1ceb57c160/sglang-0.4.6.post5.tar.gz", hash = "sha256:eef53ceb2d60d85a68d81f1ab844899d43f73fbbcd3add040d585446936dcfda", size = 997139 }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/31/58/c5dc95ba8cc08c6db289c7d0103906ec3187bd9859255029c6e845dc134e/sglang-0.4.8.post1.tar.gz", hash = "sha256:50ac9aefa41cc17d1f19c99b1891bb730b124eed889c182c3a669b12ce7a3821", size = 1127761 }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/29/53/a52eb53f91d4b7d2de1401bf91d83f7bf50453d81a89d5a19aab14cd624a/sglang-0.4.6.post5-py3-none-any.whl", hash = "sha256:2a48053bd975e09ff10eabf1ef8bab4c913f3c3e16a3e45c13be1b4543cfeaed", size = 1393672 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/37/c9/e1ebdee90f0ae52f6d3f2016142ef8bbd4f32f78772c9d17f35fb6c21a1d/sglang-0.4.8.post1-py3-none-any.whl", hash = "sha256:0c68bd3b461a910f1b135d64df7eb967ab8be73a7f17c9859c957d11c140d0e1", size = 1562438 },
 ]
 
 [package.optional-dependencies]
@@ -5744,12 +5746,14 @@ all = [
     { name = "pynvml" },
     { name = "python-multipart" },
     { name = "pyzmq" },
+    { name = "scipy" },
     { name = "sgl-kernel" },
     { name = "soundfile" },
     { name = "tiktoken" },
     { name = "torch" },
     { name = "torch-memory-saver" },
     { name = "torchao" },
+    { name = "torchaudio" },
     { name = "torchvision" },
     { name = "transformers" },
     { name = "uvicorn" },
@@ -6335,32 +6339,32 @@ wheels = [
 
 [[package]]
 name = "torchaudio"
-version = "2.7.0"
+version = "2.7.1"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "torch" },
 ]
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/34/26/abc66c79092ad2eaaade546dc93e23d99ddf2513988261b943d274f5c01a/torchaudio-2.7.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:1c4a646c9e9347836c09e965eebc58dd028ec6ef34c46d3e7891bffd8dc645ea", size = 1842304 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ee/f7/17b8fbce19280424e612f254e1b89faf3c7640c022667a480307f2f3ca76/torchaudio-2.7.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:9e4073992f4f8e7113e4b505d95095361ceb2f21dd7b9310776160a24266f8f6", size = 1680682 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f2/df/ee0097fc41f718152026541c4c6cdeea830bc09903cc36a53037942a6d3d/torchaudio-2.7.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:f7c99f7c062d6a56a3e281e3c2b779099e64cad1ce78891df61c4d19ce40742e", size = 3444849 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/65/a6/e1903c1b3787f0408d30624536d2ae30da9f749720f3cf272a4fb7abc490/torchaudio-2.7.0-cp310-cp310-win_amd64.whl", hash = "sha256:a5443422640cbe532aaacd83ad2ee6911b0451f7f50e6b3755015e92df579d37", size = 2492239 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6e/d6/27deb8862ecc005c95a5c64bcc8cc27c74878eb8d4162ce4d39b35ea9e27/torchaudio-2.7.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:862d9c5cfe15688a7846962b5d3c9f959beffe82b1e5441935c7a37504c5c5e7", size = 1849075 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/04/95/29b4a4d87540779101cb60cb7f381fdb6bc6aea0af83f0f35aa8fc70cb0d/torchaudio-2.7.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:677bd32031310ee73a47d6eebc2e74e74c1cf467932945ee88082a3935b5c950", size = 1686165 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ab/20/1873a49df9f1778c241543eaca14d613d657b9f9351c254952114251cb86/torchaudio-2.7.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:c37b77dd528ad18a036466e856f53d8bd5912b757a775309354b4a977a069379", size = 3455781 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/9e/1d/1fa4f69e4cd8c83831c3baad0ac9b56ece8ce0e75e5e5c0cdd3f591a458c/torchaudio-2.7.0-cp311-cp311-win_amd64.whl", hash = "sha256:36b94819f5406b2599ac31542e2e7a7aaf4a5b5f466ce034f296b1ee1134c945", size = 2494793 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/dd/b9/66dd7c4e16e8e6dcc52b4702ba7bbace589972b3597627d39d9dc3aa5fdd/torchaudio-2.7.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:65b4fc9b7f28367f918b02ae4db4290457bc4fdd160f22b7d684e93ab8dcb956", size = 1846733 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/47/48/850edf788c674494a7e148eee6f5563cae34c9a3e3e0962dcfce66c1dae7/torchaudio-2.7.0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:33004ed47f18f00044c97ee8cd9e3f5e1c2e26ef23d4f72b5f1ae33e6182587b", size = 1686687 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/78/98/ec8c7aba67b44cdc59717d4b43d02023ded5da180d33c6469d20bf5bfa3c/torchaudio-2.7.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:a6f03494075bcdd62e7fade7baf50a0ef107aa809d02b5e1786391adced451a3", size = 3454437 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5e/23/b73163ac06e5a724375df61a5b6c853861a825fe98e64388f277514153dd/torchaudio-2.7.0-cp312-cp312-win_amd64.whl", hash = "sha256:275931c8a38ff84b5692df990506b41f18d0a0706574d96bc8456ad9e5fa85c8", size = 2493451 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/c1/a5/bc4bb6b254d3d77e9fa4d219f29d3bff8db92acc9004c27e875f32d4724a/torchaudio-2.7.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:150fbde41da60296effed772b7a170f563cd44967555abb0603fc573f39ce245", size = 1847033 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/96/af/4c8d4e781ea5924590cccf8595a09081eb07a577c03fbf4bf04a2f5f7134/torchaudio-2.7.0-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:9d921eeb036512a87efde007977b27bd326320cd7cd5f43195824173fe82e888", size = 1686308 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/12/02/ad1083f6ce534989c704c3efcd615bdd160934229882aa0a3ea95cd24a9a/torchaudio-2.7.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:30675a5f99551e036974a7476729eb5d31f453cf792ae6e0a0d449960f84f464", size = 3455266 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/88/49/923ebb2603156dd5c5ae6d845bf51a078e05f27432cd26f13ecdcc8713cd/torchaudio-2.7.0-cp313-cp313-win_amd64.whl", hash = "sha256:ce8cfc07a4e59c835404583e7d3e171208b332b61bb92643f8723f6f192da8bf", size = 2493639 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/bf/85/dd4cd1202483e85c208e1ca3d31cc42c2972f1d955d11b742fa098a38a1b/torchaudio-2.7.0-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:9e08138cac75cde2064c8b5bbd12f27bdeb3d36f4b8c2285fc9c42eaa97c0676", size = 1929989 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ef/3a/8a1045f2b00c6300827c1e6a3e661e9d219b5406ef103dc2824604548b8c/torchaudio-2.7.0-cp313-cp313t-manylinux_2_28_aarch64.whl", hash = "sha256:1d928aeff495a0807b4da3b0dd46e15eae8070da5e7ed6d35c1dcfd9fdfe2b74", size = 1700439 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/72/53/21d589a5a41702b5d37bae224286986cb707500d5ecdbfdcfdbac9381a08/torchaudio-2.7.0-cp313-cp313t-manylinux_2_28_x86_64.whl", hash = "sha256:ee4add33f24e9cb959bd9de89f36de5ebf844eda040d1d0b38f08617d67dedc3", size = 3466356 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/00/0b/5ef81aaacce5e9c316659ddc61a2b1e4f984a504d4a06fe61bab04cc75f1/torchaudio-2.7.0-cp313-cp313t-win_amd64.whl", hash = "sha256:725dbbcc9e744ca62de8856262c6f472ca26b1cd5db062b062a2d6b66a336cc0", size = 2544970 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/da/71/bfc6d2b28ede6c4c5446901cfa4d98fa25b2606eb12e641baccec16fcde0/torchaudio-2.7.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:4739af57d0eb94347d1c6a1b5668be78a7383afe826dde18a04883b9f9f263b1", size = 1842457 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e6/8c/35eea5138ccd4abf38b163743d5ab4a8b25349bafa8bdf3d629e7f3036b9/torchaudio-2.7.1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:c089dbfc14c5f47091b7bf3f6bf2bbac93b86619299d04d9c102f4ad53758990", size = 1680682 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/7d/dc/7569889c1fc95ebf18b0295bc4fdebafbbb89ba9e0018c7e9b0844bae011/torchaudio-2.7.1-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:6bb1e6db22fa2aad6b89b2a455ec5c6dc31df2635dbfafa213394f8b07b09516", size = 3498891 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b3/e0/ff0ac4234798a0b6b1398fa878a2e7d22f1d06d4327feb312d9e77e079bd/torchaudio-2.7.1-cp310-cp310-win_amd64.whl", hash = "sha256:2ba4df6e3ad35cb1e5bd162cf86b492526138f6476f5a06b10725b8880c618eb", size = 2483343 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/85/a2/52e6760d352584ae1ab139d97647bdc51d1eb7d480b688fe69c72616c956/torchaudio-2.7.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d5a62f88c629035913f506df03f710c48fc8bb9637191933f27c67088d5ca136", size = 1849254 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/df/e6/0f3835895f9d0b8900ca4a7196932b13b74156ad9ffb76e7aacfc5bb4157/torchaudio-2.7.1-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:53bc4ba12e7468be34a7ca2ee837ee5c8bd5755b25c12f665af9339cae37e265", size = 1686156 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0d/c5/8ba8869ac5607bbd83ea864bda2c628f8b7b55a9200f8147687995e95a49/torchaudio-2.7.1-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:f8bd69354a397753b9dea9699d9e1251f8496fbbdf3028c7086a57a615bf33c3", size = 3508053 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/78/cc/11709b2cbf841eda124918523088d9aaa1509ae4400f346192037e6de6c6/torchaudio-2.7.1-cp311-cp311-win_amd64.whl", hash = "sha256:0ae0678ad27355eebea5a9fdd9ae9bfec444f8405f9b6c60026905ba3665c43a", size = 2488974 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0b/d1/eb8bc3b3502dddb1b789567b7b19668b1d32817266887b9f381494cfe463/torchaudio-2.7.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:9306dcfc4586cebd7647a93fe9a448e791c4f83934da616b9433b75597a1f978", size = 1846897 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/62/7d/6c15f15d3edc5271abc808f70713644b50f0f7bfb85a09dba8b5735fbad3/torchaudio-2.7.1-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:d66bd76b226fdd4135c97650e1b7eb63fb7659b4ed0e3a778898e41dbba21b61", size = 1686680 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/48/65/0f46ba74cdc67ea9a8c37c8acfb5194d81639e481e85903c076bcd97188c/torchaudio-2.7.1-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:9cbcdaab77ad9a73711acffee58f4eebc8a0685289a938a3fa6f660af9489aee", size = 3506966 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/52/29/06f887baf22cbba85ae331b71b110b115bf11b3968f5914a50c17dde5ab7/torchaudio-2.7.1-cp312-cp312-win_amd64.whl", hash = "sha256:9cfb8f6ace8e01e2b89de74eb893ba5ce936b88b415383605b0a4d974009dec7", size = 2484265 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b6/ee/6e308868b9467e1b51da9d781cb73dd5aadca7c8b6256f88ce5d18a7fb77/torchaudio-2.7.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:e5f0599a507f4683546878ed9667e1b32d7ca3c8a957e4c15c6b302378ef4dee", size = 1847208 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/3a/f9/ca0e0960526e6deaa476d168b877480a3fbae5d44668a54de963a9800097/torchaudio-2.7.1-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:271f717844e5c7f9e05c8328de817bf90f46d83281c791e94f54d4edea2f5817", size = 1686311 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/bb/ab/83f282ca5475ae34c58520a4a97b6d69438bc699d70d16432deb19791cda/torchaudio-2.7.1-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:1862b063d8d4e55cb4862bcbd63568545f549825a3c5605bd312224c3ebb1919", size = 3507174 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/12/91/dbd17a6eda4b0504d9b4f1f721a1654456e39f7178b8462344f942100865/torchaudio-2.7.1-cp313-cp313-win_amd64.whl", hash = "sha256:edb4deaa6f95acd5522912ed643303d0b86d79a6f15914362f5a5d49baaf5d13", size = 2484503 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/73/5e/da52d2fa9f7cc89512b63dd8a88fb3e097a89815f440cc16159b216ec611/torchaudio-2.7.1-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:18560955b8beb2a8d39a6bfae20a442337afcefb3dfd4ee007ce82233a796799", size = 1929983 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f7/16/9d03dc62613f276f9666eb0609164287df23986b67d20b53e78d21a3d8d8/torchaudio-2.7.1-cp313-cp313t-manylinux_2_28_aarch64.whl", hash = "sha256:1850475ef9101ea0b3593fe93ff6ee4e7a20598f6da6510761220b9fe56eb7fa", size = 1700436 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/83/45/57a437fe41b302fc79b4eb78fdb3e480ff42c66270e7505eedf0b000969c/torchaudio-2.7.1-cp313-cp313t-manylinux_2_28_x86_64.whl", hash = "sha256:98257fc14dd493ba5a3258fb6d61d27cd64a48ee79537c3964c4da26b9bf295f", size = 3521631 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/91/5e/9262a7e41e47bc87eb245c4fc485eb26ff41a05886b241c003440c9e0107/torchaudio-2.7.1-cp313-cp313t-win_amd64.whl", hash = "sha256:c802e0dcbf38669007327bb52f065573cc5cac106eaca987f6e1a32e6282263a", size = 2534956 },
 ]
 
 [[package]]

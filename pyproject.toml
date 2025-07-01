@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.5.2"
+version = "0.5.3"
 description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -25,7 +25,7 @@ dependencies = [
     "modelscope==1.26.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.4.6.post5",
+    "sglang[all]>=0.4.8.post1",
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.33.1",
@@ -36,6 +36,7 @@ default-groups = [] # 默认只安装dependencies中的库
 override-dependencies = [
     "setuptools==75.2.0",
     "torchvision==0.22.1",
+    "torchaudio==2.7.1",
     "torch==2.7.0",
     "triton",
     "outlines==0.1.11",
@@ -50,14 +51,6 @@ gpt_server = "gpt_server.cli:main"
 [[tool.uv.index]]
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
-
-# 强制要求 flashinfer-python通过官方源安装
-[[tool.uv.index]]
-name = "flashinfer-python"
-url = "https://flashinfer.ai/whl/cu124/torch2.5"
-
-[tool.uv.sources]
-flashinfer-python = { index = "flashinfer-python" }
 
 [build-system]
 requires = ["setuptools", "wheel"]
