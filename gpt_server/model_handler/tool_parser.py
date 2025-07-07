@@ -18,6 +18,7 @@ from lmdeploy.serve.openai.protocol import (
 
 from lmdeploy.serve.openai.tool_parser import ToolParser, ToolParserManager
 from lmdeploy.serve.openai.tool_parser.utils import extract_intermediate_diff
+from lmdeploy.serve.openai.tool_parser import ToolParser
 
 
 class ToolCall(BaseModel):
@@ -230,9 +231,7 @@ class Qwen2d5ToolParser(ToolParser):
                 tool_calls=tool_calls,
                 content=text if len(text) > 0 else "",
             )
-        elif (
-            self.tool_start_token not in text and self.tool_end_token in text
-        ) or tools:
+        elif self.tool_start_token not in text and self.tool_end_token in text:
             # 如果 tool_start_token 不在 text 但是 tool_end_token 在text
             logger.debug("tool_parse tool_start_token 不在 text")
             pattern = r"\{[^{}]*\{[^{}]*\}[^{}]*\}|{[^{}]*}"
@@ -266,7 +265,7 @@ class Qwen2d5ToolParser(ToolParser):
         )
 
 
-def tool_parser(full_text: str, tool_parser, tools, ret):
+def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
     tool_call_info = tool_parser.extract_tool_calls(full_text, tools)
     tools_called = tool_call_info.tools_called
     text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
