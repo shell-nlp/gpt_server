@@ -1,4 +1,5 @@
 import json
+import uuid
 from loguru import logger
 import re
 from typing import Dict, List, Literal, Sequence, Union, Optional
@@ -39,6 +40,52 @@ class ExtractedToolCallInformation(BaseModel):
     # content - per OpenAI spec, content AND tool calls can be returned rarely
     # But some models will do this intentionally
     content: Optional[str] = None
+
+
+@ToolParserManager.register_module(["glm"])
+class GLMToolParser(ToolParser):
+
+    def __init__(self, tokenizer: object = None):
+        super().__init__(tokenizer)
+        self.position = 0
+
+    def get_argments(self, obj):
+        if "parameters" in obj:
+            return obj.get("parameters")
+        elif "arguments" in obj:
+            return obj.get("arguments")
+        return None
+
+    def extract_tool_calls(
+        self,
+        model_output: str,
+        tools,
+    ) -> ExtractedToolCallInformation:
+        text = model_output
+        try:
+
+            i = text.rfind("Action:")
+            j = text.rfind("Action Input:")
+            name = text[i + len("Action:") : j].strip().strip(".")
+            if "Observation" in model_output:
+                k = text.rfind("Observation")
+                arguments = text[j + len("Action Input:") : k].strip()
+            else:
+                arguments = text[j + len("Action Input:") :].strip()
+            tool_calls = []
+            tool_calls.append(
+                ToolCall(function=FunctionCall(name=name, arguments=arguments))
+            )
+        except Exception:
+            return ExtractedToolCallInformation(
+                tools_called=False, tool_calls=[], content=text
+            )
+
+        return ExtractedToolCallInformation(
+            tools_called=True,
+            tool_calls=tool_calls,
+            content=text if len(text) > 0 else "",
+        )
 
 
 @ToolParserManager.register_module(["qwen2_5"])
@@ -271,7 +318,7 @@ def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
     text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
     tool_calls = [i.model_dump() for i in tool_calls]
     if tools and tools_called:  # 如果传入tools
-        logger.debug(f"工具解析成功, tool_calls: {tool_calls}")
+        logger.info(f"工具解析成功, tool_calls: {tool_calls}")
         ret["text"] = ""
         ret["tool_calls"] = tool_calls
         ret["finish_reason"] = "tool_calls"
@@ -279,3 +326,10 @@ def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
     else:
         ret["text"] = ""
         return json.dumps(ret).encode() + b"\0"
+
+
+if __name__ == "__main__":
+    full_text = """Action: get_weather
+Action Input: {"location": "Nanjing", "unit": "celsius"}"""
+    tool_parser2 = ToolParserManager.module_dict["glm"]()
+    tool_parser(full_text=full_text, tool_parser=tool_parser2, tools=True, ret={})

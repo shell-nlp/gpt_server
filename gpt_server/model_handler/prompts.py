@@ -1,6 +1,129 @@
 from typing import Optional
-from lmdeploy.model import MODELS, Qwen7BChat
+from lmdeploy.model import MODELS, Qwen7BChat, ChatGLM3, get_text
 import json
+
+
+@MODELS.register_module(name="glm4", force=True)
+class Glm4Chat(ChatGLM3):
+    """Chat template of glm-4 model."""
+
+    def __init__(
+        self,
+        system="<|system|>\n",
+        user="<|user|>\n",
+        assistant="<|assistant|>\n",
+        separator="\n",
+        tools="""\n\n你可以使用以下工具提供适当的答复和支持。\n\n# 可用工具\n\n在<tools></tools> XML标签中提供了function的签名(即函数的结构信息):\n<tools>""",
+        eotools="""\n</tools>
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin!      
+""",
+        stop_words=["<|user|>", "<|endoftext|>", "<|observation|>"],
+        meta_instruction="你是一个名为 GLM-4 的人工智能助手。你是基于智谱AI训练的语言模型 GLM-4 模型开发的，你的任务是针对用户的问题和要求提供适当的答复和支持。",
+        **kwargs,
+    ):
+        super().__init__(
+            system=system,
+            user=user,
+            assistant=assistant,
+            stop_words=stop_words,
+            separator=separator,
+            meta_instruction=meta_instruction,
+            **kwargs,
+        )
+        self.start = "[gMASK]<sop>"
+        self.tools = tools
+        self.eotools = eotools
+
+    @classmethod
+    def match(cls, model_path: str) -> Optional[str]:
+        """Return the model_name that was registered to MODELS.
+
+        Args:
+            model_path (str): the model path used for matching.
+        """
+        path = model_path.lower()
+        if "glm-4" in path:
+            return "glm4"
+
+    def messages2prompt(self, messages, sequence_start=True, tools=None, **kwargs):
+        """Return the prompt that is concatenated with other elements in the
+        chat template.
+
+        Args:
+            messages (str | List): user's input prompt
+        Returns:
+            str: the concatenated prompt
+        """
+        if isinstance(messages, str):
+            return self.get_prompt(messages, sequence_start)
+        return self.start + self.messages2prompt_base(
+            messages, sequence_start, tools=tools, **kwargs
+        )
+
+    def messages2prompt_base(self, messages, sequence_start=True, tools=None, **kwargs):
+        """Return the prompt that is concatenated with other elements in the
+        chat template.
+
+        Args:
+            messages (str | List): user's input prompt
+        Returns:
+            str: the concatenated prompt
+        """
+
+        if isinstance(messages, str):
+            return self.get_prompt(messages, sequence_start)
+        box_map = dict(
+            user=self.user, assistant=self.assistant, system=self.system, tool=self.tool
+        )
+        eox_map = dict(
+            user=self.eoh,
+            assistant=self.eoa + self.separator,
+            system=self.eosys,
+            tool=self.eotool,
+        )
+        ret = ""
+        if self.meta_instruction is not None and sequence_start:
+            if len(messages) and messages[0]["role"] != "system":
+                ret += f"{self.system}{self.meta_instruction}{self.eosys}"
+        tool_prompt = ""
+        if tools is not None and len(tools) > 0:
+            tool_names = []
+            for tool in tools:
+                tool_names.append(tool["function"]["name"])
+            tool_names = ",".join(tool_names)
+            self.eotools = self.eotools.format(tool_names=tool_names)
+            for tool in tools:
+                tool_prompt += self.separator
+                tool_prompt += f'{{"type": "function", "function": {json.dumps(tool, ensure_ascii=False)}}}'
+            if len(messages) and messages[0]["role"] == "system":
+                ret += f"{self.system}{messages[0]['content']}{self.tools}{tool_prompt}{self.eotools}{self.eosys}"
+                messages.pop(0)
+            else:
+                ret += f"{self.system}{self.meta_instruction}{self.tools}{tool_prompt}{self.eotools}{self.eosys}"
+
+        for message in messages:
+            role = message["role"]
+            content = get_text(message["content"])
+            ret += f"{box_map[role]}{content}{eox_map[role]}"
+        if (
+            len(messages)
+            and messages[-1]["role"] == "assistant"
+            and len(eox_map["assistant"]) > 0
+        ):
+            return ret[: -len(eox_map["assistant"])]  # prefix of response
+        ret += f"{self.assistant}"
+        return ret
 
 
 @MODELS.register_module(name="qwen2_5")
@@ -124,3 +247,52 @@ class Qwen2d5Chat(Qwen7BChat):
         lower_path = model_path.lower()
         if "qwen2.5" in lower_path or "qwen2_5" in lower_path:
             return "qwen2d5"
+
+
+if __name__ == "__main__":
+    chat_template = MODELS.module_dict["glm4"]()
+    messages = [
+        {"role": "system", "content": "我的Qwen "},
+        {"role": "user", "content": "你是谁 "},
+    ]
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_weather",
+                "description": "Get the current weather in a given location",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": "City and state, e.g., 'San Francisco, CA'",
+                        },
+                        "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                    },
+                    "required": ["location"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "get_weather2",
+                "description": "Get the current weather in a given location",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": "City and state, e.g., 'San Francisco, CA'",
+                        },
+                        "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                    },
+                    "required": ["location"],
+                },
+            },
+        },
+    ]
+    # tools = None
+    promt = chat_template.messages2prompt(messages, True, tools)
+    print(promt)
