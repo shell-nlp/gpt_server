@@ -63,7 +63,8 @@ class GLMToolParser(ToolParser):
     ) -> ExtractedToolCallInformation:
         text = model_output
         try:
-
+            if "Action:" not in text:
+                raise Exception
             i = text.rfind("Action:")
             j = text.rfind("Action Input:")
             name = text[i + len("Action:") : j].strip().strip(".")
@@ -324,7 +325,10 @@ def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
         ret["finish_reason"] = "tool_calls"
         return json.dumps(ret).encode() + b"\0"
     else:
+        logger.info(f"工具解析失败, tool_calls: {tool_calls}")
         ret["text"] = ""
+        ret["tool_calls"] = tool_calls
+        ret["finish_reason"] = "tool_calls"
         return json.dumps(ret).encode() + b"\0"
 
 

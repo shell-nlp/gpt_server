@@ -5,7 +5,7 @@ import json
 client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 
 
-def get_weather(location: str, unit: str):
+def get_weather(location: str, unit: str = "celsius"):
     return f"Getting the weather for {location} in {unit}..."
 
 
@@ -37,8 +37,10 @@ response = client.chat.completions.create(
     tools=tools,
     tool_choice="auto",
 )
-tool_call = response.choices[0].message.tool_calls[0].function
+
+print("message", response.choices[0].message)
 print(response.choices[0].message.tool_calls)
+tool_call = response.choices[0].message.tool_calls[0].function
 print(f"Function called: {tool_call.name}")
 print(f"Arguments: {tool_call.arguments}")
 print(f"Result: {get_weather(**json.loads(tool_call.arguments))}")

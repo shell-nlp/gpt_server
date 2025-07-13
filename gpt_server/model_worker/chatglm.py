@@ -50,9 +50,7 @@ class ChatGLMWorker(ModelWorkerBase):
         )
         self.stop_words_ids = []
 
-        self.stop = [
-            self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
-        ]
+        self.stop = ["Observation:"]
         logger.warning(f"{model_names[0]} 停用词: {self.stop}")
 
     async def generate_stream_gate(self, params):

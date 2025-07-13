@@ -15,18 +15,16 @@ class Glm4Chat(ChatGLM3):
         separator="\n",
         tools="""\n\n你可以使用以下工具提供适当的答复和支持。\n\n# 可用工具\n\n在<tools></tools> XML标签中提供了function的签名(即函数的结构信息):\n<tools>""",
         eotools="""\n</tools>
-Use the following format:
+## 如果使用工具，你可以在回复中插入零次、一次或多次以下命令以调用工具：
 
-Question: the input question you must answer
-Thought: you should always think about what to do
 Action: the action to take, should be one of [{tool_names}]
 Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
 
-Begin!      
+形如：
+Action: get_result
+Action Input: {{"a": "1","b": "2"}}
+
+如果回答问题已经不需要再继续使用工具，则不需要再使用Action、Action Input格式，可直接回答。 
 """,
         stop_words=["<|user|>", "<|endoftext|>", "<|observation|>"],
         meta_instruction="你是一个名为 GLM-4 的人工智能助手。你是基于智谱AI训练的语言模型 GLM-4 模型开发的，你的任务是针对用户的问题和要求提供适当的答复和支持。",
@@ -102,15 +100,15 @@ Begin!
             for tool in tools:
                 tool_names.append(tool["function"]["name"])
             tool_names = ",".join(tool_names)
-            self.eotools = self.eotools.format(tool_names=tool_names)
+            eotools = self.eotools.format(tool_names=tool_names)
             for tool in tools:
                 tool_prompt += self.separator
                 tool_prompt += f'{{"type": "function", "function": {json.dumps(tool, ensure_ascii=False)}}}'
             if len(messages) and messages[0]["role"] == "system":
-                ret += f"{self.system}{messages[0]['content']}{self.tools}{tool_prompt}{self.eotools}{self.eosys}"
+                ret += f"{self.system}{messages[0]['content']}{self.tools}{tool_prompt}{eotools}{self.eosys}"
                 messages.pop(0)
             else:
-                ret += f"{self.system}{self.meta_instruction}{self.tools}{tool_prompt}{self.eotools}{self.eosys}"
+                ret += f"{self.system}{self.meta_instruction}{self.tools}{tool_prompt}{eotools}{self.eosys}"
 
         for message in messages:
             role = message["role"]
