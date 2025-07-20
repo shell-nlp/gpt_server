@@ -106,7 +106,7 @@ class LMDeployBackend(ModelBackend):
         top_p = float(params.get("top_p", 0.8))
         top_k = params.get("top_k", 50)
 
-        max_new_tokens = min(int(params.get("max_new_tokens", 1024 * 8)), 1024 * 4)
+        max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
         stop_str = params.get("stop", None)
         stop_token_ids = params.get("stop_words_ids", None) or []
         presence_penalty = float(params.get("presence_penalty", 0.0))
