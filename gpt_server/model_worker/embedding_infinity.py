@@ -48,9 +48,10 @@ class EmbeddingWorker(ModelWorkerBase):
             device = "cuda"
         logger.warning(f"使用{device}加载...")
         model_type = getattr(self.model_config, "model_type", None)
-        bettertransformer = True
-        if model_type is not None and "deberta" in model_type:
-            bettertransformer = False
+        bettertransformer = False
+        # TODO bettertransformer = True  transformer 出问题
+        # if model_type is not None and "deberta" in model_type:
+        #     bettertransformer = False
         engine_args = EngineArgs(
             model_name_or_path=model_path,
             engine="torch",
