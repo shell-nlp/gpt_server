@@ -99,5 +99,5 @@ def get_embedding_mode(model_path: str):
 if __name__ == "__main__":
 
     # 示例用法
-    r = get_embedding_mode("/home/dev/model/BAAI/bge-m3/")
+    r = get_embedding_mode("/home/dev/model/Qwen/Qwen3-Reranker-0___6B/")
     print(r)

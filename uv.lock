@@ -27,6 +27,7 @@ resolution-markers = [
 
 [manifest]
 overrides = [
+    { name = "flashinfer-python", specifier = "==0.2.10" },
     { name = "setuptools", specifier = "==75.2.0" },
     { name = "soundfile", specifier = "==0.13.1" },
     { name = "torch", specifier = "==2.7.0" },
@@ -1359,19 +1360,21 @@ sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6b/b6/82c7e601d6d3c3
 
 [[package]]
 name = "flashinfer-python"
-version = "0.2.7.post1"
+version = "0.2.10"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "cuda-python" },
     { name = "einops" },
     { name = "ninja" },
     { name = "numpy" },
+    { name = "nvidia-cudnn-cu12" },
+    { name = "nvidia-cudnn-frontend" },
     { name = "nvidia-nvshmem-cu12" },
     { name = "pynvml" },
     { name = "requests" },
     { name = "torch" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/c0/10/43cf1ea7a03ca8e75a185190708e48286e1583d781e93d1de130e5d450ca/flashinfer_python-0.2.7.post1.tar.gz", hash = "sha256:affe7745f7660c30fe53830ac737f4b430dc070e227999a11a2a567dd5b7f3c1", size = 3237175 }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/74/e4/2c6d6a19d13ed13d4863f6900febe72b502334e43292d5fe9a1ac2f6c5be/flashinfer_python-0.2.10.tar.gz", hash = "sha256:429d6533061d553e517f519bb7f928e60bed2f07c1c9829f1e2a85f6f365b900", size = 3541708 }
 
 [[package]]
 name = "flashtts"
@@ -1638,7 +1641,7 @@ wheels = [
 
 [[package]]
 name = "gpt-server"
-version = "0.5.4"
+version = "0.6.0"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
@@ -1678,13 +1681,13 @@ requires-dist = [
     { name = "fschat", specifier = "==0.2.36" },
     { name = "funasr", specifier = ">=1.2.6" },
     { name = "infinity-emb", extras = ["all"], specifier = "==0.0.76" },
-    { name = "lmdeploy", specifier = "==0.9.1" },
+    { name = "lmdeploy", specifier = "==0.9.2" },
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "modelscope", specifier = "==1.26.0" },
     { name = "openai", specifier = "==1.86.0" },
     { name = "qwen-vl-utils" },
     { name = "setuptools", specifier = "==75.2.0" },
-    { name = "sglang", extras = ["all"], specifier = ">=0.4.9.post3" },
+    { name = "sglang", extras = ["all"], specifier = ">=0.4.10" },
     { name = "streamlit", specifier = "==1.39.0" },
     { name = "torch", specifier = "==2.6.0" },
     { name = "torchvision", specifier = "==0.20.1" },
@@ -2664,7 +2667,7 @@ wheels = [
 
 [[package]]
 name = "lmdeploy"
-version = "0.9.1"
+version = "0.9.2"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "accelerate" },
@@ -2703,12 +2706,14 @@ dependencies = [
     { name = "uvicorn" },
 ]
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/fe/23/f23a33c96bdef9e17433617cd86d21a4ebede0484fbf7831d4fbc9539eeb/lmdeploy-0.9.1-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:c2ec633db3f1119936dd958bbf80924665ac9633a51d6bd3946677631517f3e4", size = 106579672 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/21/2e/ad3623959cda4b3ed651f09d2fee40f2a3f38256f552b96b84c2f6b77243/lmdeploy-0.9.1-cp310-cp310-win_amd64.whl", hash = "sha256:840314e56583bdd975fcca210cf9f17eda4b85eaff7a1548ede718991cfeba5b", size = 26661386 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/82/ae/c3ef8f9aa55658361e9c65af4555a4b8d04c3a625a8c22871de8bc2546b9/lmdeploy-0.9.1-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:a7ca57f5204b5c3c73e7fcb6b2d47cb2d990189424724edb25d330f01d4555f2", size = 106591105 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/cc/eb/4af17c1e5f18349e696a8711586f757938d38b9d135112700e45b8bcd91b/lmdeploy-0.9.1-cp311-cp311-win_amd64.whl", hash = "sha256:d8df216277fc4b9e715efb277cef7e03abc1c8eb261c0622aa45563a76ab8d1b", size = 26663042 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/11/a5/747b90ab1923e25f14a68abab9fccca283b86d141c17bf008662ead81342/lmdeploy-0.9.1-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:2fccb635ad4cd28819356306816d746094d5e6b7533806b5e57a2ef743be5b79", size = 106599284 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/2f/19/4fb55f3d416ce8d251575d2d7e52fdad4d43075203d74c4ab7d860f6a9af/lmdeploy-0.9.1-cp312-cp312-win_amd64.whl", hash = "sha256:6428ee13018f18d558149e400b6bbdd3c90e7b47c7bd5db0ca13414a210c4e4d", size = 26664778 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/1c/13/603244ceefdb9464d9c56d4d01d3ba5bacba83d8e67127d005c0b3242e7c/lmdeploy-0.9.2-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:6e6985caa915ac5ed6e23193da4c6ec94de1cd0aeb38eb8a020ddde77be19d71", size = 75601903 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/56/34/ce9d5a2cac1286aaee5063a4767200279f5c66cd97d02d5446bcfb74a376/lmdeploy-0.9.2-cp310-cp310-win_amd64.whl", hash = "sha256:5e7236d3eb08c52152dd93b37632f95de7ae4f11901772d9daa0dc29af415839", size = 27957424 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/c4/7a/36a405341e617e28964a9998d7df7c3b0aaf44f47d4714af419842ae4dca/lmdeploy-0.9.2-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:36685a948ff3756ef38f1192e774c2c1d01e96887880e36da8f054b57e486574", size = 75629943 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/7d/d2/f8001affba3612b6274aab7088bd8e75ce2ca1d270cffe8ae281da5bd7c3/lmdeploy-0.9.2-cp311-cp311-win_amd64.whl", hash = "sha256:f4e29900cd2de4a4940ca37300e526a57fe54fa7866ad1658450a4a9c38b6f26", size = 27958427 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b0/0e/621a7153bb066bc864fec72ba75d84ef525d6dad4bf7556ceb42ddca58ee/lmdeploy-0.9.2-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:4fda8b5cf1b25d763f093a7bc250714160f6ae3308007f3d5002fa35693b8b6b", size = 75631749 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/d0/bf/f41392a788b9865f29e71f1c5a144b0ff991529d2fe5def4e8e043c80756/lmdeploy-0.9.2-cp312-cp312-win_amd64.whl", hash = "sha256:8d4c2604deda7226977d544340a9590e26beeb84b05063e50580bf8cb91f5f3c", size = 27957286 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/af/f2/3aed095db800950bfe17d6a03486f3877232274a4700f627c971c06bcc45/lmdeploy-0.9.2-cp313-cp313-manylinux2014_x86_64.whl", hash = "sha256:cff76305d33121528f27893aca9f86ce52137bb0f35ba4defa9288a3c5070e52", size = 75631727 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/07/af/041cec39b9731b95700f362c82e46d1ae1ceeba8e3cc547faf6d2caefe41/lmdeploy-0.9.2-cp313-cp313-win_amd64.whl", hash = "sha256:d86ae5e4d69cb184c3a5403673c7275575614b27c0539e9462847063e9a7d2c3", size = 27957539 },
 ]
 
 [[package]]
@@ -3556,10 +3561,29 @@ name = "nvidia-cudnn-cu12"
 version = "9.5.1.17"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
+    { name = "nvidia-cublas-cu12", version = "12.4.5.8", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or sys_platform == 'darwin' or sys_platform == 'emscripten'" },
     { name = "nvidia-cublas-cu12", version = "12.6.4.1", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'linux')" },
 ]
 wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/99/93/a201a12d3ec1caa8c6ac34c1c2f9eeb696b886f0c36ff23c638b46603bd0/nvidia_cudnn_cu12-9.5.1.17-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:9fd4584468533c61873e5fda8ca41bac3a38bcb2d12350830c69b0a96a7e4def", size = 570523509 },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/2a/78/4535c9c7f859a64781e43c969a3a7e84c54634e319a996d43ef32ce46f83/nvidia_cudnn_cu12-9.5.1.17-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:30ac3869f6db17d170e0e556dd6cc5eee02647abc31ca856634d5a40f82c15b2", size = 570988386 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b6/b2/3f60d15f037fa5419d9d7f788b100ef33ea913ae5315c87ca6d6fa606c35/nvidia_cudnn_cu12-9.5.1.17-py3-none-win_amd64.whl", hash = "sha256:d7af0f8a4f3b4b9dbb3122f2ef553b45694ed9c384d5a75bab197b8eefb79ab8", size = 565440743 },
+]
+
+[[package]]
+name = "nvidia-cudnn-frontend"
+version = "1.13.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/d3/1f/9768f4dffeac73d64e383d4b295220d8e8ea91537c54bc2e019f4fb2ec3c/nvidia_cudnn_frontend-1.13.0-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:660a5b07d1802fb185741f0e420a8af9abab5ab42baa76a90d0e6a0debbc4651", size = 1693930 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f0/ab/5d036d050bb4a3ce16825b404409c1328fb5b8ab56db932c0caa15b1e17a/nvidia_cudnn_frontend-1.13.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:2695c66e0880a33a736eb465c5989129d9730b42b7935301bff08567ef493d3c", size = 1804952 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0b/d6/98331dba5569b9b89410b010263c52301dc7de5bbbc3983dfac5c0f834ee/nvidia_cudnn_frontend-1.13.0-cp310-cp310-win_amd64.whl", hash = "sha256:7ad0e6c6ddffe4f49258b24b7c98864d06ee50a0625ca36917036c424dc2338a", size = 1260947 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/72/20/e456c49db45367ed18b08d136d0b8e5f9c329011abe98b3e843afe620003/nvidia_cudnn_frontend-1.13.0-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e3f98133b85284121f762d44e10f2ec0d0186304ad364133be61e35914c5e1ac", size = 1695303 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0e/ac/a72c8451d42efb74b8b17158ea038f9fcf6a729611312b925d508eeedf0e/nvidia_cudnn_frontend-1.13.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5c42f892b77dac4d1a3ddbc0ae191232cc024fe165f806301b0e886abb1f58f6", size = 1804537 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/3b/67/32ca2b09ce28313ed821b8fa05d2ac83942ecd072c0ec346c60ea153d5bf/nvidia_cudnn_frontend-1.13.0-cp311-cp311-win_amd64.whl", hash = "sha256:8499fb84675a6ecf51a1c6fb9c162cf42e9a31978f5a78fd114c88d886739afc", size = 1261642 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/3f/bb/b0265bece0b460b4931d0f486e442b6288d43991827e20efe1ff010a1a66/nvidia_cudnn_frontend-1.13.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:53f430d24033797e4687bca8b2ef27972124a98f975461cc5ae28fd05b5ceae0", size = 1701066 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/1d/95/6c2c625db1615a3664b7a6a8148e4939a33c82ba1e4ab1e45995b628bf1e/nvidia_cudnn_frontend-1.13.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9c48a788dcf4af231c3270d7ddcd36b763a88edd4e4c2067d0d77eebd5c330bc", size = 1813581 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/4d/fe/a5e7c391753a96ffdb3dcbe6ed2ce6b2c9d18c7125e3a6cf6d06cae2488b/nvidia_cudnn_frontend-1.13.0-cp312-cp312-win_amd64.whl", hash = "sha256:3b83ee62e92b9a633f4fd5fbd4770a3f1a9a8ef40e0a85e8aef3f54a66da02a9", size = 1261724 },
 ]
 
 [[package]]
@@ -5660,15 +5684,15 @@ wheels = [
 
 [[package]]
 name = "sgl-kernel"
-version = "0.2.6.post1"
+version = "0.2.8"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0c/1c/cd7059475defd115cc10794b311ec7a0577e19005495e16c61c4be547071/sgl_kernel-0.2.6.post1-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:58560dd9bbc3d87305dfa4dab100a6afdef338150a0a5234d59b9beb494c9e52", size = 281540517 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e6/ad/1aaefd94bd4a723e7f19e37d0ce2448b25c07160572e44d052f4bf5d3b80/sgl_kernel-0.2.8-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:6e4fb1f9cc955c4044f9b85249207c6d4f7a48844f85ec88384236e3f4b21cf5", size = 279710723 },
 ]
 
 [[package]]
 name = "sglang"
-version = "0.4.9.post3"
+version = "0.4.10.post2"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -5678,9 +5702,9 @@ dependencies = [
     { name = "setproctitle" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b4/28/839e540ce9b6c27c1ea5633b212d77eab3f1940dd2a61382cc1a14f057f1/sglang-0.4.9.post3.tar.gz", hash = "sha256:1702b25add4af83ba56fc8651fdd74f19f06cc712b3e7f4322ca3aadae774392", size = 1255083 }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/af/47/244f59f464a64119e5fb7db3af6a61b0d7df37987f63175925b8098fb2e3/sglang-0.4.10.post2.tar.gz", hash = "sha256:bad519d1c80f7e89ba8118b3d8dc647d587e8d9526ca2118fdb9c695ad42b6fd", size = 1347401 }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/54/2f/fad2638e9d5cbd02b9f8d42bebfb62c339c55886ad65c54a9fcfad2d145b/sglang-0.4.9.post3-py3-none-any.whl", hash = "sha256:954a31faefbd69668f837df1b3734bbde172d12e3b9d85346599380d999bda3e", size = 1711609 },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/57/9d/7fe415d523a79931be8359d6f78b940fca94a5998cabc20a6b5be04ef6ba/sglang-0.4.10.post2-py3-none-any.whl", hash = "sha256:ca31b6d33d8b770b1e6d0271be855002c5333304fb440c412b43dbdc56be0a22", size = 1829419 },
 ]
 
 [package.optional-dependencies]
