@@ -55,6 +55,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-8-8   初步支持了 embedding 的 vllm 加速
 2025-6-17  支持了 jina-reranker-m0 全球首个支持多模态多语言的重排模型
 2025-6-12  支持了 文生图模型 flux (代码样例见gpt_server/tests/test_image_gen.py)
 2025-6-6   支持了 bge-vl 系列 (代码样例见gpt_server/tests/test_openai_embedding_vl.py)
@@ -81,7 +82,7 @@
 2024-9-19  支持了 minicpmv 模型
 2024-8-17  支持了 vllm/hf 后端的 lora 部署
 2024-8-14  支持了 InternVL2 系列多模态模型
-2024-7-28  支持embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
+2024-7-28  支持了 embedding/reranker 的动态组批加速（infinity后端, 比onnx/tensorrt更快）
 2024-7-19  支持了多模态模型 glm-4v-gb 的LMDeploy PyTorch后端
 2024-6-22  支持了 Qwen系列、ChatGLM系列 function call (tools) 能力
 2024-6-12  支持了 qwen-2
@@ -288,30 +289,30 @@ Chat UI界面:
 
 **原则上支持所有的Embedding/Rerank/Classify模型**
 
-**推理速度：** embedding_infinity > embedding
+**推理速度：** infinity > sentence_transformers
 
 以下模型经过测试可放心使用：
 
-| Models / model_type                                                           | embedding  | embedding_infinity |
-| ----------------------------------------------------------------------------------- | --- | -------- |
-| bge-m3                                                                        | √   | √        |
-| bge-vl                                                                   | √   | ×        |
-| jina-reranker-m0                                                                   | √   | ×        |
-| bge-reranker                                                                        | √   | √        |
-| bge-embedding                                                                       | √   | √        |
-| bce-reranker                                                                        | √   | √        |
-| bce-embedding                                                                       | √   | √        |
-| puff                                                                                | √   | √        |
-| piccolo-base-zh-embedding                                                           | √   | √        |
-| acge_text_embedding                                                                 | √   | √        |
-| Yinka                                                                               | √   | √        |
-| zpoint_large_embedding_zh                                                           | √   | √        |
-| xiaobu-embedding                                                                    | √   | √        |
-| Conan-embedding-v1                                                                  | √   | √        |
-| qwen3-embedding                                                                     | √   | √        |
-| ritrieve_zh_v1                                                                      | √   | √        |
-| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）                 | ×   | √        |
-| protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入）    | ×   | √        |
+| Models / BackEnd                                                           | sentence_transformers  | infinity | vllm|
+| ---------------------------------------------------- | --- | -------- |-------- |
+| bge-m3                                                                        | √   | √        |×        |
+| bge-vl                                                                   | √   | ×        |×        |
+| jina-reranker-m0                                                                   | √   | ×        |×        |
+| bge-reranker                                                                        | √   | √        |×        |
+| bge-embedding                                                                       | √   | √        |×        |
+| bce-reranker                                                                        | √   | √        |×        |
+| bce-embedding                                                                       | √   | √        |×        |
+| puff                                                                                | √   | √        |×        |
+| piccolo-base-zh-embedding                                                           | √   | √        |×        |
+| acge_text_embedding                                                                 | √   | √        |×        |
+| Yinka                                                                               | √   | √        |×        |
+| zpoint_large_embedding_zh                                                           | √   | √        |×        |
+| xiaobu-embedding                                                                    | √   | √        |×        |
+| Conan-embedding-v1                                                                  | √   | √        |×        |
+| qwen3-embedding                                                                     | √   | √        |√        |
+| ritrieve_zh_v1                                                                      | √   | √        |×        |
+| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）                 | ×   | √        |×        |
+| protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入）    | ×   | √        |×        |
 
 目前 **ritrieve_zh_v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
