@@ -127,7 +127,8 @@ def get_model_types():
     return model_types
 
 
-model_types = get_model_types()
+model_types = get_model_types() + ["embedding"]
+embedding_backend_type = ["vllm", "infinity", "sentence_transformers"]
 
 
 def start_model_worker(config: dict):
@@ -201,7 +202,6 @@ def start_model_worker(config: dict):
                         f"不支持model_type: {model_type},仅支持{model_types}模型之一！"
                     )
                     sys.exit()
-                py_path = f"-m gpt_server.model_worker.{model_type}"
 
                 model_names = model_name
                 if model_config["alias"]:
@@ -240,7 +240,11 @@ def start_model_worker(config: dict):
                     else:
                         raise Exception("目前仅支持 CPU/GPU设备!")
                     backend = model_config["work_mode"]
+                    if model_type == "embedding":
+                        assert backend in embedding_backend_type
+                        model_type = f"embedding_{backend}"
 
+                    py_path = f"-m gpt_server.model_worker.{model_type}"
                     cmd = (
                         CUDA_VISIBLE_DEVICES
                         + run_mode

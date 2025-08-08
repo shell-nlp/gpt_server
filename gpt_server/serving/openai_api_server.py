@@ -127,7 +127,6 @@ models_ = []
 async def timing_tasks():
     """定时任务"""
     global model_address_map, models_
-    logger.info("定时任务已启动！")
     controller_address = app_settings.controller_address
 
     while True:

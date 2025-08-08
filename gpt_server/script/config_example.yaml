@@ -87,8 +87,8 @@ models:
     enable: true # false true
     model_config:
       model_name_or_path: /home/dev/model/Xorbits/bge-reranker-base/
-    model_type: embedding_infinity # embedding_infinity/embedding 
-    work_mode: hf
+    model_type: embedding
+    work_mode: infinity # 可选 ["vllm", "infinity", "sentence_transformers"]，但并不是所有后端都支持
     device: gpu # gpu / cpu
     workers:
     - gpus:
@@ -101,8 +101,8 @@ models:
     model_config:
       model_name_or_path: /home/dev/model/jinaai/jina-reranker-m0/
       task_type: auto # auto 、embedding 、 reranker 或者 classify 不设置这个参数，默认为 auto,自动识别可能会识别错误
-    model_type: embedding # 这里仅支持 embedding
-    work_mode: hf
+    model_type: embedding 
+    work_mode: sentence_transformers # 可选 ["vllm", "infinity", "sentence_transformers"]，但并不是所有后端都支持
     device: gpu
     workers:
     - gpus:
@@ -115,8 +115,8 @@ models:
     model_config:
       model_name_or_path: /home/dev/model/aspire/acge_text_embedding
       task_type: auto # auto 、embedding 、 reranker 或者 classify 不设置这个参数，默认为 auto,自动识别可能会识别错误
-    model_type: embedding_infinity # embedding_infinity/embedding 
-    work_mode: hf
+    model_type: embedding
+    work_mode: infinity # 可选 ["vllm", "infinity", "sentence_transformers"]，但并不是所有后端都支持
     device: gpu # gpu / cpu
     workers:
     - gpus:
@@ -128,8 +128,8 @@ models:
     enable: true
     model_config:
       model_name_or_path: /home/dev/model/BAAI/BGE-VL-base/
-    model_type: embedding # 这里仅支持 embedding
-    work_mode: hf
+    model_type: embedding
+    work_mode: sentence_transformers # 可选 ["vllm", "infinity", "sentence_transformers"]，但并不是所有后端都支持
     device: gpu
     workers:
     - gpus:
@@ -141,8 +141,8 @@ models:
     enable: true
     model_config:
       model_name_or_path: /home/dev/model/KoalaAI/Text-Moderation
-    model_type: embedding_infinity # embedding_infinity
-    work_mode: hf
+    model_type: embedding
+    work_mode: infinity # 可选 ["vllm", "infinity", "sentence_transformers"]，但并不是所有后端都支持
     device: gpu
     workers:
     - gpus:
