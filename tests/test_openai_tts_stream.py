@@ -3,9 +3,11 @@ from pathlib import Path
 from openai import OpenAI
 
 speech_file_path = Path(__file__).parent / "speech.mp3"
+audio_path = (
+    Path(__file__).parent.parent / "assets/audio_data/roles/余承东/reference_audio.wav"
+)
 
-
-with open("../assets/audio_data/roles/余承东/reference_audio.wav", "rb") as f:
+with open(audio_path, "rb") as f:
     audio_bytes = f.read()
 audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
 clone_voice = False  # 是否使用声音克隆
