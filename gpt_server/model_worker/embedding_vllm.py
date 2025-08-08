@@ -7,8 +7,7 @@ from infinity_emb import AsyncEngineArray, EngineArgs, AsyncEmbeddingEngine
 from infinity_emb.inference.select_model import get_engine_type_from_config
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_worker.utils import get_embedding_mode
-import torch
-import vllm
+import numpy as np
 from vllm import LLM
 
 label_to_category = {
@@ -71,6 +70,11 @@ class EmbeddingWorker(ModelWorkerBase):
             # ----------
             outputs = self.engine.embed(texts)
             embedding = [o.outputs.embedding for o in outputs]
+            embeddings_np = np.array(embedding)
+            # ------ L2归一化（沿axis=1，即对每一行进行归一化）-------
+            norm = np.linalg.norm(embeddings_np, ord=2, axis=1, keepdims=True)
+            normalized_embeddings_np = embeddings_np / norm
+            embedding = normalized_embeddings_np.tolist()
 
         ret["embedding"] = embedding
         return ret

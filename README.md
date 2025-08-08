@@ -293,26 +293,27 @@ Chat UI界面:
 
 以下模型经过测试可放心使用：
 
-| Models / BackEnd                                                           | sentence_transformers  | infinity | vllm|
-| ---------------------------------------------------- | --- | -------- |-------- |
-| bge-m3                                                                        | √   | √        |×        |
-| bge-vl                                                                   | √   | ×        |×        |
-| jina-reranker-m0                                                                   | √   | ×        |×        |
-| bge-reranker                                                                        | √   | √        |×        |
-| bge-embedding                                                                       | √   | √        |×        |
-| bce-reranker                                                                        | √   | √        |×        |
-| bce-embedding                                                                       | √   | √        |×        |
-| puff                                                                                | √   | √        |×        |
-| piccolo-base-zh-embedding                                                           | √   | √        |×        |
-| acge_text_embedding                                                                 | √   | √        |×        |
-| Yinka                                                                               | √   | √        |×        |
-| zpoint_large_embedding_zh                                                           | √   | √        |×        |
-| xiaobu-embedding                                                                    | √   | √        |×        |
-| Conan-embedding-v1                                                                  | √   | √        |×        |
+| Models / BackEnd                                                                    | sentence_transformers  | infinity | vllm|
+| ----------------------------------------------------------------------------------- | --------------- | -------------- |----------- |
+| bge-m3                                                                              | √   | √        |√        |
+| bge-embedding                                                                       | √   | √        |√        |
+| bce-embedding                                                                       | √   | √        |√        |
+| puff                                                                                | √   | √        |√        |
+| piccolo-base-zh-embedding                                                           | √   | √        |√        |
+| acge_text_embedding                                                                 | √   | √        |√        |
+| Yinka                                                                               | √   | √        |√        |
+| zpoint_large_embedding_zh                                                           | √   | √        |√        |
+| xiaobu-embedding                                                                    | √   | √        |√        |
+| Conan-embedding-v1                                                                  | √   | √        |√        |
 | qwen3-embedding                                                                     | √   | √        |√        |
-| ritrieve_zh_v1                                                                      | √   | √        |×        |
-| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）                 | ×   | √        |×        |
-| protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入）    | ×   | √        |×        |
+| ritrieve_zh_v1                                                                      | √   | √        |√        |
+| jina-embeddings-v3                                                                  | √   | √        |√        |
+| KoalaAI/Text-Moderation（文本审核/多分类，审核文本是否存在暴力、色情等）                | ×   | √         |×        |
+| protectai/deberta-v3-base-prompt-injection-v2（提示注入/2分类，审核文本为提示注入）    | ×   | √         |×        |
+| bge-vl                                                                              | √   | ×        |×        |
+| jina-reranker-m0                                                                    | √   | ×        |×        |
+| bge-reranker                                                                        | √   | √        |×        |
+| bce-reranker                                                                        | √   | √        |×        |
 
 目前 **ritrieve_zh_v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
