@@ -67,14 +67,12 @@ class EmbeddingWorker(ModelWorkerBase):
         ret = {"embedding": [], "token_num": 0}
         texts: list = params["input"]
         if self.mode == "embedding":
-            usage = None
             texts = list(map(lambda x: x.replace("\n", " "), texts))
             # ----------
-            outputs = self.engine.embed(prompts=texts)
+            outputs = self.engine.embed(texts)
             embedding = [o.outputs.embedding for o in outputs]
 
         ret["embedding"] = embedding
-        ret["token_num"] = usage
         return ret
 
 
