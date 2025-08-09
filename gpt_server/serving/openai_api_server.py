@@ -395,6 +395,7 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomChatMessage,
     CustomChatCompletionResponse,
     CustomChatCompletionResponseChoice,
+    CustomCompletionResponseChoice
 )
 
 
@@ -602,7 +603,7 @@ async def create_completion(request: CompletionRequest):
             if content["error_code"] != 0:
                 return create_error_response(content["error_code"], content["text"])
             choices.append(
-                CompletionResponseChoice(
+                CustomCompletionResponseChoice(
                     index=i,
                     text=content["text"],
                     logprobs=create_openai_logprobs(content.get("logprobs", None)),

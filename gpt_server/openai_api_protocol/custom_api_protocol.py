@@ -10,6 +10,7 @@ from fastchat.protocol.openai_api_protocol import (
     UsageInfo,
     DeltaMessage,
     ModelCard,
+    CompletionResponseChoice,
 )
 from pydantic import Field, BaseModel
 
@@ -130,6 +131,12 @@ class CustomChatMessage(ChatMessage):
 
 class CustomChatCompletionResponseChoice(ChatCompletionResponseChoice):
     message: CustomChatMessage
+    finish_reason: Optional[Literal["stop", "length", "tool_calls", "error"]] = None
+
+
+class CustomCompletionResponseChoice(CompletionResponseChoice):
+    """completion 的响应结构"""
+
     finish_reason: Optional[Literal["stop", "length", "tool_calls", "error"]] = None
 
 
