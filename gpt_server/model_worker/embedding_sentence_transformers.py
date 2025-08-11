@@ -100,7 +100,7 @@ class EmbeddingWorker(ModelWorkerBase):
             if (
                 query.startswith("http://")
                 or query.startswith("https://")
-                or "data:" in query
+                or is_base64_image(query)
             ):
                 query_type = "image"
             if (
@@ -135,7 +135,7 @@ class EmbeddingWorker(ModelWorkerBase):
                     text=text,
                 ).tolist()
             elif isinstance(texts[0], str):
-                if "http" in texts[0] or "data:image" in texts[0]:  # 图片
+                if "http" in texts[0] or is_base64_image(texts[0]):  # 图片
                     images = texts
                     coro_list = []
                     for i in images:
