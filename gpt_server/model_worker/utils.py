@@ -5,6 +5,12 @@ import base64
 import io
 import os
 from PIL.Image import Image
+import re
+
+
+def is_base64_image(data_string):
+    pattern = r"^data:image\/[a-zA-Z+]+;base64,[A-Za-z0-9+/]+=*$"
+    return bool(re.match(pattern, data_string))
 
 
 # 转换为Base64
@@ -49,10 +55,7 @@ async def load_base64_or_url(base64_or_url):
 
 
 def get_embedding_mode(model_path: str):
-    from infinity_emb import EngineArgs
-    from transformers import AutoConfig
-    from infinity_emb.inference.select_model import get_engine_type_from_config
-
+    """获取模型的类型"""
     task_type = os.environ.get("task_type", "auto")
     if task_type == "embedding":
         return "embedding"
@@ -60,21 +63,24 @@ def get_embedding_mode(model_path: str):
         return "rerank"
     elif task_type == "classify":
         return "classify"
+    from transformers import AutoConfig
 
     model_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
     architectures = getattr(model_config, "architectures", [])
-    if "JinaVLForRanking" in architectures:
-        logger.warning("model_type: JinaVLForRanking")
-        return "vl_rerank"
     model_type_text = getattr(
         getattr(model_config, "text_config", {}), "model_type", None
     )
     logger.warning(f"model_type: {model_type_text}")
-    # model_type_vison = getattr(
-    #     getattr(model_config, "vision_config", {}), "model_type", None
-    # )
-    # print(model_type_vison, model_type_text)
+
     model_type = model_type_text
+    # TODO --------- 在这里进行大过滤 ---------
+    if "JinaVLForRanking" in architectures:
+        logger.warning("model_type: JinaVLForRanking")
+        return "vl_rerank"
+    # --------- 在这里进行大过滤 ---------
+    from infinity_emb import EngineArgs
+
+    from infinity_emb.inference.select_model import get_engine_type_from_config
 
     engine_args = EngineArgs(
         model_name_or_path=model_path,
@@ -99,5 +105,5 @@ def get_embedding_mode(model_path: str):
 if __name__ == "__main__":
 
     # 示例用法
-    r = get_embedding_mode("/home/dev/model/Qwen/Qwen3-Reranker-0___6B/")
+    r = get_embedding_mode("/home/dev/model/jinaai/jina-reranker-m0/")
     print(r)

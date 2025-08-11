@@ -6,7 +6,7 @@ from loguru import logger
 from infinity_emb import AsyncEngineArray, EngineArgs, AsyncEmbeddingEngine
 from infinity_emb.inference.select_model import get_engine_type_from_config
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_worker.utils import get_embedding_mode
+from gpt_server.model_worker.utils import get_embedding_mode, is_base64_image
 
 label_to_category = {
     "S": "sexual",
@@ -74,6 +74,8 @@ class EmbeddingWorker(ModelWorkerBase):
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts: list = params["input"]
+        embedding = []
+        usage = 0
         if self.mode == "embedding":
             texts = list(map(lambda x: x.replace("\n", " "), texts))
             embeddings, usage = await self.engine.embed(sentences=texts)
@@ -99,7 +101,7 @@ class EmbeddingWorker(ModelWorkerBase):
             if (
                 isinstance(texts[0], bytes)
                 or "http" in texts[0]
-                or "data:image" in texts[0]
+                or is_base64_image(texts[0])
             ):
                 embeddings, usage = await self.engine.image_embed(images=texts)
             else:

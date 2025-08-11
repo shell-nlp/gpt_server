@@ -65,6 +65,7 @@ class EmbeddingWorker(ModelWorkerBase):
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts: list = params["input"]
+        embedding = []
         if self.mode == "embedding":
             texts = list(map(lambda x: x.replace("\n", " "), texts))
             # ----------

@@ -7,7 +7,11 @@ import torch
 from transformers import AutoConfig, AutoModel
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_worker.utils import load_base64_or_url, get_embedding_mode
+from gpt_server.model_worker.utils import (
+    load_base64_or_url,
+    get_embedding_mode,
+    is_base64_image,
+)
 
 
 class EmbeddingWorker(ModelWorkerBase):
@@ -74,6 +78,8 @@ class EmbeddingWorker(ModelWorkerBase):
         self.call_ct += 1
         ret = {"embedding": [], "token_num": 0}
         texts = params["input"]
+        embedding = []
+        token_num = 0
         if self.mode == "embedding":
             outputs = self.client.tokenize(texts)
             token_num = outputs["input_ids"].size(0) * outputs["input_ids"].size(1)
@@ -84,13 +90,11 @@ class EmbeddingWorker(ModelWorkerBase):
             # outputs = self.client.tokenizer.tokenize(texts)
             # token_num = len(outputs)
             # TODO 暂时不计算 rerank token num
-            token_num = 0
             sentence_pairs = [[query, inp] for inp in texts]
             scores = self.client.predict(sentence_pairs)
             embedding = [[float(score)] for score in scores]
         elif self.mode == "vl_rerank":
             query = params.get("query", None)
-            token_num = 0
             sentence_pairs = [[query, inp] for inp in texts]
             query_type = doc_type = "text"
             if (
@@ -102,7 +106,7 @@ class EmbeddingWorker(ModelWorkerBase):
             if (
                 texts[0].startswith("http://")
                 or texts[0].startswith("https://")
-                or "data:" in texts[0]
+                or is_base64_image(texts[0])
             ):
                 doc_type = "image"
             scores = self.client.compute_score(
@@ -115,7 +119,6 @@ class EmbeddingWorker(ModelWorkerBase):
                 scores = [scores]
             embedding = [[float(score)] for score in scores]
         elif self.mode == "clip_text_model":
-            token_num = 0
             if isinstance(texts[0], dict):
                 text = [i["text"] for i in texts]
                 text = list(map(lambda x: x.replace("\n", " "), text))
@@ -146,6 +149,8 @@ class EmbeddingWorker(ModelWorkerBase):
                     embedding = self.client.encode(
                         text=texts,
                     ).tolist()
+        else:
+            raise Exception(f"不支持的类型 mode: {self.mode}")
         ret["embedding"] = embedding
         ret["token_num"] = token_num
         return ret
