@@ -253,7 +253,7 @@ class Qwen2d5ToolParser(ToolParser):
         tools,
     ) -> ExtractedToolCallInformation:
         text = model_output
-        if self.tool_start_token in text:
+        if self.tool_start_token in text and self.tool_end_token in text:
             logger.debug("tool_parse tool_start_token 在 text")
             # get tool_call in text
             match_result_list = re.findall(self.pattern, text, re.DOTALL)
@@ -279,7 +279,7 @@ class Qwen2d5ToolParser(ToolParser):
                 tool_calls=tool_calls,
                 content=text if len(text) > 0 else "",
             )
-        elif self.tool_start_token not in text and self.tool_end_token in text:
+        elif self.tool_start_token in text or self.tool_end_token in text:
             # 如果 tool_start_token 不在 text 但是 tool_end_token 在text
             logger.debug("tool_parse tool_start_token 不在 text")
             pattern = r"\{[^{}]*\{[^{}]*\}[^{}]*\}|{[^{}]*}"
