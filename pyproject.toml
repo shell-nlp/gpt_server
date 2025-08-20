@@ -1,11 +1,11 @@
 [project]
 name = "gpt_server"
-version = "0.6.0"
+version = "0.6.1"
 description = "gpt_server是一个用于生产级部署LLMs或Embedding的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
 authors = [{ name = "Yu Liu", email = "506610466@qq.com" }]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "accelerate>=1.0.1",
     "fastapi==0.115.0",
@@ -14,18 +14,18 @@ dependencies = [
     "infinity-emb[all]==0.0.76",
     "lmdeploy==0.9.2",
     "loguru>=0.7.2",
-    "openai==1.86.0",
+    "openai==1.99.1",
     "setuptools==75.2.0",
     "streamlit==1.39.0",
     "torch==2.6.0",
     "torchvision==0.20.1",
-    "vllm==0.9.2",
+    "vllm==0.10.1",
     "qwen_vl_utils",
     "evalscope[perf,rag]==0.16.1",
     "modelscope==1.26.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.4.10",
+    "sglang[all]>=0.4.10.post2",
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.33.1",
@@ -41,8 +41,9 @@ override-dependencies = [
     "triton",
     "transformers==4.53.3", #  infinity-emb
     "soundfile==0.13.1", # infinity
-    "xgrammar==0.1.21", #  sglang[all]==0.4.5 depends on xgrammar==0.1.17
+    "xgrammar==0.1.23", #  sglang[all]==0.4.5 depends on xgrammar==0.1.17
     "flashinfer-python==0.2.10",
+    "outlines-core==0.2.10", # sglang 和 vllm 的冲突
 ]
 
 [project.scripts]

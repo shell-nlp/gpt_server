@@ -3,12 +3,16 @@ import asyncio
 import os
 from typing import List
 from loguru import logger
+from gpt_server.model_handler.pitch import pitch_flashtts
+
+pitch_flashtts()
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_worker.utils import load_base64_or_url
 from flashtts.engine import AutoEngine
 from flashtts.server.utils.audio_writer import StreamingAudioWriter
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+# os.environ["VLLM_USE_V1"] = "0"
 
 
 class SparkTTSWorker(ModelWorkerBase):
