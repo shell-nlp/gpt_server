@@ -90,6 +90,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             # logger.info(f"模型配置：{self.model_config}")
             self.vision_config = getattr(self.model_config, "vision_config", None)
             is_vision = self.vision_config is not None
+            if is_vision:
+                multimodal = True
+                logger.warning(f"{model_names[0]} 是多模态模型")
         super().__init__(
             controller_addr,
             worker_addr,
@@ -98,7 +101,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             model_names,
             limit_worker_concurrency,
             conv_template,
-            multimodal=multimodal or is_vision,
+            multimodal=multimodal,
         )
         os.environ["WORKER_NAME"] = self.__class__.__name__
         self.worker_name = self.__class__.__name__

@@ -77,7 +77,8 @@ class ChatGLMWorker(ModelWorkerBase):
                 # text = self.tokenizer.decode(input_ids.tolist()[0])
                 params["prompt"] = text
                 # params["input_ids"] = input_ids
-
+            else:  # 多模态模型
+                params["multimodal"] = True
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
             params["stop"].extend(self.stop)

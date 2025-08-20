@@ -1,5 +1,6 @@
 import base64
 from openai import OpenAI
+from pathlib import Path
 
 
 def image_to_base64(image_path):
@@ -11,7 +12,7 @@ def image_to_base64(image_path):
     return base64_prefix + base64_string
 
 
-image_path = "../assets/logo.png"
+image_path = Path(__file__).parent.parent / "assets/logo.png"
 # 使用本地的图片
 url = image_to_base64(image_path)
 # 使用网络图片
@@ -22,7 +23,7 @@ client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 
 stream = True
 output = client.chat.completions.create(
-    model="minicpmv",  # internlm chatglm3  qwen  llama3 chatglm4
+    model="glm4.1v",  # internlm chatglm3  qwen  llama3 chatglm4
     messages=[
         {
             "role": "user",

@@ -69,12 +69,13 @@ class VllmBackend(ModelBackend):
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
-        top_k = params.get("top_k", -1.0)
+        top_k = int(params.get("top_k", 0))
         max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
         stop_str = params.get("stop", None)
         stop_token_ids = params.get("stop_words_ids", None) or []
         presence_penalty = float(params.get("presence_penalty", 0.0))
         frequency_penalty = float(params.get("frequency_penalty", 0.0))
+        repetition_penalty = float(params.get("repetition_penalty", 1.0))
         request = params.get("request", None)
         # Handle stop_str
         stop = set()
@@ -145,6 +146,7 @@ class VllmBackend(ModelBackend):
             stop_token_ids=stop_token_ids,
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
+            repetition_penalty=repetition_penalty,
             guided_decoding=guided_decoding,
         )
         lora_request = None
