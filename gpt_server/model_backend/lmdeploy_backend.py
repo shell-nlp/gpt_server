@@ -90,16 +90,13 @@ class LMDeployBackend(ModelBackend):
             backend=backend,
             backend_config=backend_config,
         )
-        model_type = get_names_from_model(model_path=model_path)[1]
-        self.messages_type_select = (
-            model_type[1] == "base"
-        )  # 如果为True 则使用 prompt:str 否则： messages：list
+        model_name, chat_template_name = get_names_from_model(model_path=model_path)
+        self.chat_template_name = chat_template_name
         self.tokenizer = self.async_engine.tokenizer
         self.reasoning_parser_cache = {}
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
-        logger.info(prompt)
         messages = params["messages"]
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
@@ -134,11 +131,17 @@ class LMDeployBackend(ModelBackend):
         )
         if params.get("tools", None) or is_messages_with_tool(messages=messages):
             messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
-        if self.messages_type_select:
+        logger.info(f"chat_template_name: {self.chat_template_name}")
+        if self.chat_template_name == "base":
             messages = prompt or messages
         multimodal = params.get("multimodal", False)
         if multimodal:  # 多模态模型
             messages = params["messages"]
+        if isinstance(messages, str):
+            logger.info(f"使用prompt模式")
+            logger.info(prompt)
+        else:
+            logger.info(f"使用messages模式")
         results_generator = self.async_engine.generate(
             messages=messages, session_id=int(request_id), gen_config=gen_config
         )
