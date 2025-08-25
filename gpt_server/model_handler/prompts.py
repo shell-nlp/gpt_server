@@ -169,7 +169,9 @@ class Qwen2d5Chat(Qwen7BChat):
             **kwargs,
         )
 
-    def messages2prompt(self, messages, sequence_start=True, tools=None, **kwargs):
+    def messages2prompt(
+        self, messages, sequence_start=True, tools=None, enable_thinking=None, **kwargs
+    ):
         """Return the prompt that is concatenated with other elements in the
         chat template.
 
@@ -233,6 +235,8 @@ class Qwen2d5Chat(Qwen7BChat):
                 if index == len(messages) - 1 or messages[index + 1]["role"] != "tool":
                     ret += f"{self.eoh}"
         ret += f"{self.assistant}"
+        if enable_thinking is False:
+            ret += "<think>\n\n</think>\n\n"
         return ret
 
     @classmethod
@@ -248,7 +252,7 @@ class Qwen2d5Chat(Qwen7BChat):
 
 
 if __name__ == "__main__":
-    chat_template = MODELS.module_dict["glm4"]()
+    chat_template = MODELS.module_dict["qwen2_5"]()
     messages = [
         {"role": "system", "content": "我的Qwen "},
         {"role": "user", "content": "你是谁 "},
@@ -292,5 +296,5 @@ if __name__ == "__main__":
         },
     ]
     # tools = None
-    promt = chat_template.messages2prompt(messages, True, tools)
-    print(promt)
+    prompt = chat_template.messages2prompt(messages, True, tools)
+    print(prompt)

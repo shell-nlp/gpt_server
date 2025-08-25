@@ -268,6 +268,7 @@ def get_gen_params(
     tool_choice=None,
     response_format=None,
     reasoning_parser: str = None,
+    enable_thinking: bool = True,
 ) -> Dict[str, Any]:
     images = []
     if isinstance(messages, str):
@@ -307,6 +308,7 @@ def get_gen_params(
     # ------- TODO add messages tools -------
     gen_params["response_format"] = response_format
     gen_params["reasoning_parser"] = reasoning_parser
+    gen_params["enable_thinking"] = enable_thinking
     return gen_params
 
 
@@ -395,7 +397,7 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomChatMessage,
     CustomChatCompletionResponse,
     CustomChatCompletionResponseChoice,
-    CustomCompletionResponseChoice
+    CustomCompletionResponseChoice,
 )
 
 
@@ -441,6 +443,7 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         tool_choice=request.tool_choice,
         response_format=request.response_format,
         reasoning_parser=request.reasoning_parser,
+        enable_thinking=request.enable_thinking,
     )
     if gen_params["max_new_tokens"] is None:
         gen_params["max_new_tokens"] = 1024 * 16

@@ -76,7 +76,11 @@ class QwenWorker(ModelWorkerBase):
                 if isinstance(messages, list):
                     # text = self.chat_template.messages2prompt(messages, True, tools)
                     text = await asyncio.to_thread(
-                        self.chat_template.messages2prompt, messages, True, tools
+                        self.chat_template.messages2prompt,
+                        messages,
+                        True,
+                        tools,
+                        enable_thinking=bool(params.get("enable_thinking", True)),
                     )
                 elif isinstance(messages, str):
                     text = messages

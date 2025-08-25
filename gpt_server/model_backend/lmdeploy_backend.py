@@ -110,6 +110,7 @@ class LMDeployBackend(ModelBackend):
         frequency_penalty = float(params.get("frequency_penalty", 0.0))
         reasoning_parser_type = params.get("reasoning_parser", None)
         request = params.get("request", None)
+        enable_thinking = bool(params.get("enable_thinking", True))
         # Handle stop_str
         stop = set()
         if isinstance(stop_str, str) and stop_str != "":
@@ -143,7 +144,10 @@ class LMDeployBackend(ModelBackend):
         else:
             logger.info(f"使用messages模式")
         results_generator = self.async_engine.generate(
-            messages=messages, session_id=int(request_id), gen_config=gen_config
+            messages=messages,
+            session_id=int(request_id),
+            gen_config=gen_config,
+            enable_thinking=enable_thinking,
         )
         usage = {}
         previous_text = ""

@@ -123,6 +123,7 @@ class CustomChatCompletionRequest(ChatCompletionRequest):
     response_format: Optional[Any] = None
     reasoning_parser: Optional[str] = None
     max_completion_tokens: Optional[int] = None
+    enable_thinking: bool = True
 
 
 class CustomChatMessage(ChatMessage):
