@@ -145,9 +145,8 @@ class Qwen2d5Chat(Qwen7BChat):
     ):
 
         self.tools = tools
-        self.eotools = (
-            eotools
-            + """\n如果需要同时调用多个function,则返回多个包含function name和参数的 JSON 对象，并用 <tool_call></tool_call> XML 标签包裹,形如:
+        self.eotools = eotools
+        muti_tools = """\n如果需要同时调用多个function,则返回多个包含function name和参数的 JSON 对象，并用 <tool_call></tool_call> XML 标签包裹,形如:
 <tool_call>
 {"name": <function-name-1>, "arguments": <args-json-object>}
 </tool_call>
@@ -155,7 +154,7 @@ class Qwen2d5Chat(Qwen7BChat):
 {"name": <function-name-2>, "arguments": <args-json-object>}
 </tool_call>
 """
-        )
+        # self.eotools = eotools + muti_tools
         super().__init__(
             system=system,
             meta_instruction=meta_instruction,
