@@ -52,6 +52,7 @@ class VllmBackend(ModelBackend):
             enable_prefix_caching=model_config.enable_prefix_caching,
             dtype=model_config.dtype,
             max_model_len=model_config.max_model_len,
+            guided_decoding_backend="xgrammar",
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         self.tokenizer = tokenizer

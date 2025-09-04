@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings
 
 
 class ModelConfig(BaseSettings):
+    model_name_or_path: str | None = None
+    """模型名称或者路径"""
     backend: str = "vllm"
     enable_prefix_caching: bool = False
     max_model_len: int | None = None

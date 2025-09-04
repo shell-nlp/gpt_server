@@ -1,6 +1,5 @@
 from typing import Any, Dict
 import torch
-import os
 import json
 from peft import PeftModel
 from transformers import TextIteratorStreamer
@@ -15,6 +14,7 @@ from gpt_server.model_backend.utils import (
 )
 import asyncio
 from loguru import logger
+from gpt_server.settings import get_model_config
 
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
@@ -29,11 +29,12 @@ class NoneContextManager:
 
 class HFBackend(ModelBackend):
     def __init__(self, tokenizer, model: torch.nn.Module) -> None:
+        model_config = get_model_config()
         self.model = model
         self.tokenizer = tokenizer
         self.xgrammar_processor = XgrammarLogitsProcessor(tokenizer)
         self.lora_requests = []
-        lora = os.getenv("lora", None)
+        lora = model_config.lora
         if lora:
             lora_dict: dict = json.loads(lora)
             for i, (lora_name, lora_path) in enumerate(lora_dict.items()):
