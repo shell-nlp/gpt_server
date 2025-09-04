@@ -1,9 +1,7 @@
 import json
-import os
 from typing import Any, Dict, AsyncGenerator
 from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
 from vllm.sampling_params import GuidedDecodingParams
-from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
@@ -15,6 +13,7 @@ from vllm.entrypoints.chat_utils import (
     load_chat_template,
     parse_chat_messages_futures,
 )
+from gpt_server.settings import get_model_config
 
 # 解决vllm中 ray集群在 TP>1时死的Bug
 import ray
@@ -24,18 +23,14 @@ ray.init(ignore_reinit_error=True, num_cpus=8)
 
 class VllmBackend(ModelBackend):
     def __init__(self, model_path, tokenizer: AutoTokenizer) -> None:
-        lora = os.getenv("lora", None)
-        enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
-        max_model_len = os.getenv("max_model_len", None)
-        tensor_parallel_size = int(os.getenv("num_gpus", "1"))
-        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.8))
-        dtype = os.getenv("dtype", "auto")
+        model_config = get_model_config()
+        logger.info(f"model_config: {model_config}")
         max_loras = 1
         enable_lora = False
         self.lora_requests = []
-        if lora:
+        if model_config.lora:
             enable_lora = True
-            lora_dict: dict = json.loads(lora)
+            lora_dict: dict = json.loads(model_config.lora)
             max_loras = len(lora_dict)
             for i, (lora_name, lora_path) in enumerate(lora_dict.items()):
                 self.lora_requests.append(
@@ -48,15 +43,15 @@ class VllmBackend(ModelBackend):
 
         self.engine_args = AsyncEngineArgs(
             model_path,
-            tensor_parallel_size=tensor_parallel_size,
+            tensor_parallel_size=model_config.num_gpus,
             trust_remote_code=True,
-            gpu_memory_utilization=gpu_memory_utilization,
+            gpu_memory_utilization=model_config.gpu_memory_utilization,
             enable_chunked_prefill=False,
             enable_lora=enable_lora,
             max_loras=max_loras,
-            enable_prefix_caching=enable_prefix_caching,
-            dtype=dtype,
-            max_model_len=int(max_model_len) if max_model_len else None,
+            enable_prefix_caching=model_config.enable_prefix_caching,
+            dtype=model_config.dtype,
+            max_model_len=model_config.max_model_len,
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         self.tokenizer = tokenizer

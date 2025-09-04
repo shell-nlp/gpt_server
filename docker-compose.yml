@@ -15,6 +15,7 @@ services:
     # network_mode: host
     ports:
       - 8082:8082
+      - 21001:21001
     environment:
       - TZ:Asia/Shanghai  # 设置中国时区
     volumes:

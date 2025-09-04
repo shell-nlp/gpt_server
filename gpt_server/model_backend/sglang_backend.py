@@ -14,6 +14,7 @@ from sglang.srt.conversation import generate_chat_conv
 
 from qwen_vl_utils import process_vision_info
 from sglang.srt.managers.io_struct import GenerateReqInput
+from gpt_server.settings import get_model_config
 
 
 def _transform_messages(
@@ -46,25 +47,19 @@ def _transform_messages(
 
 class SGLangBackend(ModelBackend):
     def __init__(self, model_path, tokenizer: PreTrainedTokenizerBase) -> None:
-        lora = os.getenv("lora", None)
-        enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
-        max_model_len = os.getenv("max_model_len", None)
-        tensor_parallel_size = int(os.getenv("num_gpus", "1"))
-        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.8))
-        dtype = os.getenv("dtype", "auto")
-        max_loras = 1
-        enable_lora = False
+        model_config = get_model_config()
+        logger.info(f"model_config: {model_config}")
         self.lora_requests = []
         # ---
         self.async_engine = sgl.Engine(
             model_path=model_path,
             trust_remote_code=True,
-            mem_fraction_static=gpu_memory_utilization,
-            tp_size=tensor_parallel_size,
-            dtype=dtype,
-            context_length=int(max_model_len) if max_model_len else None,
+            mem_fraction_static=model_config.gpu_memory_utilization,
+            tp_size=model_config.num_gpus,
+            dtype=model_config.dtype,
+            context_length=model_config.max_model_len,
             grammar_backend="xgrammar",
-            disable_radix_cache=not enable_prefix_caching,
+            disable_radix_cache=not model_config.enable_prefix_caching,
         )
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:

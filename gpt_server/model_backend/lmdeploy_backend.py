@@ -12,6 +12,8 @@ from gpt_server.model_handler.reasoning_parser import ReasoningParserManager
 from lmdeploy.serve.async_engine import get_names_from_model
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
+from gpt_server.settings import get_model_config
+
 
 if sys.platform == "linux":
     # 防止Python c库没有加载导致lmdeploy pytorch后端报错
@@ -25,11 +27,13 @@ backend_map = {
     "lmdeploy-pytorch": "pytorch",  # pytorch后端
     "lmdeploy-turbomind": "turbomind",  # turbomind后端
 }
+# ------- 日志控制 -------
 log_level = os.getenv("log_level", "WARNING")
 from lmdeploy.utils import get_logger
 
 get_logger("lmdeploy").setLevel(log_level)  # 默认WARNING
 os.environ["TM_LOG_LEVEL"] = "WARNING"
+# ------- 日志控制 -------
 
 
 def is_stop(output: str, stop_str: str):
@@ -58,30 +62,27 @@ def is_messages_with_tool(messages: list):
 
 class LMDeployBackend(ModelBackend):
     def __init__(self, model_path, tokenizer: PreTrainedTokenizerBase) -> None:
-        backend = backend_map[os.getenv("backend")]
-        enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
-        max_model_len = os.getenv("max_model_len", None)
-        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.8))
-        kv_cache_quant_policy = int(os.getenv("kv_cache_quant_policy", 0))
-        dtype = os.getenv("dtype", "auto")
+        model_config = get_model_config()
+        logger.info(f"model_config: {model_config}")
+        backend = backend_map[model_config.backend]
         logger.info(f"后端 {backend}")
         if backend == "pytorch":
             backend_config = PytorchEngineConfig(
-                tp=int(os.getenv("num_gpus", "1")),
-                dtype=dtype,
-                session_len=int(max_model_len) if max_model_len else None,
-                enable_prefix_caching=enable_prefix_caching,
-                cache_max_entry_count=gpu_memory_utilization,
-                quant_policy=kv_cache_quant_policy,
+                tp=model_config.num_gpus,
+                dtype=model_config.dtype,
+                session_len=model_config.max_model_len,
+                enable_prefix_caching=model_config.enable_prefix_caching,
+                cache_max_entry_count=model_config.gpu_memory_utilization,
+                quant_policy=model_config.kv_cache_quant_policy,
             )
         if backend == "turbomind":
             backend_config = TurbomindEngineConfig(
-                tp=int(os.getenv("num_gpus", "1")),
-                enable_prefix_caching=enable_prefix_caching,
-                session_len=int(max_model_len) if max_model_len else None,
-                dtype=dtype,
-                cache_max_entry_count=gpu_memory_utilization,
-                quant_policy=kv_cache_quant_policy,  # 默认为：0
+                tp=model_config.num_gpus,
+                enable_prefix_caching=model_config.enable_prefix_caching,
+                session_len=model_config.max_model_len,
+                dtype=model_config.dtype,
+                cache_max_entry_count=model_config.gpu_memory_utilization,
+                quant_policy=model_config.kv_cache_quant_policy,  # 默认为：0
             )
         pipeline_type, pipeline_class = get_task(model_path)
         logger.info(f"模型架构：{pipeline_type}")
