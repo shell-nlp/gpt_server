@@ -714,7 +714,35 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     SpeechRequest,
     OpenAISpeechRequest,
     ImagesGenRequest,
+    ImagesEditsRequest,
 )
+
+
+async def get_images_edits(payload: Dict[str, Any]):
+    model_name = payload["model"]
+    worker_addr = get_worker_address(model_name)
+
+    transcription = await fetch_remote(
+        worker_addr + "/worker_get_image_output", payload
+    )
+    return json.loads(transcription)
+
+
+@app.post("/v1/images/edits", dependencies=[Depends(check_api_key)])
+async def images_edits(request: ImagesEditsRequest):
+    """图片编辑"""
+    error_check_ret = check_model(request)
+    if error_check_ret is not None:
+        return error_check_ret
+    payload = {
+        "image": request.image,
+        "model": request.model,
+        "prompt": request.prompt,
+        "output_format": request.output_format,
+        "response_format": request.response_format,
+    }
+    result = await get_images_edits(payload=payload)
+    return result
 
 
 async def get_images_gen(payload: Dict[str, Any]):
@@ -728,7 +756,8 @@ async def get_images_gen(payload: Dict[str, Any]):
 
 
 @app.post("/v1/images/generations", dependencies=[Depends(check_api_key)])
-async def speech(request: ImagesGenRequest):
+async def images_generations(request: ImagesGenRequest):
+    """文生图"""
     error_check_ret = check_model(request)
     if error_check_ret is not None:
         return error_check_ret

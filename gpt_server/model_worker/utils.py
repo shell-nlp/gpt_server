@@ -4,7 +4,7 @@ from fastapi import HTTPException
 import base64
 import io
 import os
-from PIL.Image import Image
+from PIL import Image
 import re
 
 
@@ -14,18 +14,18 @@ def is_base64_image(data_string):
 
 
 # 转换为Base64
-def pil_to_base64(pil_img: Image, format: str = "PNG"):
+def pil_to_base64(pil_img: Image.Image, format: str = "PNG"):
     buffered = io.BytesIO()
     pil_img.save(buffered, format=format)  # 明确指定PNG格式
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
-def extract_base64(data_url: str):
+def _extract_base64(data_url: str):
     """从Data URL中提取纯Base64数据"""
     return data_url.split(",", 1)[-1]  # 从第一个逗号后分割
 
 
-async def get_bytes_from_url(url: str) -> bytes:
+async def _get_bytes_from_url(url: str) -> bytes:
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         if response.status_code != 200:
@@ -33,19 +33,28 @@ async def get_bytes_from_url(url: str) -> bytes:
         return response.content
 
 
-async def load_base64_or_url(base64_or_url):
+def bytesio2image(bytes_io: io.BytesIO) -> Image.Image:
+    return Image.open(bytes_io)
+
+
+def bytes2image(bytes_: bytes) -> Image.Image:
+    bytes_io = io.BytesIO(bytes_)
+    return Image.open(bytes_io)
+
+
+async def load_base64_or_url(base64_or_url) -> io.BytesIO:
     # 根据 reference_audio 内容判断读取方式
     if base64_or_url.startswith("http://") or base64_or_url.startswith("https://"):
-        audio_bytes = await get_bytes_from_url(base64_or_url)
+        audio_bytes = await _get_bytes_from_url(base64_or_url)
     else:
         try:
             if "data:" in base64_or_url:
-                base64_or_url = extract_base64(data_url=base64_or_url)
+                base64_or_url = _extract_base64(data_url=base64_or_url)
             audio_bytes = base64.b64decode(base64_or_url)
         except Exception as e:
             logger.warning("无效的 base64 数据: " + str(e))
             raise HTTPException(status_code=400, detail="无效的 base64 数据: " + str(e))
-    # 利用 BytesIO 包装字节数据，然后使用 soundfile 读取为 numpy 数组
+    # 利用 BytesIO 包装字节数据
     try:
         bytes_io = io.BytesIO(audio_bytes)
     except Exception as e:
