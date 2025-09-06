@@ -55,6 +55,11 @@ gpt_server = "gpt_server.cli:main"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
 
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
+
 [tool.uv.sources]
 vllm = { git = "https://gitee.com/liuyu_1997/vllm.git" }
 
