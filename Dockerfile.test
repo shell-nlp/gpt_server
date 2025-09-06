@@ -1,0 +1,29 @@
+# 第一阶段
+FROM 506610466/gpt_server:0.6.1 AS builder 
+RUN apt-get update -y && apt-get install -y numactl build-essential git && rm -rf /var/lib/apt/lists/*
+COPY ./ /gpt_server
+WORKDIR /gpt_server
+ENV UV_HTTP_TIMEOUT=120 CUDA_HOME=/usr/local/cuda-12.2
+ENV PATH=$CUDA_HOME/bin:$PATH 
+ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+RUN uv venv --seed && uv sync --index pypi -vv && uv cache clean && \
+    echo '[[ -f .venv/bin/activate ]] && source .venv/bin/activate' >> ~/.bashrc
+
+# 第二阶段
+FROM 506610466/cuda:12.2.2-devel-ubuntu20.04-uv
+RUN apt-get update -y && apt-get install -y numactl build-essential git && rm -rf /var/lib/apt/lists/*
+COPY ./ /gpt_server
+WORKDIR /gpt_server
+
+# RUN uv sync && uv cache clean
+ENV UV_HTTP_TIMEOUT=120 CUDA_HOME=/usr/local/cuda-12.2
+ENV PATH=$CUDA_HOME/bin:$PATH 
+ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+
+# 从第一阶段复制编译好的二进制文件
+COPY --from=builder /gpt_server/.venv ./.venv
+RUN uv sync -v&& uv cache clean && \
+    echo '[[ -f .venv/bin/activate ]] && source .venv/bin/activate' >> ~/.bashrc
+ENV PATH=/gpt_server/.venv/bin:$PATH
+
+CMD ["/bin/bash"]
