@@ -19,12 +19,13 @@ from typing import Generator, Optional, Union, Dict, List, Any
 
 import aiohttp
 import fastapi
-from fastapi import Depends, HTTPException, responses
+from fastapi import Depends, File, HTTPException, Request, responses, Form, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 import httpx
+import base64
 
 try:
     from pydantic.v1 import BaseSettings, validator
@@ -194,18 +195,18 @@ def create_error_response(code: int, message: str) -> JSONResponse:
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return create_error_response(ErrorCode.VALIDATION_TYPE_ERROR, str(exc))
 
 
-def check_model(request) -> Optional[JSONResponse]:
+def check_model(model: str) -> Optional[JSONResponse]:
     global model_address_map, models_
     ret = None
     models = models_
-    if request.model not in models_:
+    if model not in models_:
         ret = create_error_response(
             ErrorCode.INVALID_MODEL,
-            f"Only {'&&'.join(models)} allowed now, your model {request.model}",
+            f"Only {'&&'.join(models)} allowed now, your model {model}",
         )
     return ret
 
@@ -418,7 +419,7 @@ def get_model_address_map():
 )
 async def create_chat_completion(request: CustomChatCompletionRequest):
     """Creates a completion for the chat message"""
-    error_check_ret = check_model(request)
+    error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
     worker_addr = get_worker_address(request.model)
@@ -554,7 +555,7 @@ async def chat_completion_stream_generator(
     response_class=responses.ORJSONResponse,
 )
 async def create_completion(request: CompletionRequest):
-    error_check_ret = check_model(request)
+    error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
 
@@ -714,7 +715,6 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     SpeechRequest,
     OpenAISpeechRequest,
     ImagesGenRequest,
-    ImagesEditsRequest,
 )
 
 
@@ -729,17 +729,27 @@ async def get_images_edits(payload: Dict[str, Any]):
 
 
 @app.post("/v1/images/edits", dependencies=[Depends(check_api_key)])
-async def images_edits(request: ImagesEditsRequest):
+async def images_edits(
+    model: str = Form(...),
+    image: UploadFile = File(media_type="application/octet-stream"),
+    prompt: Optional[Union[str, List[str]]] = Form(None),
+    # negative_prompt: Optional[Union[str, List[str]]] = Form(None),
+    response_format: Optional[str] = Form("url"),
+    output_format: Optional[str] = Form("png"),
+):
     """图片编辑"""
-    error_check_ret = check_model(request)
+
+    error_check_ret = check_model(model)
     if error_check_ret is not None:
         return error_check_ret
     payload = {
-        "image": request.image,
-        "model": request.model,
-        "prompt": request.prompt,
-        "output_format": request.output_format,
-        "response_format": request.response_format,
+        "image": base64.b64encode(await image.read()).decode(
+            "utf-8"
+        ),  # bytes → Base64 字符串,
+        "model": model,
+        "prompt": prompt,
+        "output_format": output_format,
+        "response_format": response_format,
     }
     result = await get_images_edits(payload=payload)
     return result
@@ -758,7 +768,7 @@ async def get_images_gen(payload: Dict[str, Any]):
 @app.post("/v1/images/generations", dependencies=[Depends(check_api_key)])
 async def images_generations(request: ImagesGenRequest):
     """文生图"""
-    error_check_ret = check_model(request)
+    error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
     payload = {
@@ -877,10 +887,6 @@ async def get_transcriptions(payload: Dict[str, Any]):
     return json.loads(transcription)
 
 
-from fastapi import UploadFile, Form
-import base64
-
-
 @app.post(
     "/v1/audio/transcriptions",
     dependencies=[Depends(check_api_key)],
@@ -915,7 +921,7 @@ async def transcriptions(file: UploadFile, model: str = Form()):
     response_class=responses.ORJSONResponse,
 )
 async def classify(request: ModerationsRequest):
-    error_check_ret = check_model(request)
+    error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
     request.input = process_input(request.model, request.input)
@@ -958,7 +964,7 @@ async def classify(request: ModerationsRequest):
     response_class=responses.ORJSONResponse,
 )
 async def rerank(request: RerankRequest):
-    error_check_ret = check_model(request)
+    error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
     request.documents = process_input(request.model, request.documents)
@@ -1009,7 +1015,7 @@ async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = 
     """Creates embeddings for the text"""
     if request.model is None:
         request.model = model_name
-    error_check_ret = check_model(request)
+    error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
 
@@ -1111,7 +1117,7 @@ async def count_tokens(request: APITokenCheckRequest):
 @app.post("/api/v1/chat/completions")
 async def create_chat_completion(request: APIChatCompletionRequest):
     """Creates a completion for the chat message"""
-    error_check_ret = check_model(request)
+    error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
 

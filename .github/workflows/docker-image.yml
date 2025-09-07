@@ -33,7 +33,7 @@ jobs:
       # 构建 Docker 镜像
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} .
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} .
           # docker tag ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
       # 推送镜像到 Docker Hub
       - name: Push Docker image
