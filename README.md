@@ -14,7 +14,7 @@
 
 本项目依托fastchat的基础能力来提供**openai server**的能力.
 
-1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS（支持声音克隆）**、 **SD(Stable Diffusion,文生图)** 模型的 **openai**规范 接口服务。
+1. 支持**Chat**、**Embedding**、**ReRanker**、**text-moderation（文本审核，分类）**、**ASR**、**TTS（支持声音克隆）**、**SD(Stable Diffusion,文生图、文生视频、图片编辑、)** 模型的 **openai**规范 接口服务。
 2. 支持**HF**、**vLLM**、**LMDeploy**和**SGLang** 多种加速推理后端引擎。
 3. 多个模型共用**openai server**的同一个端口进行调用，自动进行模型调度。
 
@@ -31,6 +31,7 @@
 | 📱  | **ASR(语音转文本)**    | 支持基于`FunASR`的ASR模型                                        |
 | 🔊  | **TTS(文本转语音)**   | 支持基于`SparkTTS`的TTS模型，支持基于`vLLM`、`SGLang`后端对齐加速，`RTF<<1`,支持流式音频流输出                                          |
 | 🖌️  | **SD(Stable Diffusion,文生图)**    | 支持基于`diffusers`的 `文生图` 模型                                        |
+| 🏔️  | **SD(Stable Diffusion,图片编辑)**    | 支持基于`diffusers`的 `图片编辑` 模型                                        |
 | 🔄  | **支持LM/VL模型**  | 支持多种大语言模型或多模态语言模型                                              |
 | 🎭  | **推理服务性能测试**   | 基于`Evalscope`实现`Throughput`、`TTFT`、`TPOT`等服务性能指标                                                  |
 
@@ -44,6 +45,7 @@
 - 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
 - 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
 - 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/generations）,基于diffusers后端(代码样例见gpt_server/tests/test_image_gen.py)
+- - 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/edits）,基于diffusers后端(代码样例见gpt_server/tests/test_image_edit.py)
 
 ## 🖼️ 配置文档
 通过这个样例文件，可以很快的掌握项目的配置方式。
@@ -55,6 +57,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-9-7   支持了 文本编辑模型 (代码样例见gpt_server/tests/test_image_edit.py)
 2025-8-8   初步支持了 embedding 的 vllm 加速
 2025-6-17  支持了 jina-reranker-m0 全球首个支持多模态多语言的重排模型
 2025-6-12  支持了 文生图模型 flux (代码样例见gpt_server/tests/test_image_gen.py)

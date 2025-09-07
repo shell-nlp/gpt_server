@@ -256,6 +256,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--task_type", type=str, default="auto")
         # limit_worker_concurrency
         parser.add_argument("--limit_worker_concurrency", type=int, default=1024)
+        # port
+        parser.add_argument("--port", type=int, default=None)
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -288,12 +290,13 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         logger.remove(0)
         log_level = os.getenv("log_level", "WARNING")
         logger.add(sys.stderr, level=log_level)
-        
 
         host = args.host
         controller_address = args.controller_address
-
-        port = get_free_tcp_port()
+        if args.port:
+            port = args.port
+        else:
+            port = get_free_tcp_port()
         os.environ["WORKER_PORT"] = str(port)
         os.environ["WORKER_HOST"] = str(local_ip)
         worker_addr = f"http://{host}:{port}"

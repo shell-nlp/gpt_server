@@ -195,6 +195,7 @@ models:
     model_type: qwen_image_edit
     work_mode: hf
     device: gpu
+    port: 8084 # 支持手动设置端口
     workers:
     - gpus:
       - 7

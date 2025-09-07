@@ -239,6 +239,7 @@ def start_model_worker(config: dict):
                         CUDA_VISIBLE_DEVICES = ""
                     else:
                         raise Exception("目前仅支持 CPU/GPU设备!")
+                    port = model_config.get("port", None)
                     backend = model_config["work_mode"]
                     if model_type == "embedding":
                         assert backend in embedding_backend_type
@@ -264,6 +265,8 @@ def start_model_worker(config: dict):
                         + f" --limit_worker_concurrency {limit_worker_concurrency}"  # 限制worker并发数
                     )
                     # 处理为 None的情况
+                    if port:
+                        cmd += f" --port {port}"
                     if lora:
                         cmd += f" --lora '{json.dumps(lora)}'"
                     if max_model_len:
