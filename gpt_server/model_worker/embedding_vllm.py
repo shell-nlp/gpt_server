@@ -46,7 +46,7 @@ class EmbeddingWorker(ModelWorkerBase):
         )
         tensor_parallel_size = int(os.getenv("num_gpus", "1"))
         max_model_len = os.getenv("max_model_len", None)
-        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.8))
+        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.6))
         enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
 
         self.mode = get_embedding_mode(model_path=model_path)

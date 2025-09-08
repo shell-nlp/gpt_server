@@ -182,7 +182,7 @@ distro==1.9.0
     #   anthropic
     #   openai
     #   posthog
-dnspython==2.7.0
+dnspython==2.8.0
     # via email-validator
 edge-tts==7.2.3
     # via gpt-server (pyproject.toml)
@@ -381,7 +381,7 @@ jsonschema==4.25.1
     #   mistral-common
     #   outlines
     #   ray
-jsonschema-specifications==2025.4.1
+jsonschema-specifications==2025.9.1
     # via jsonschema
 kaldiio==2.18.1
     # via funasr
@@ -412,7 +412,7 @@ langchain-text-splitters==0.3.11
     # via langchain
 langdetect==1.0.9
     # via evalscope
-langsmith==0.4.25
+langsmith==0.4.26
     # via
     #   langchain
     #   langchain-community
@@ -499,7 +499,7 @@ multiprocess==0.70.16
     # via datasets
 mypy-extensions==1.1.0
     # via typing-inspect
-narwhals==2.3.0
+narwhals==2.4.0
     # via altair
 nest-asyncio==1.6.0
     # via
@@ -563,6 +563,7 @@ numpy==1.26.4
     #   pydeck
     #   pyloudnorm
     #   pytorch-wpe
+    #   pytrec-eval-terrier
     #   ragas
     #   rouge-score
     #   sacrebleu
@@ -619,7 +620,7 @@ nvidia-cusparse-cu12==12.5.8.93
     #   torch
 nvidia-cusparselt-cu12==0.7.1
     # via torch
-nvidia-ml-py==12.575.51
+nvidia-ml-py==13.580.65
     # via pynvml
 nvidia-nccl-cu12==2.27.3
     # via
@@ -631,7 +632,7 @@ nvidia-nvjitlink-cu12==12.8.93
     #   nvidia-cusolver-cu12
     #   nvidia-cusparse-cu12
     #   torch
-nvidia-nvshmem-cu12==3.3.24
+nvidia-nvshmem-cu12==3.4.5
     # via flashinfer-python
 nvidia-nvtx-cu12==12.8.90
     # via torch
@@ -751,7 +752,7 @@ pooch==1.8.2
     # via librosa
 portalocker==3.2.0
     # via sacrebleu
-posthog==6.7.3
+posthog==6.7.4
     # via infinity-emb
 prometheus-client==0.22.1
     # via
@@ -855,7 +856,7 @@ pynini==2.1.6
     # via wetextprocessing
 pynndescent==0.5.13
     # via umap-learn
-pynvml==12.0.0
+pynvml==13.0.1
     # via
     #   flashinfer-python
     #   lmdeploy
@@ -883,7 +884,7 @@ python-multipart==0.0.20
     #   sglang
 pytorch-wpe==0.0.1
     # via funasr
-pytrec-eval-terrier==0.5.8
+pytrec-eval-terrier==0.5.9
     # via mteb
 pytz==2025.2
     # via pandas
@@ -1013,6 +1014,7 @@ scipy==1.16.1
     #   mteb
     #   pyloudnorm
     #   pynndescent
+    #   pytrec-eval-terrier
     #   scikit-learn
     #   sentence-transformers
     #   sglang
@@ -1084,7 +1086,7 @@ soundfile==0.13.1
     #   librosa
     #   mistral-common
     #   sglang
-soxr==0.5.0.post1
+soxr==1.0.0
     # via
     #   flashtts
     #   librosa
@@ -1311,7 +1313,8 @@ uvloop==0.21.0
     # via
     #   sglang
     #   uvicorn
-vllm @ git+https://gitee.com/liuyu_1997/vllm.git@006e7a34aeb3e905ca4131a3251fe079f0511e2f
+--find-links https://wheels.vllm.ai/006e7a34aeb3e905ca4131a3251fe079f0511e2f 
+vllm
     # via gpt-server (pyproject.toml)
 watchdog==5.0.3
     # via streamlit
