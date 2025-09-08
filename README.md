@@ -262,14 +262,9 @@ Chat UI界面:
 | :-------------------: | :--------: | :---: | :---: | :----------------: | :--------------: | :----: |
 |      chatglm4-9b      |  chatglm   |   √   |   √   |         √          |        √         |   √    |
 |      chatglm3-6b      |  chatglm   |   √   |   √   |         ×          |        √         |   √    |
-| Qwen (7B, 14B, etc.)) |    qwen    |   √   |   √   |         √          |        √         |   √    |
-| Qwen-1.5 (0.5B--72B)  |    qwen    |   √   |   √   |         √          |        √         |   √    |
-|        Qwen-2         |    qwen    |   √   |   √   |         √          |        √         |   √    |
-|       Qwen-2.5        |    qwen    |   √   |   √   |         √          |        √         |   √    |
-|        Qwen-3         |    qwen    |   √   |   √   |         √          |        √         |   √    |
+|   Qwen-1.0--3.0       |    qwen    |   √   |   √   |         √          |        √         |   √    |
 |        Yi-34B         |     yi     |   √   |   √   |         √          |        √         |   √    |
-|     Internlm-1.0      |  internlm  |   √   |   √   |         √          |        √         |   √    |
-|     Internlm-2.0      |  internlm  |   √   |   √   |         √          |        √         |   √    |
+|    Internlm-1.0--2.0  |  internlm  |   √   |   √   |         √          |        √         |   √    |
 |       Deepseek        |  deepseek  |   √   |   √   |         √          |        √         |   √    |
 |        Llama-3        |   llama    |   √   |   √   |         √          |        √         |   √    |
 |      Baichuan-2       |  baichuan  |   √   |   √   |         √          |        √         |   √    |
@@ -281,9 +276,9 @@ Chat UI界面:
 | :--------------: | :--------: | :---: | :---: | :----------------: | :--------------: | :----: |
 |    glm-4v-9b     |  chatglm   |   ×   |   ×   |         ×          |        √         |   ×    |
 |    InternVL2     |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
-|   InternVL2.5    |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
-|   InternVL3      |  internvl  |   ×   |   √   |         √          |        √         |   ×    |
-|  MiniCPM-V-2_6   |  minicpmv  |   ×   |   √   |         √          |        ×         |   ×    |
+|InternVL2.5--3.5  |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
+|  MiniCPM-V-2.6   |  minicpmv  |   ×   |   √   |         √          |        ×         |   ×    |
+|  MiniCPM-V-4.5   |  minicpmv  |   ×   |   √   |         ×          |        ×         |   ×    |
 |     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |   √    |
 |    Qwen2.5-VL    |    qwen    |   ×   |   √   |         ×          |        √         |   √    |
 |       QVQ        |    qwen    |   ×   |   √   |         ×          |        ×         |   ×    |

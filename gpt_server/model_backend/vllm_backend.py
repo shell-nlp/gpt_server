@@ -72,6 +72,7 @@ class VllmBackend(ModelBackend):
         presence_penalty = float(params.get("presence_penalty", 0.0))
         frequency_penalty = float(params.get("frequency_penalty", 0.0))
         repetition_penalty = float(params.get("repetition_penalty", 1.0))
+        enable_thinking = bool(params.get("enable_thinking", True))
         request = params.get("request", None)
         # Handle stop_str
         stop = set()
@@ -96,6 +97,7 @@ class VllmBackend(ModelBackend):
                 add_generation_prompt=True,
                 tools=tools,
                 model_config=await self.engine.get_model_config(),
+                enable_thinking=enable_thinking,
             )
             mm_data = await mm_data_future
             inputs = {"multi_modal_data": mm_data, "prompt": prompt}

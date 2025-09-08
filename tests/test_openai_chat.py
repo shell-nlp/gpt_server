@@ -8,6 +8,7 @@ output = client.chat.completions.create(
     model="qwen",  # internlm chatglm3  qwen  llama3 chatglm4 qwen-72b
     messages=[{"role": "user", "content": "你是谁"}],
     stream=stream,
+    extra_body={"enable_thinking": True},  # 可以控制是否 think,部分模型支持
 )
 if stream:
     for chunk in output:

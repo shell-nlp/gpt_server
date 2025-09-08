@@ -23,7 +23,7 @@ client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 
 stream = True
 output = client.chat.completions.create(
-    model="glm4.1v",  # internlm chatglm3  qwen  llama3 chatglm4
+    model="minicpmv",  # internlm chatglm3  qwen  llama3 chatglm4
     messages=[
         {
             "role": "user",
@@ -42,6 +42,7 @@ output = client.chat.completions.create(
         }
     ],
     stream=stream,
+    extra_body={"enable_thinking": True},  # 可以控制是否 think,部分模型支持
 )
 if stream:
     for chunk in output:
