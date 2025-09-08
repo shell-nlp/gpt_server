@@ -56,7 +56,7 @@ class HFBackend(ModelBackend):
 
     async def stream_chat(self, params: Dict[str, Any]):
         prompt = params.get("prompt", "")
-        logger.info(prompt)
+        logger.info(f"prompt：\n{prompt}")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
         max_new_tokens = int(params.get("max_new_tokens", 512))

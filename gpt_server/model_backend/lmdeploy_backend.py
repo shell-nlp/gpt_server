@@ -6,7 +6,7 @@ from lmdeploy import (
     PytorchEngineConfig,
 )
 from transformers import PreTrainedTokenizerBase
-from typing import Any, Dict, AsyncGenerator
+from typing import Any, Dict, AsyncGenerator, List, Optional
 from lmdeploy.archs import get_task
 from gpt_server.model_handler.reasoning_parser import ReasoningParserManager
 from lmdeploy.serve.async_engine import get_names_from_model
@@ -60,6 +60,39 @@ def is_messages_with_tool(messages: list):
     return flag
 
 
+from lmdeploy.logger import RequestLogger
+
+
+class CustomRequestLogger(RequestLogger):
+    def log_prompt(self, session_id: int, prompt: str) -> None:
+        if not isinstance(prompt, str):
+            # Prompt may be a GPT4V message with base64 images;
+            # logging might be impractical due to length
+            return
+
+    def log_inputs(
+        self,
+        session_id: int,
+        prompt: Optional[str],
+        prompt_token_ids: Optional[List[int]],
+        gen_config: GenerationConfig,
+        adapter_name: str,
+    ) -> None:
+        max_log_len = self.max_log_len
+        input_tokens = len(prompt_token_ids)
+        if max_log_len is not None:
+            if prompt is not None:
+                prompt = prompt[:max_log_len]
+
+            if prompt_token_ids is not None:
+                prompt_token_ids = prompt_token_ids[:max_log_len]
+
+        logger.info(
+            f"session_id={session_id} adapter_name={adapter_name} gen_config={gen_config}"
+        )
+        logger.info(f"prompt：\n{prompt}")
+
+
 class LMDeployBackend(ModelBackend):
     def __init__(self, model_path, tokenizer: PreTrainedTokenizerBase) -> None:
         model_config = get_model_config()
@@ -95,6 +128,8 @@ class LMDeployBackend(ModelBackend):
         self.chat_template_name = chat_template_name
         self.tokenizer = self.async_engine.tokenizer
         self.reasoning_parser_cache = {}
+        # 自定义日志
+        self.async_engine.request_logger = CustomRequestLogger(max_log_len=None)
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
@@ -141,7 +176,6 @@ class LMDeployBackend(ModelBackend):
             messages = params["messages"]
         if isinstance(messages, str):
             logger.info(f"使用prompt模式")
-            logger.info(prompt)
         else:
             logger.info(f"使用messages模式")
         results_generator = self.async_engine.generate(
