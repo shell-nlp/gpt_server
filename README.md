@@ -45,7 +45,7 @@
 - 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
 - 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
 - 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/generations）,基于diffusers后端(代码样例见gpt_server/tests/test_image_gen.py)
-- - 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/edits）,基于diffusers后端(代码样例见gpt_server/tests/test_image_edit.py)
+- 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/edits）,基于diffusers后端(代码样例见gpt_server/tests/test_image_edit.py)
 
 ## 🖼️ 配置文档
 通过这个样例文件，可以很快的掌握项目的配置方式。
@@ -350,6 +350,14 @@ Chat UI界面:
 | :--------------: | :--------: |
 |    flux     | flux  |
 
+<br>
+
+### **图片编辑** 模型
+[Qwen-Image-Edit 模型地址](https://huggingface.co/Qwen/Qwen-Image-Edit)
+
+| Models / BackEnd | model_type |
+| :--------------: | :--------: |
+|Qwen-Image-Edit   | qwen_image_edit  |
 
 <br>
 
