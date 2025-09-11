@@ -51,11 +51,10 @@
 ## 📘 配置文档 
 
 
-- **[详细配置说明](https://blog.csdn.net/q506610466/article/details/151360406 "详细配置说明")**
+- **[配置详细说明](https://blog.csdn.net/q506610466/article/details/151360406 "详细配置说明")**
 <br>
+
 - [配置文件样例](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")
-
-
 
 ## 🎉 最新进展
 <details open>
