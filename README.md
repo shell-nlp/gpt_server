@@ -47,10 +47,15 @@
 - 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/generations）,基于diffusers后端(代码样例见gpt_server/tests/test_image_gen.py)
 - 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/edits）,基于diffusers后端(代码样例见gpt_server/tests/test_image_edit.py)
 
-## 🖼️ 配置文档
-通过这个样例文件，可以很快的掌握项目的配置方式。
+
+## 📘 配置文档 
+
+
+- **[详细配置说明](https://blog.csdn.net/q506610466/article/details/151360406 "详细配置说明")**
 <br>
-**配置文件的详细说明信息位于：[config_example.yaml](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")**
+- [配置文件样例](https://github.com/shell-nlp/gpt_server/blob/main/gpt_server/script/config_example.yaml "配置文件")
+
+
 
 ## 🎉 最新进展
 <details open>
