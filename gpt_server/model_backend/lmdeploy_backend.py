@@ -9,7 +9,7 @@ from transformers import PreTrainedTokenizerBase
 from typing import Any, Dict, AsyncGenerator, List, Optional
 from lmdeploy.archs import get_task
 from gpt_server.model_handler.reasoning_parser import ReasoningParserManager
-from lmdeploy.serve.async_engine import get_names_from_model
+from lmdeploy.serve.async_engine import best_match_model
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
 from gpt_server.settings import get_model_config
@@ -124,7 +124,7 @@ class LMDeployBackend(ModelBackend):
             backend=backend,
             backend_config=backend_config,
         )
-        model_name, chat_template_name = get_names_from_model(model_path=model_path)
+        chat_template_name = best_match_model(query=model_path)
         self.chat_template_name = chat_template_name
         self.tokenizer = self.async_engine.tokenizer
         self.reasoning_parser_cache = {}
@@ -166,18 +166,14 @@ class LMDeployBackend(ModelBackend):
             skip_special_tokens=True,
             response_format=params["response_format"],
         )
-        if params.get("tools", None) or is_messages_with_tool(messages=messages):
-            messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
+        # if params.get("tools", None) or is_messages_with_tool(messages=messages):
+        #     messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
         logger.info(f"chat_template_name: {self.chat_template_name}")
-        if self.chat_template_name == "base":
-            messages = prompt or messages
-        multimodal = params.get("multimodal", False)
-        if multimodal:  # 多模态模型
-            messages = params["messages"]
-        if isinstance(messages, str):
-            logger.info(f"使用prompt模式")
-        else:
-            logger.info(f"使用messages模式")
+        # if self.chat_template_name == "base":
+        #     messages = prompt or messages
+        # multimodal = params.get("multimodal", False)
+        # if multimodal:  # 多模态模型
+        #     messages = params["messages"]
         results_generator = self.async_engine.generate(
             messages=messages,
             session_id=int(request_id),

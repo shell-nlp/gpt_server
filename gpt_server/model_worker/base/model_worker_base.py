@@ -17,6 +17,7 @@ from transformers import (
     AutoModelForCausalLM,
     LlamaForCausalLM,
     AutoConfig,
+    PreTrainedTokenizer,
 )
 import uuid
 from gpt_server.utils import get_free_tcp_port, STATIC_DIR, local_ip
@@ -61,6 +62,19 @@ async def run_scheduler():
     while True:
         await cleanup_static_files()
         await asyncio.sleep(60 * 60 * 12)  # 60分钟 = 3600秒
+
+
+def pop_matching_tool(tools, tool_choice):
+    # 获取目标function名称
+    target_name = tool_choice["function"]["name"]
+
+    # 遍历tools列表，查找匹配项
+    for index, tool in enumerate(tools):
+        if tool["function"]["name"] == target_name:
+            return [tools.pop(index)]
+
+    # 未找到时返回None
+    return None
 
 
 class ModelWorkerBase(BaseModelWorker, ABC):
@@ -109,7 +123,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         self.model_path = model_path
         self.model = None
         self.backend = None
-        self.tokenizer = None
+        self.chat_template = None
+        self.tokenizer: PreTrainedTokenizer | None = None
         self.load_model_tokenizer(model_path)
         self.context_len = self.get_context_length()
         logger.info(f"Loading the model {self.model_names} on worker {worker_id} ...")
@@ -118,6 +133,36 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         if worker is None:
             worker = self
             logger.info("worker 已赋值")
+
+    def preprocess_params(self, params: dict) -> dict:
+        """预处理 params"""
+        messages = params["messages"]
+        if isinstance(messages, str):
+            messages = [{"role": "user", "content": messages}]
+            params["messages"] = messages
+        # 1. 处理 工具，支持 tool_choice 的控制
+        tool_choice = params.get("tool_choice", "none")
+        tools = params.get("tools", None)
+        if self.chat_template:
+            params["chat_template"] = self.chat_template
+        params["extra_prompt"] = ""
+        if tools:
+            if tool_choice == "none":
+                tools = None  # OK
+            elif tool_choice == "auto":
+                pass  # OK
+            elif tool_choice == "required":
+                params["extra_prompt"] = """<tool_call>\n{"name":"""
+            elif isinstance(tool_choice, dict):
+                tools = pop_matching_tool(tools=tools, tool_choice=tool_choice)
+                tool_name = tool_choice["function"]["name"]
+                params[
+                    "extra_prompt"
+                ] = f"""<tool_call>
+{{"name": "{tool_name}", "arguments": 
+    """
+        params["tools"] = tools
+        return params
 
     def get_context_length(
         self,
@@ -146,7 +191,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         """加载 模型 和 分词器 直接对 self.model 和 self.tokenizer 进行赋值"""
         if self.model_type in ["embedding", "asr", "tts", "image"]:
             return 1
-        self.tokenizer = AutoTokenizer.from_pretrained(
+        self.tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(
             model_path,
             trust_remote_code=True,
             encode_special_tokens=True,

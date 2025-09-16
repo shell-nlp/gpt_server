@@ -26,7 +26,7 @@ aiohttp==3.12.15
     #   vllm
 aiosignal==1.4.0
     # via aiohttp
-airportsdata==20250811
+airportsdata==20250909
     # via outlines
 aliyun-python-sdk-core==2.16.0
     # via
@@ -38,7 +38,7 @@ altair==5.5.0
     # via streamlit
 annotated-types==0.7.0
     # via pydantic
-anthropic==0.66.0
+anthropic==0.67.0
     # via sglang
 antlr4-python3-runtime==4.9.3
     # via
@@ -96,7 +96,7 @@ certifi==2025.8.3
     #   httpcore
     #   httpx
     #   requests
-cffi==1.17.1
+cffi==2.0.0
     # via
     #   cryptography
     #   soundfile
@@ -134,7 +134,7 @@ ctranslate2==4.6.0
     # via infinity-emb
 cuda-bindings==13.0.1
     # via cuda-python
-cuda-pathfinder==1.2.1
+cuda-pathfinder==1.2.2
     # via
     #   cuda-bindings
     #   cuda-python
@@ -282,7 +282,7 @@ hf-transfer==0.1.9
     # via
     #   infinity-emb
     #   sglang
-hf-xet==1.1.9
+hf-xet==1.1.10
     # via huggingface-hub
 httpcore==1.0.9
     # via httpx
@@ -298,7 +298,7 @@ httpx==0.28.1
     #   openai
 httpx-sse==0.4.1
     # via langchain-community
-huggingface-hub==0.34.4
+huggingface-hub==0.34.6
     # via
     #   accelerate
     #   datasets
@@ -357,7 +357,7 @@ jinja2==3.1.6
     #   outlines
     #   pydeck
     #   torch
-jiter==0.10.0
+jiter==0.11.0
     # via
     #   anthropic
     #   openai
@@ -396,7 +396,7 @@ langchain-community==0.3.29
     # via
     #   evalscope
     #   ragas
-langchain-core==0.3.75
+langchain-core==0.3.76
     # via
     #   evalscope
     #   langchain
@@ -412,7 +412,7 @@ langchain-text-splitters==0.3.11
     # via langchain
 langdetect==1.0.9
     # via evalscope
-langsmith==0.4.26
+langsmith==0.4.28
     # via
     #   langchain
     #   langchain-community
@@ -441,7 +441,7 @@ llvmlite==0.44.0
     #   pynndescent
 lm-format-enforcer==0.11.3
     # via vllm
-lmdeploy==0.9.2.post1
+lmdeploy==0.10.0
     # via gpt-server (pyproject.toml)
 loguru==0.7.3
     # via gpt-server (pyproject.toml)
@@ -465,7 +465,7 @@ matplotlib-inline==0.1.7
     # via ipython
 mdurl==0.1.2
     # via markdown-it-py
-mistral-common==1.8.4
+mistral-common==1.8.5
     # via vllm
 ml-dtypes==0.5.3
     # via onnx
@@ -499,7 +499,7 @@ multiprocess==0.70.16
     # via datasets
 mypy-extensions==1.1.0
     # via typing-inspect
-narwhals==2.4.0
+narwhals==2.5.0
     # via altair
 nest-asyncio==1.6.0
     # via
@@ -620,7 +620,7 @@ nvidia-cusparse-cu12==12.5.8.93
     #   torch
 nvidia-cusparselt-cu12==0.7.1
     # via torch
-nvidia-ml-py==13.580.65
+nvidia-ml-py==13.580.82
     # via pynvml
 nvidia-nccl-cu12==2.27.3
     # via
@@ -746,16 +746,17 @@ platformdirs==4.4.0
     # via
     #   pooch
     #   yapf
-polars==1.33.0
+polars==1.33.1
     # via mteb
 pooch==1.8.2
     # via librosa
 portalocker==3.2.0
     # via sacrebleu
-posthog==6.7.4
+posthog==6.7.5
     # via infinity-emb
 prometheus-client==0.22.1
     # via
+    #   lmdeploy
     #   prometheus-fastapi-instrumentator
     #   sglang
     #   vllm
@@ -806,13 +807,13 @@ pycountry==24.6.1
     # via
     #   outlines
     #   pydantic-extra-types
-pycparser==2.22
+pycparser==2.23
     # via cffi
 pycryptodome==3.23.0
     # via oss2
 pycryptodomex==3.23.0
     # via blobfile
-pydantic==2.11.7
+pydantic==2.11.9
     # via
     #   anthropic
     #   compressed-tensors
@@ -861,7 +862,7 @@ pynvml==13.0.1
     #   flashinfer-python
     #   lmdeploy
     #   sglang
-pyparsing==3.2.3
+pyparsing==3.2.4
     # via matplotlib
 pyproject-hooks==1.2.0
     # via build
@@ -911,7 +912,7 @@ pyyaml==6.0.2
     #   vllm
     #   wavedrom
     #   webdataset
-pyzmq==27.0.2
+pyzmq==27.1.0
     # via
     #   lmdeploy
     #   sglang
@@ -997,7 +998,7 @@ safetensors==0.6.2
     #   peft
     #   timm
     #   transformers
-scikit-learn==1.7.1
+scikit-learn==1.7.2
     # via
     #   evalscope
     #   librosa
@@ -1005,7 +1006,7 @@ scikit-learn==1.7.1
     #   pynndescent
     #   sentence-transformers
     #   umap-learn
-scipy==1.16.1
+scipy==1.16.2
     # via
     #   colpali-engine
     #   funasr
@@ -1045,9 +1046,9 @@ setuptools==77.0.3
     #   torch
     #   triton
     #   vllm
-sgl-kernel==0.3.7
+sgl-kernel==0.3.9.post2
     # via sglang
-sglang==0.5.1.post3
+sglang==0.5.2
     # via gpt-server (pyproject.toml)
 shellingham==1.5.4
     # via typer
@@ -1313,8 +1314,7 @@ uvloop==0.21.0
     # via
     #   sglang
     #   uvicorn
---find-links https://wheels.vllm.ai/006e7a34aeb3e905ca4131a3251fe079f0511e2f 
-vllm
+vllm==0.10.2rc2.dev99+g006e7a34a.cu129
     # via gpt-server (pyproject.toml)
 watchdog==5.0.3
     # via streamlit
@@ -1349,5 +1349,5 @@ yarl==1.20.1
     # via aiohttp
 zipp==3.23.0
     # via importlib-metadata
-zstandard==0.24.0
+zstandard==0.25.0
     # via langsmith

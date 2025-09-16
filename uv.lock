@@ -1505,7 +1505,7 @@ wheels = [
 
 [[package]]
 name = "gpt-server"
-version = "0.6.2"
+version = "0.6.3"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
@@ -1546,7 +1546,7 @@ requires-dist = [
     { name = "fschat", specifier = "==0.2.36" },
     { name = "funasr", specifier = ">=1.2.6" },
     { name = "infinity-emb", extras = ["all"], specifier = "==0.0.76" },
-    { name = "lmdeploy", specifier = "==0.9.2.post1" },
+    { name = "lmdeploy", specifier = "==0.10.0" },
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "modelscope", specifier = "==1.26.0" },
     { name = "openai", specifier = "==1.99.1" },
@@ -2422,7 +2422,7 @@ wheels = [
 
 [[package]]
 name = "lmdeploy"
-version = "0.9.2.post1"
+version = "0.10.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "accelerate" },
@@ -2444,6 +2444,7 @@ dependencies = [
     { name = "partial-json-parser" },
     { name = "peft" },
     { name = "pillow" },
+    { name = "prometheus-client" },
     { name = "protobuf" },
     { name = "pydantic" },
     { name = "pynvml" },
@@ -2460,12 +2461,12 @@ dependencies = [
     { name = "uvicorn" },
 ]
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5d/52/573e81b36a07a70f081e621420b86e8d6dc5fcce3600d1ab7a2ed85ec74e/lmdeploy-0.9.2.post1-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:f4170fc26a94c9c4c8f9e96f88c28656d7084f2c0bad73cca09806a5563d297b", size = 75630393, upload-time = "2025-08-25T08:08:59.836Z" },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/80/5b/6e9d4520619c97e488a29831b24e3b1c09bbccf71e857f483c77ecc0f301/lmdeploy-0.9.2.post1-cp311-cp311-win_amd64.whl", hash = "sha256:1fdb7b3388db0f5d455ec68568621e0cde4abe38b6920d1dcd2dac418d6d37f4", size = 28244716, upload-time = "2025-08-25T08:09:04.857Z" },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e3/c5/49e50dc62dcc0b2d91835e216d6cf83a903d55f3f0f1a2271b16ed843522/lmdeploy-0.9.2.post1-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:c4ac97b4e812a76f7f7c0207bfa480c7e7a80b9255b2e5d8cd13209d78c646e8", size = 75632549, upload-time = "2025-08-25T08:09:09.713Z" },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/51/c6/a6e12c971cac43f738e509de616da95776f0fd878b189e182ac68d5a686b/lmdeploy-0.9.2.post1-cp312-cp312-win_amd64.whl", hash = "sha256:83f59944fe528fcbe9bad9fc2c818ec13c3d57e3dd539eab2445fdc9cc6d2d79", size = 28231354, upload-time = "2025-08-25T08:09:13.786Z" },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/01/3d/c0e06addc158124906032057cf3379222e754cb25dfbce2ed6fa99cd10fb/lmdeploy-0.9.2.post1-cp313-cp313-manylinux2014_x86_64.whl", hash = "sha256:4bdd13a11fcbeaec2e7e4aa0a4885b6534e51a2b09d12353a62bb6380c4410f1", size = 75631683, upload-time = "2025-08-25T08:09:17.727Z" },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/00/f4/7fa516e47acd8326784d52a328de538e31f35032209f429ffd1b1d7848ad/lmdeploy-0.9.2.post1-cp313-cp313-win_amd64.whl", hash = "sha256:51630934b9b64025569040dbd4fd4ccd04ddf41487d1c9d75951ef7ab2f94af0", size = 28231002, upload-time = "2025-08-25T08:09:22.737Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/9e/0e/6211205f4c83fd50554800835968746c3278ee2a6729ca2021f431a2604a/lmdeploy-0.10.0-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:a38c007d04b902aaf359b0e014942a08c17b2cc3daaf2929917fe8cbcce8571b", size = 79759024, upload-time = "2025-09-09T05:43:08.569Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/74/97/6dfdd90511e9523dac5526bb43b4e1e32f5724bf7d8867e69d92a3ebeac3/lmdeploy-0.10.0-cp311-cp311-win_amd64.whl", hash = "sha256:27604673b41c2c0030de1824b16b73f70f3a721351ed518e5eb18d6b03e1b596", size = 29269896, upload-time = "2025-09-09T05:43:12.177Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/59/0d/c3a5d72200026437fc2a457a908ad4b6ce7acdcd91279e83e0864bb61613/lmdeploy-0.10.0-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:4d13cc5a2fbb137c73b960a7e932319d13d33423591cf47950c9184979884a20", size = 79752444, upload-time = "2025-09-09T05:43:15.469Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/56/39/11da5cecbc2ba253545e64d83ddf6c163eea9c2acf5f67d61b7f02acec1e/lmdeploy-0.10.0-cp312-cp312-win_amd64.whl", hash = "sha256:fbdffbcf2af67fbc658a1ef3645757840d89330ee0530fc65148368673c1cb2b", size = 29264628, upload-time = "2025-09-09T05:43:18.48Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e6/1f/ce2698762dfc7718bc84c8e466ab550e1c77e90e019a7e0f96726b737f9f/lmdeploy-0.10.0-cp313-cp313-manylinux2014_x86_64.whl", hash = "sha256:67c08216ae86e075d6fda3697f7b4a64d5ef2a7276ffeefca0e5eea614fc11d6", size = 79750779, upload-time = "2025-09-09T05:43:21.89Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0c/ea/db4e408508c06491c17555a9363fff04d42afdd99ca071c9eeaaf3431f60/lmdeploy-0.10.0-cp313-cp313-win_amd64.whl", hash = "sha256:066210ba8bdb893c46286e51aa88cda753df9afe3068e786d87b7a5c07517c90", size = 29266049, upload-time = "2025-09-09T05:43:25.492Z" },
 ]
 
 [[package]]

@@ -8,19 +8,7 @@ import traceback
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_handler.prompts import MODELS
 from gpt_server.model_handler.tool_parser import tool_parser, ToolParserManager
-
-
-def pop_matching_tool(tools, tool_choice):
-    # 获取目标function名称
-    target_name = tool_choice["function"]["name"]
-
-    # 遍历tools列表，查找匹配项
-    for index, tool in enumerate(tools):
-        if tool["function"]["name"] == target_name:
-            return [tools.pop(index)]
-
-    # 未找到时返回None
-    return None
+from gpt_server.model_handler.chat_template.get_chat_template import get_chat_template
 
 
 class QwenWorker(ModelWorkerBase):
@@ -52,7 +40,7 @@ class QwenWorker(ModelWorkerBase):
         ]
         logger.warning(f"{model_names[0]} 停用词: {self.stop}")
 
-        self.chat_template = MODELS.module_dict["qwen2_5"]()
+        self.chat_template = get_chat_template(model_name="qwen", lang="zh")
         self.tool_parser = ToolParserManager.module_dict["qwen2_5"](
             tokenizer=self.tokenizer
         )
@@ -62,50 +50,25 @@ class QwenWorker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
+            # 处理 工具，支持 tool_choice 的控制
+            params = self.preprocess_params(params)
             messages = params.get("messages", [])
             tools = params.get("tools", None)
-            tool_choice = params.get("tool_choice", "none")
-            if tool_choice == "none":
-                tools = None
-            elif tool_choice == "auto" or tool_choice == "required":
-                pass
-            elif isinstance(tool_choice, dict):
-                tools = pop_matching_tool(tools=tools, tool_choice=tool_choice)
+            if self.vision_config:
+                params["multimodal"] = True
+            if isinstance(messages, list):
+                text = await asyncio.to_thread(
+                    self.tokenizer.apply_chat_template,
+                    messages,
+                    # chat_template=self.vl_chat_template,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                    tools=tools,
+                    enable_thinking=bool(params.get("enable_thinking", True)),
+                )
 
-            if not self.vision_config:
-                if isinstance(messages, list):
-                    # text = self.chat_template.messages2prompt(messages, True, tools)
-                    text = await asyncio.to_thread(
-                        self.chat_template.messages2prompt,
-                        messages,
-                        True,
-                        tools,
-                        enable_thinking=bool(params.get("enable_thinking", True)),
-                    )
-                elif isinstance(messages, str):
-                    text = messages
-
-                # input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-                # params["input_ids"] = input_ids
                 params["prompt"] = text
-            else:  # 多模态
-                if isinstance(messages, list):
-                    text = await asyncio.to_thread(
-                        self.tokenizer.apply_chat_template,
-                        messages,
-                        chat_template=self.vl_chat_template,
-                        tokenize=False,
-                        add_generation_prompt=True,
-                    )
-                    # text = self.tokenizer.apply_chat_template(
-                    #     messages,
-                    #     chat_template=self.vl_chat_template,
-                    #     tokenize=False,
-                    #     add_generation_prompt=True,
-                    # )
-                    params["prompt"] = text
-                    # 多模态不需要传入input_ids
-                    params["multimodal"] = True
+                # 多模态不需要传入input_ids
             # ---------------添加额外的参数------------------------
             params["messages"] = messages
             params["stop"].extend(self.stop)

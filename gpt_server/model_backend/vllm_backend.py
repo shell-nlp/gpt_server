@@ -61,7 +61,6 @@ class VllmBackend(ModelBackend):
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         prompt = params.get("prompt", "")
         messages = params["messages"]
-        logger.info(f"prompt：\n{prompt}")
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
@@ -74,6 +73,7 @@ class VllmBackend(ModelBackend):
         repetition_penalty = float(params.get("repetition_penalty", 1.0))
         enable_thinking = bool(params.get("enable_thinking", True))
         request = params.get("request", None)
+        tools = params.get("tools", None)
         # Handle stop_str
         stop = set()
         if isinstance(stop_str, str) and stop_str != "":
@@ -89,7 +89,7 @@ class VllmBackend(ModelBackend):
             conversation, mm_data_future = parse_chat_messages_futures(
                 messages, model_config, tokenizer, content_format="string"
             )
-            tools = params.get("tools", None)
+
             prompt = apply_hf_chat_template(
                 tokenizer,
                 conversation=conversation,
@@ -102,11 +102,22 @@ class VllmBackend(ModelBackend):
             mm_data = await mm_data_future
             inputs = {"multi_modal_data": mm_data, "prompt": prompt}
         else:
+            conversation = messages
+            prompt = apply_hf_chat_template(
+                tokenizer,
+                conversation=conversation,
+                chat_template=tokenizer.get_chat_template(),
+                add_generation_prompt=True,
+                tools=tools,
+                model_config=await self.engine.get_model_config(),
+                enable_thinking=enable_thinking,
+            )
             input_ids = params.get("input_ids", None)
             inputs = {"prompt": prompt}
             if input_ids is not None:
                 prompt_token_ids = input_ids.tolist()[0]
                 inputs["prompt_token_ids"] = prompt_token_ids
+        logger.info(f"prompt：\n{prompt}")
         # ----------------------------------------------------------------
         # make sampling params in vllm
         top_p = max(top_p, 1e-5)

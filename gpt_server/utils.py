@@ -398,17 +398,26 @@ model_type_mapping = {
 if __name__ == "__main__":
     # /home/dev/model/KirillR/QwQ-32B-Preview-AWQ
     # get_model_types()
-    from lmdeploy.serve.async_engine import get_names_from_model
+    # from lmdeploy.serve.async_engine import get_names_from_model
+    from lmdeploy.serve.async_engine import best_match_model, MODELS
+    from lmdeploy.model import HFChatTemplate
     from lmdeploy.archs import get_model_arch
     from lmdeploy.cli.utils import get_chat_template
 
     print(local_ip)
-    ckpt = "/home/dev/model/Qwen/Qwen3-32B/"  # internlm2
-    chat_template = get_chat_template(ckpt)
-    model_type = get_names_from_model(ckpt)
-    arch = get_model_arch(ckpt)
+    ckpt = "/home/dev/model/Qwen/Qwen3-32B-AWQ/"  # internlm2
+
+    # for name, model in MODELS.module_dict.items():
+    #     print(name, model)
+    #     pass
+
+    chat_template_name = best_match_model(ckpt)  # base
+    # chat_template_name = "qwen3"
+    chat_template = get_chat_template(chat_template_name, ckpt)
+    prompt = chat_template.chat_template.get_prompt("你好啊", sequence_start=True)
+    # arch = get_model_arch(ckpt)
 
     print(chat_template)
     # print(arch)
-    print(model_type)
-    print(model_type[1] == "base")
+    print(chat_template_name)
+    print(prompt)
