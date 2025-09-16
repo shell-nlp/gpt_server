@@ -147,6 +147,7 @@ class LMDeployBackend(ModelBackend):
         reasoning_parser_type = params.get("reasoning_parser", None)
         request = params.get("request", None)
         enable_thinking = bool(params.get("enable_thinking", True))
+        tools = params.get("tools", None)
         # Handle stop_str
         stop = set()
         if isinstance(stop_str, str) and stop_str != "":
@@ -179,6 +180,7 @@ class LMDeployBackend(ModelBackend):
             session_id=int(request_id),
             gen_config=gen_config,
             enable_thinking=enable_thinking,
+            tools=tools,
         )
         usage = {}
         previous_text = ""
