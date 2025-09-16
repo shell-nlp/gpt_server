@@ -124,6 +124,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         self.model = None
         self.backend = None
         self.chat_template = None
+        self.vl_chat_template = None
         self.tokenizer: PreTrainedTokenizer | None = None
         self.load_model_tokenizer(model_path)
         self.context_len = self.get_context_length()
@@ -137,6 +138,10 @@ class ModelWorkerBase(BaseModelWorker, ABC):
     def preprocess_params(self, params: dict) -> dict:
         """预处理 params"""
         messages = params["messages"]
+        params["chat_template"] = self.chat_template
+        if self.vision_config:
+            params["multimodal"] = True
+            params["chat_template"] = self.vl_chat_template
         if isinstance(messages, str):
             messages = [{"role": "user", "content": messages}]
             params["messages"] = messages

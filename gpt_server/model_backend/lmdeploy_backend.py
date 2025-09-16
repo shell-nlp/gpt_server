@@ -138,7 +138,7 @@ class LMDeployBackend(ModelBackend):
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
         top_k = params.get("top_k", 50)
-
+        chat_template = params["chat_template"]
         max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
         stop_str = params.get("stop", None)
         stop_token_ids = params.get("stop_words_ids", None) or []
