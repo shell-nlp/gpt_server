@@ -328,6 +328,23 @@ wheels = [
 ]
 
 [[package]]
+name = "autoawq"
+version = "0.2.9"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "accelerate" },
+    { name = "datasets" },
+    { name = "huggingface-hub" },
+    { name = "tokenizers" },
+    { name = "torch" },
+    { name = "transformers" },
+    { name = "triton" },
+    { name = "typing-extensions" },
+    { name = "zstandard" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b3/58/58426405b68555a12364533b1426e7f3ccf59ce6fd7754b1dabb8c7de44a/autoawq-0.2.9.tar.gz", hash = "sha256:f3397687118c7d23c769de0de05ff1dca8950a2644acbe1b6eb1399c691fe7ee", size = 74313, upload-time = "2025-05-11T09:02:26.341Z" }
+
+[[package]]
 name = "av"
 version = "13.1.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
@@ -1509,6 +1526,7 @@ version = "0.6.3"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
+    { name = "autoawq" },
     { name = "diffusers" },
     { name = "edge-tts" },
     { name = "evalscope", extra = ["perf", "rag"] },
@@ -1526,7 +1544,6 @@ dependencies = [
     { name = "qwen-vl-utils" },
     { name = "setuptools" },
     { name = "sglang", extra = ["all"] },
-    { name = "sqlmodel" },
     { name = "streamlit" },
     { name = "torch" },
     { name = "torchvision" },
@@ -1536,6 +1553,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate", specifier = ">=1.0.1" },
+    { name = "autoawq", specifier = ">=0.2.9" },
     { name = "diffusers", specifier = ">=0.35.1" },
     { name = "edge-tts", specifier = ">=7.0.0" },
     { name = "evalscope", extras = ["perf", "rag"], specifier = "==0.16.1" },
@@ -1553,7 +1571,6 @@ requires-dist = [
     { name = "qwen-vl-utils" },
     { name = "setuptools", specifier = "==75.2.0" },
     { name = "sglang", extras = ["all"], specifier = ">=0.5.1.post3" },
-    { name = "sqlmodel", specifier = ">=0.0.24" },
     { name = "streamlit", specifier = "==1.39.0" },
     { name = "torch", specifier = "==2.6.0" },
     { name = "torchvision", specifier = "==0.20.1" },
@@ -5359,19 +5376,6 @@ wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/fa/2e/677c17c5d6a004c3c45334ab1dbe7b7deb834430b282b8a0f75ae220c8eb/sqlalchemy-2.0.41-cp313-cp313-win32.whl", hash = "sha256:bfc9064f6658a3d1cadeaa0ba07570b83ce6801a1314985bf98ec9b95d74e15f", size = 2082420, upload-time = "2025-05-14T17:55:52.69Z" },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e9/61/e8c1b9b6307c57157d328dd8b8348ddc4c47ffdf1279365a13b2b98b8049/sqlalchemy-2.0.41-cp313-cp313-win_amd64.whl", hash = "sha256:82ca366a844eb551daff9d2e6e7a9e5e76d2612c8564f58db6c19a726869c1df", size = 2108329, upload-time = "2025-05-14T17:55:54.495Z" },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/1c/fc/9ba22f01b5cdacc8f5ed0d22304718d2c758fce3fd49a5372b886a86f37c/sqlalchemy-2.0.41-py3-none-any.whl", hash = "sha256:57df5dc6fdb5ed1a88a1ed2195fd31927e705cad62dedd86b46972752a80f576", size = 1911224, upload-time = "2025-05-14T17:39:42.154Z" },
-]
-
-[[package]]
-name = "sqlmodel"
-version = "0.0.24"
-source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
-dependencies = [
-    { name = "pydantic" },
-    { name = "sqlalchemy" },
-]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/86/4b/c2ad0496f5bdc6073d9b4cef52be9c04f2b37a5773441cc6600b1857648b/sqlmodel-0.0.24.tar.gz", hash = "sha256:cc5c7613c1a5533c9c7867e1aab2fd489a76c9e8a061984da11b4e613c182423", size = 116780, upload-time = "2025-03-07T05:43:32.887Z" }
-wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/16/91/484cd2d05569892b7fef7f5ceab3bc89fb0f8a8c0cde1030d383dbc5449c/sqlmodel-0.0.24-py3-none-any.whl", hash = "sha256:6778852f09370908985b667d6a3ab92910d0d5ec88adcaf23dbc242715ff7193", size = 28622, upload-time = "2025-03-07T05:43:30.37Z" },
 ]
 
 [[package]]
