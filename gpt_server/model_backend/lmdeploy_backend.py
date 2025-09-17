@@ -5,15 +5,15 @@ from lmdeploy import (
     TurbomindEngineConfig,
     PytorchEngineConfig,
 )
-from transformers import PreTrainedTokenizerBase
+from transformers import PreTrainedTokenizer
 from typing import Any, Dict, AsyncGenerator, List, Optional
 from lmdeploy.archs import get_task
 from gpt_server.model_handler.reasoning_parser import ReasoningParserManager
-from lmdeploy.serve.async_engine import best_match_model
 from loguru import logger
 from gpt_server.model_backend.base import ModelBackend
 from gpt_server.settings import get_model_config
-
+from lmdeploy.logger import RequestLogger
+from lmdeploy.utils import get_logger
 
 if sys.platform == "linux":
     # 防止Python c库没有加载导致lmdeploy pytorch后端报错
@@ -29,38 +29,11 @@ backend_map = {
 }
 # ------- 日志控制 -------
 log_level = os.getenv("log_level", "WARNING")
-from lmdeploy.utils import get_logger
+
 
 get_logger("lmdeploy").setLevel(log_level)  # 默认WARNING
 os.environ["TM_LOG_LEVEL"] = "WARNING"
 # ------- 日志控制 -------
-
-
-def is_stop(output: str, stop_str: str):
-    # 直接创建子序列列表，不在每次调用中重复计算
-    stop_str_sub_seq_list = [stop_str[: i + 1] for i in range(len(stop_str))]
-
-    # 判断是否以 stop_str 子序列结尾
-    for stop_str_sub_seq in stop_str_sub_seq_list:
-        if output.endswith(stop_str_sub_seq):
-            # 找到匹配的子序列，返回截断后的输出和状态
-            sub_seq_len = len(stop_str_sub_seq)
-            return output[:-sub_seq_len], stop_str_sub_seq == stop_str
-
-    # 如果没有匹配的子序列且整体不在结尾，返回原始输出
-    return output, False
-
-
-def is_messages_with_tool(messages: list):
-    flag = False
-    for msg in messages:
-        if "content" not in msg:
-            flag = True
-            break
-    return flag
-
-
-from lmdeploy.logger import RequestLogger
 
 
 class CustomRequestLogger(RequestLogger):
@@ -94,7 +67,7 @@ class CustomRequestLogger(RequestLogger):
 
 
 class LMDeployBackend(ModelBackend):
-    def __init__(self, model_path, tokenizer: PreTrainedTokenizerBase) -> None:
+    def __init__(self, model_path, tokenizer: PreTrainedTokenizer) -> None:
         model_config = get_model_config()
         logger.info(f"model_config: {model_config}")
         backend = backend_map[model_config.backend]
@@ -124,21 +97,18 @@ class LMDeployBackend(ModelBackend):
             backend=backend,
             backend_config=backend_config,
         )
-        chat_template_name = best_match_model(query=model_path)
-        self.chat_template_name = chat_template_name
         self.tokenizer = self.async_engine.tokenizer
         self.reasoning_parser_cache = {}
         # 自定义日志
         self.async_engine.request_logger = CustomRequestLogger(max_log_len=None)
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        prompt = params.get("prompt", "")
+        # params 已不需要传入 prompt
         messages = params["messages"]
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
         top_k = params.get("top_k", 50)
-        chat_template = params["chat_template"]
         max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
         stop_str = params.get("stop", None)
         stop_token_ids = params.get("stop_words_ids", None) or []
@@ -148,6 +118,7 @@ class LMDeployBackend(ModelBackend):
         request = params.get("request", None)
         enable_thinking = bool(params.get("enable_thinking", True))
         tools = params.get("tools", None)
+        chat_template = params.get("chat_template", None)
         # Handle stop_str
         stop = set()
         if isinstance(stop_str, str) and stop_str != "":
@@ -167,20 +138,14 @@ class LMDeployBackend(ModelBackend):
             skip_special_tokens=True,
             response_format=params["response_format"],
         )
-        # if params.get("tools", None) or is_messages_with_tool(messages=messages):
-        #     messages = prompt or messages  # 解决lmdeploy 的提示模板不支持 tools
-        logger.info(f"chat_template_name: {self.chat_template_name}")
-        # if self.chat_template_name == "base":
-        #     messages = prompt or messages
-        # multimodal = params.get("multimodal", False)
-        # if multimodal:  # 多模态模型
-        #     messages = params["messages"]
+
         results_generator = self.async_engine.generate(
             messages=messages,
             session_id=int(request_id),
             gen_config=gen_config,
             enable_thinking=enable_thinking,
             tools=tools,
+            chat_template=chat_template,
         )
         usage = {}
         previous_text = ""
@@ -241,22 +206,7 @@ class LMDeployBackend(ModelBackend):
                         else ""
                     )
                 previous_token_ids = current_token_ids
-            # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
-            # output_info_list = []
-            # for stop_str in list(stop):
-            #     if stop_str:
-            #         text, bool_value = is_stop(output=current_text, stop_str=stop_str)
-            #         output_info_list.append(
-            #             {"text": text, "bool_value": bool_value, "text_len": len(text)}
-            #         )
-            # output_info_list.sort(key=lambda x: x["text_len"])
-            # output_info = output_info_list[0]
-            # ret["text"] = output_info["text"][len(previous_text) :]
-            # if output_info["bool_value"]:
-            #     ret["finish_reason"] = "stop"
-            #     yield ret
-            #     break
-            # TODO ------------------------修复LMDeploy stop 无法停止的问题-------------------------------------------
+
             if not ret["text"] and not ret.get("reasoning_content", ""):
                 continue
             yield ret

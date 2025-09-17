@@ -2,7 +2,7 @@ from typing import Any, Dict
 import torch
 import json
 from peft import PeftModel
-from transformers import TextIteratorStreamer
+from transformers import TextIteratorStreamer, PreTrainedTokenizer
 from transformers.generation.logits_process import LogitsProcessorList
 from threading import Thread
 from gpt_server.model_backend.base import ModelBackend
@@ -28,7 +28,7 @@ class NoneContextManager:
 
 
 class HFBackend(ModelBackend):
-    def __init__(self, tokenizer, model: torch.nn.Module) -> None:
+    def __init__(self, tokenizer: PreTrainedTokenizer, model: torch.nn.Module) -> None:
         model_config = get_model_config()
         self.model = model
         self.tokenizer = tokenizer
@@ -55,7 +55,18 @@ class HFBackend(ModelBackend):
                 self.model.load_adapter(model_id=lora_path, adapter_name=lora_name)
 
     async def stream_chat(self, params: Dict[str, Any]):
-        prompt = params.get("prompt", "")
+        messages = params["messages"]
+        chat_template = params.get("chat_template", None)
+        tools = params.get("tools", None)
+        enable_thinking = bool(params.get("enable_thinking", True))
+        prompt = self.tokenizer.apply_chat_template(
+            messages,
+            chat_template=chat_template,
+            tokenize=False,
+            add_generation_prompt=True,
+            tools=tools,
+            enable_thinking=enable_thinking,
+        )
         logger.info(f"prompt：\n{prompt}")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))

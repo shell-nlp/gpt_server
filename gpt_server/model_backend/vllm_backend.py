@@ -6,7 +6,7 @@ from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
 from vllm.lora.request import LoRARequest
-from transformers import AutoTokenizer
+from transformers import PreTrainedTokenizer
 from vllm.entrypoints.chat_utils import (
     ConversationMessage,
     apply_hf_chat_template,
@@ -22,7 +22,7 @@ ray.init(ignore_reinit_error=True, num_cpus=8)
 
 
 class VllmBackend(ModelBackend):
-    def __init__(self, model_path, tokenizer: AutoTokenizer) -> None:
+    def __init__(self, model_path, tokenizer: PreTrainedTokenizer) -> None:
         model_config = get_model_config()
         logger.info(f"model_config: {model_config}")
         max_loras = 1
@@ -59,7 +59,7 @@ class VllmBackend(ModelBackend):
         self.reasoning_parser_cache = {}
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        prompt = params.get("prompt", "")
+        # params 已不需要传入 prompt
         messages = params["messages"]
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
@@ -74,6 +74,7 @@ class VllmBackend(ModelBackend):
         enable_thinking = bool(params.get("enable_thinking", True))
         request = params.get("request", None)
         tools = params.get("tools", None)
+        chat_template = params.get("chat_template", None)
         # Handle stop_str
         stop = set()
         if isinstance(stop_str, str) and stop_str != "":
@@ -82,9 +83,9 @@ class VllmBackend(ModelBackend):
             stop.update(stop_str)
 
         multimodal = params.get("multimodal", False)
+        tokenizer = await self.engine.get_tokenizer()
         if multimodal:  # 多模态模型
             # ----------------------------------------------------------------
-            tokenizer = await self.engine.get_tokenizer()
             model_config = await self.engine.get_model_config()
             conversation, mm_data_future = parse_chat_messages_futures(
                 messages, model_config, tokenizer, content_format="string"
@@ -93,7 +94,9 @@ class VllmBackend(ModelBackend):
             prompt = apply_hf_chat_template(
                 tokenizer,
                 conversation=conversation,
-                chat_template=tokenizer.get_chat_template(),
+                chat_template=(
+                    chat_template if chat_template else tokenizer.get_chat_template()
+                ),
                 add_generation_prompt=True,
                 tools=tools,
                 model_config=await self.engine.get_model_config(),
@@ -106,7 +109,9 @@ class VllmBackend(ModelBackend):
             prompt = apply_hf_chat_template(
                 tokenizer,
                 conversation=conversation,
-                chat_template=tokenizer.get_chat_template(),
+                chat_template=(
+                    chat_template if chat_template else tokenizer.get_chat_template()
+                ),
                 add_generation_prompt=True,
                 tools=tools,
                 model_config=await self.engine.get_model_config(),
@@ -128,7 +133,6 @@ class VllmBackend(ModelBackend):
         guided_json_object = None
         guided_decoding = None
         guided_json = None
-        # ---- 支持 response_format,但是官方对BPE分词器的支持仍然太差 ----
         if response_format is not None:
             if response_format["type"] == "json_object":
                 guided_json_object = True

@@ -8,7 +8,7 @@ from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 from PIL import Image
 import sglang as sgl
-from transformers import PreTrainedTokenizerBase
+from transformers import PreTrainedTokenizer
 from sglang.utils import convert_json_schema_to_str
 from sglang.srt.conversation import generate_chat_conv
 
@@ -46,7 +46,7 @@ def _transform_messages(
 
 
 class SGLangBackend(ModelBackend):
-    def __init__(self, model_path, tokenizer: PreTrainedTokenizerBase) -> None:
+    def __init__(self, model_path, tokenizer: PreTrainedTokenizer) -> None:
         model_config = get_model_config()
         logger.info(f"model_config: {model_config}")
         self.lora_requests = []
@@ -61,10 +61,22 @@ class SGLangBackend(ModelBackend):
             grammar_backend="xgrammar",
             disable_radix_cache=not model_config.enable_prefix_caching,
         )
+        self.tokenizer = tokenizer
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        prompt = params.get("prompt", "")
+        # params 已不需要传入 prompt
         messages = params["messages"]
+        tools = params.get("tools", None)
+        chat_template = params.get("chat_template", None)
+        enable_thinking = bool(params.get("enable_thinking", True))
+        prompt = self.tokenizer.apply_chat_template(
+            messages,
+            chat_template=chat_template,
+            tokenize=False,
+            add_generation_prompt=True,
+            tools=tools,
+            enable_thinking=enable_thinking,
+        )
         logger.info(f"prompt：\n{prompt}")
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
