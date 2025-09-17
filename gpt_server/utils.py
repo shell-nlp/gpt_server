@@ -195,7 +195,7 @@ def start_model_worker(config: dict):
 
                 # -------------- 向前兼容 --------------
                 # 模型类型
-                model_type = model_config["model_type"]
+                model_type = model_config.get("model_type", "auto")
                 # 对model type 进行校验
                 if model_type not in model_types:
                     logger.error(

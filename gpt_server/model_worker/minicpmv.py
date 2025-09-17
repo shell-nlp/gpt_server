@@ -28,10 +28,7 @@ class MiniCPMVWorker(ModelWorkerBase):
             model_type="AutoModel",
             multimodal=True,
         )
-        self.stop_words_ids = [
-            # 151643,  # <|endoftext|>
-            # 151645,  # <|im_end|>
-        ]
+        self.stop_words_ids = []
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
@@ -40,22 +37,10 @@ class MiniCPMVWorker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            messages = params["messages"]
-            if isinstance(messages, list):
-                pass
-            elif isinstance(messages, str):
-                text = messages
-            params["multimodal"] = True
-            # input_ids = self.tokenizer([text], return_tensors="pt").input_ids
-            params["messages"] = messages
-            # params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            # params["input_ids"] = input_ids
-
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
-
                 yield json.dumps(ret).encode() + b"\0"
 
         except torch.cuda.OutOfMemoryError as e:

@@ -28,11 +28,7 @@ class LlamaWorker(ModelWorkerBase):
             model_type="AutoModelForCausalLM",
         )
 
-        self.stop_words_ids = [
-            128000,  # bos  <|begin_of_text|>
-            128001,  # eos  <|end_of_text|>
-            128009,  #  <|eot_id|>
-        ]
+        self.stop_words_ids = []
 
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
@@ -42,26 +38,12 @@ class LlamaWorker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            messages = params["messages"]
-            if isinstance(messages, list):
-                task = "chat"
-            elif isinstance(messages, str):
-                task = "completion"
-
-            text = self.tokenizer.apply_chat_template(
-                conversation=messages, tokenize=False, add_generation_prompt=True
-            )
-            # ---------------添加额外的参数------------------------
-            params["messages"] = messages
-            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
-
                 yield json.dumps(ret).encode() + b"\0"
-
         except torch.cuda.OutOfMemoryError as e:
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",

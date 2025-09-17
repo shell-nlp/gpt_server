@@ -28,10 +28,7 @@ class InternVL2Worker(ModelWorkerBase):
             model_type="AutoModel",
             multimodal=True,
         )
-        self.stop_words_ids = [
-            # 2,  # <|endoftext|>
-            # 7,  # <|im_end|>
-        ]
+        self.stop_words_ids = []
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
@@ -42,25 +39,11 @@ class InternVL2Worker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            messages = params.get("messages", [])
-            # 一定是多模态
-            if isinstance(messages, list):
-                text = self.tokenizer.apply_chat_template(
-                    messages,
-                    chat_template=self.vl_chat_template,
-                    tokenize=False,
-                    add_generation_prompt=True,
-                )
-                params["prompt"] = text
-                # 多模态不需要传入input_ids
-                params["multimodal"] = True
-            params["messages"] = messages
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             ret = {}
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
-
                 yield json.dumps(ret).encode() + b"\0"
 
         except torch.cuda.OutOfMemoryError as e:

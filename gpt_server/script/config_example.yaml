@@ -41,7 +41,7 @@ models:
       # lora:  # lora 模型的路径
       #   test_lora: /home/dev/project/LLaMA-Factory/saves/Qwen1.5-14B-Chat/lora/train_2024-03-22-09-01-32/checkpoint-100
 
-    model_type: qwen # qwen  yi internlm 等
+    model_type: qwen # qwen  yi internlm 等,也可设置为 auto, 现在只有 大语言模型 和 多模态语言模型 支持 auto
     work_mode: lmdeploy-turbomind # vllm/hf/lmdeploy-turbomind/lmdeploy-pytorch
 
     device: gpu # gpu / cpu
@@ -73,7 +73,7 @@ models:
       # 模型的配置参数
       model_name_or_path: /home/dev/model/OpenGVLab/InternVL2-40B-AWQ/
       enable_prefix_caching: false
-    model_type: internvl2 # qwen  yi internlm
+    model_type: internvl2 # qwen  yi internlm ,也可设置为 auto, 现在只有 大语言模型 和 多模态语言模型 支持 auto
     work_mode: lmdeploy-turbomind # vllm/hf/lmdeploy-turbomind/lmdeploy-pytorch
     device: gpu # gpu / cpu
     workers:
@@ -101,7 +101,7 @@ models:
     model_config:
       model_name_or_path: /home/dev/model/jinaai/jina-reranker-m0/
       task_type: auto # auto 、embedding 、 reranker 或者 classify 不设置这个参数，默认为 auto,自动识别可能会识别错误
-    model_type: embedding 
+    model_type: embedding
     work_mode: sentence_transformers # 可选 ["vllm", "infinity", "sentence_transformers"]，但并不是所有后端都支持
     device: gpu
     workers:
@@ -186,8 +186,8 @@ models:
     - gpus:
       - 7
 
-- image-edit: 
-  # 图片编辑模型
+- image-edit:
+    # 图片编辑模型
     alias: null
     enable: true
     model_config:

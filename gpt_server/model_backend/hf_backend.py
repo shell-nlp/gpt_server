@@ -55,6 +55,7 @@ class HFBackend(ModelBackend):
                 self.model.load_adapter(model_id=lora_path, adapter_name=lora_name)
 
     async def stream_chat(self, params: Dict[str, Any]):
+        # params 已不需要传入 prompt
         messages = params["messages"]
         chat_template = params.get("chat_template", None)
         tools = params.get("tools", None)

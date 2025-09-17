@@ -137,19 +137,20 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
     def preprocess_params(self, params: dict) -> dict:
         """预处理 params"""
-        messages = params["messages"]
+        # ---------- 添加 chat_template 信息 ----------
         params["chat_template"] = self.chat_template
+        # ---------- 添加多模态信息 ----------
         if self.vision_config:
             params["multimodal"] = True
             params["chat_template"] = self.vl_chat_template
+        # ---------- 如果传入的是 str 则修改为messages ----------
+        messages = params["messages"]
         if isinstance(messages, str):
             messages = [{"role": "user", "content": messages}]
             params["messages"] = messages
-        # 1. 处理 工具，支持 tool_choice 的控制
+        # ---------- 处理 工具，支持 tool_choice 的控制 ----------
         tool_choice = params.get("tool_choice", "none")
         tools = params.get("tools", None)
-        if self.chat_template:
-            params["chat_template"] = self.chat_template
         params["extra_prompt"] = ""
         if tools:
             if tool_choice == "none":
@@ -404,6 +405,8 @@ async def api_generate_stream(request: Request):
     params["request"] = request
     params.pop("prompt")
     logger.debug(f"params {params}")
+    # 对 params 进行预处理
+    params = worker.preprocess_params(params)
     generator = worker.generate_stream_gate(params)
     background_tasks = create_background_tasks(request_id)
     return StreamingResponse(generator, background=background_tasks)
@@ -450,6 +453,8 @@ async def api_generate(request: Request):
     params["request"] = request
     params.pop("prompt")
     logger.debug(f"params {params}")
+    # 对 params 进行预处理
+    params = worker.preprocess_params(params)
     output = await worker.generate_gate(params)
     release_worker_semaphore()
 

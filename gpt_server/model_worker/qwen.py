@@ -50,26 +50,8 @@ class QwenWorker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            # 处理 工具，支持 tool_choice 的控制
-            params = self.preprocess_params(params)
-            messages = params.get("messages", [])
             tools = params.get("tools", None)
-            if self.vision_config:
-                params["multimodal"] = True
-            if isinstance(messages, list):
-                text = await asyncio.to_thread(
-                    self.tokenizer.apply_chat_template,
-                    messages,
-                    chat_template=params["chat_template"],
-                    tokenize=False,
-                    add_generation_prompt=True,
-                    tools=tools,
-                    enable_thinking=bool(params.get("enable_thinking", True)),
-                )
-                params["prompt"] = text
-                # 多模态不需要传入input_ids
             # ---------------添加额外的参数------------------------
-            params["messages"] = messages
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------

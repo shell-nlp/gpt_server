@@ -28,10 +28,7 @@ class DeepSeekWorker(ModelWorkerBase):
             model_type="AutoModelForCausalLM",
         )
 
-        self.stop_words_ids = [
-            # 32013,  # bos  <｜begin▁of▁sentence｜>
-            # 32021,  # eos  <|EOT|>
-        ]
+        self.stop_words_ids = []
 
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
@@ -41,19 +38,6 @@ class DeepSeekWorker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            messages = params["messages"]
-            if not self.vision_config:
-                if isinstance(messages, list):
-                    text = self.tokenizer.apply_chat_template(
-                        conversation=messages,
-                        tokenize=False,
-                        add_generation_prompt=True,
-                    )
-                elif isinstance(messages, str):
-                    text = messages
-                params["prompt"] = text
-            # ---------------添加额外的参数------------------------
-            params["messages"] = messages
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------

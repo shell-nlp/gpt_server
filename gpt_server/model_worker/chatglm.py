@@ -44,46 +44,20 @@ class ChatGLMWorker(ModelWorkerBase):
             model_type="AutoModel",
             multimodal=False,
         )
-        self.chat_template = MODELS.module_dict["glm4"]()
         self.tool_parser = ToolParserManager.module_dict["glm"](
             tokenizer=self.tokenizer
         )
         self.stop_words_ids = []
-
         self.stop = ["Observation:"]
         logger.warning(f"{model_names[0]} 停用词: {self.stop}")
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            messages = params.get("messages", [])
             tools = params.get("tools", None)
-            tool_choice = params.get("tool_choice", "none")
-            if tool_choice == "none":
-                tools = None
-            elif tool_choice == "auto" or tool_choice == "required":
-                pass
-            elif isinstance(tool_choice, dict):
-                tools = pop_matching_tool(tools=tools, tool_choice=tool_choice)
-            if not self.vision_config:
-                if isinstance(messages, list):
-                    text = await asyncio.to_thread(
-                        self.chat_template.messages2prompt, messages, True, tools
-                    )
-                elif isinstance(messages, str):
-                    text = messages
-                    # input_ids = self.tokenizer([text], return_tensors="pt").input_ids
 
-                # text = self.tokenizer.decode(input_ids.tolist()[0])
-                params["prompt"] = text
-                # params["input_ids"] = input_ids
-            else:  # 多模态模型
-                params["multimodal"] = True
-            # ---------------添加额外的参数------------------------
-            params["messages"] = messages
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
-            # ---------------添加额外的参数------------------------
             full_text = ""
             ret = {}
             async for ret in self.backend.stream_chat(params=params):

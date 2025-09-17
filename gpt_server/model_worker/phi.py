@@ -28,11 +28,7 @@ class PhiWorker(ModelWorkerBase):
             conv_template,
             model_type="AutoModelForCausalLM",
         )
-        # from tokenizer_config.json
-        self.stop_words_ids = [
-            100257,  # eos
-            100265,  # eos
-        ]
+        self.stop_words_ids = []
 
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
@@ -42,24 +38,6 @@ class PhiWorker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            messages = params["messages"]
-            if isinstance(messages, list):
-                task = "chat"
-            elif isinstance(messages, str):
-                task = "completion"
-            if task == "chat":
-                # 暂时保留，用于特殊情况的处理
-                text = self.tokenizer.apply_chat_template(
-                    conversation=messages,
-                    tokenize=False,
-                    add_generation_prompt=True,
-                )
-            elif task == "completion":
-                text = messages
-
-            # ---------------添加额外的参数------------------------
-            params["messages"] = messages
-            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------

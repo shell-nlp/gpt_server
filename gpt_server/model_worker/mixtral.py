@@ -28,7 +28,6 @@ class MixtralWorker(ModelWorkerBase):
             conv_template,
             model_type="AutoModelForCausalLM",
         )
-        # from tokenizer_config.json
         self.stop_words_ids = []
 
         self.stop = [
@@ -39,30 +38,12 @@ class MixtralWorker(ModelWorkerBase):
     async def generate_stream_gate(self, params):
         self.call_ct += 1
         try:
-            messages = params["messages"]
-            if isinstance(messages, list):
-                task = "chat"
-            elif isinstance(messages, str):
-                task = "completion"
-            if task == "chat":
-                # 暂时保留，用于特殊情况的处理
-                text = self.tokenizer.apply_chat_template(
-                    conversation=messages,
-                    tokenize=False,
-                    add_generation_prompt=True,
-                )
-            elif task == "completion":
-                text = messages
-
             # ---------------添加额外的参数------------------------
-            params["messages"] = messages
-            params["prompt"] = text
             params["stop"].extend(self.stop)
             params["stop_words_ids"] = self.stop_words_ids
             # ---------------添加额外的参数------------------------
             async for ret in self.backend.stream_chat(params=params):
                 response = ret["text"]
-
                 yield json.dumps(ret).encode() + b"\0"
 
         except torch.cuda.OutOfMemoryError as e:
