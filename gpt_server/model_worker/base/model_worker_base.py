@@ -340,7 +340,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         limit_worker_concurrency = int(args.limit_worker_concurrency)
         logger.remove(0)
         log_level = os.getenv("log_level", "WARNING")
-        logger.add(sys.stderr, level=log_level)
+        logger.add(sys.stderr, level=log_level, enqueue=True)
 
         host = args.host
         controller_address = args.controller_address

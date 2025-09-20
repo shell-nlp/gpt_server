@@ -8,3 +8,5 @@ outputs/
 data/
 .venv/
 config.yaml
+.env
+*_test.yaml

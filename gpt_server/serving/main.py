@@ -2,7 +2,10 @@ import yaml
 import os
 import sys
 import ray
+from dotenv import load_dotenv
+from loguru import logger
 
+load_dotenv()
 os.environ["OPENBLAS_NUM_THREADS"] = (
     "1"  # 解决线程不足时，OpenBLAS blas_thread_init报错
 )
@@ -25,8 +28,11 @@ from gpt_server.utils import (
 # 删除日志
 delete_log()
 
-
 config_path = os.path.join(root_dir, "gpt_server/script/config.yaml")
+env = os.getenv("ENV")
+if env == "test":
+    logger.warning("当前使用测试环境！开发测试专用")
+    config_path = os.path.join(root_dir, "gpt_server/script/config_test.yaml")
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 
