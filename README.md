@@ -155,7 +155,7 @@ source .venv/bin/activate # 激活 uv 环境
 
 ```bash
 # 1. 创建conda 环境
-conda create -n gpt_server python=3.10
+conda create -n gpt_server python=3.11
 
 # 2. 激活conda 环境
 conda activate gpt_server
@@ -193,20 +193,31 @@ python gpt_server/serving/main.py
 
 #### 3.2 Docker启动
 
-##### 3.2.0 使用Docker Hub镜像
+##### 3.2.0 拉取Docker Hub镜像
 ```bash
 docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的方式
 # 如果国内无法拉取docker镜像，可以尝试下面的国内镜像拉取的方式（不保证国内镜像源一直可用）
 docker pull docker.1ms.run/506610466/gpt_server:latest
 ```
-
-##### 3.2.1 手动构建镜像（可选）
-- 构建镜像
-
+##### 3.2.1 直接使用Docker命令直接启动
 ```bash
-docker build --rm -f "Dockerfile" -t gpt_server:latest "." 
+docker run -d \
+  --name gpt_server \
+  --restart always \
+  --shm-size 32g \
+  --network host
+  -v your_model_path/:your_model_path/ \
+  -v your_config_path/config.yaml:/gpt_server/gpt_server/script/config.yaml \
+  --gpus all \
+  docker.1ms.run/506610466/gpt_server:latest  \
+  python gpt_server/serving/main.py  
 ```
-##### 3.2.2 Docker Compose 启动 (建议在项目里使用docker-compose启动)
+
+将`your_model_path`替换为你的模型路径，且要和`config.yaml`中配置的路径一致
+将`your_config_path`替换为你`config.yaml`文件的路径
+
+
+##### 3.2.2 手动构建镜像并使用Docker Compose 启动（可选）
 
 ```bash
 docker-compose  -f "docker-compose.yml" up -d --build gpt_server
@@ -252,13 +263,16 @@ Chat UI界面:
 
 ### 推理后端官方支持模型情况
 
+
 [LMDeploy](https://lmdeploy.readthedocs.io/en/latest/supported_models/supported_models.html) 
 
 [vLLM](https://docs.vllm.ai/en/latest/models/supported_models.html) 
 
 [SGLang](https://docs.sglang.ai/supported_models/generative_models.html) 
 
-官方支持的模型本项目可以五分钟之内进行兼容,但由于本人时间关系,暂时本项目只支持了常用的一些模型,如果想要支持其它模型,请提Issue.
+#### 注意：
+- **现可以通过在 `config.yaml`中 设置 `model_type: auto`** 支持所有vllm/sglang/lmdeploy 当前版本已经支持的大语言模型和多模态语言模型，embedding、reranker等非语言模型除外。
+- 下面的项目兼容表未来将移除或者重构
 
 ### **LLM**
 
