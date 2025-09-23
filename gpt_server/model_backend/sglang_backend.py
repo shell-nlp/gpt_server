@@ -10,7 +10,6 @@ from PIL import Image
 import sglang as sgl
 from transformers import PreTrainedTokenizer
 from sglang.utils import convert_json_schema_to_str
-from sglang.srt.conversation import generate_chat_conv
 
 from qwen_vl_utils import process_vision_info
 from sglang.srt.managers.io_struct import GenerateReqInput
