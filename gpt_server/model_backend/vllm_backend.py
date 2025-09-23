@@ -87,7 +87,7 @@ class VllmBackend(ModelBackend):
         if multimodal:  # 多模态模型
             # ----------------------------------------------------------------
             model_config = await self.engine.get_model_config()
-            conversation, mm_data_future = parse_chat_messages_futures(
+            conversation, mm_data_future, _ = parse_chat_messages_futures(
                 messages, model_config, tokenizer, content_format="string"
             )
 
