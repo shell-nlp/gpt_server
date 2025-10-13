@@ -65,11 +65,23 @@ jobs:
         run: |
           version=$(grep -Po '(?<=^version = ")[^"]*' pyproject.toml) 
           echo "VERSION=$version" >> $GITHUB_ENV 
- 
-      - name: Pull and tag latest 
+      # 安装 skopeo
+      - name: Install skopeo
         run: |
-          # 拉取已存在的版本镜像
-          docker pull ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }}
-          # 仅添加latest标签并推送
-          docker tag ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest 
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+      # 5. (新) 使用 skopeo 高效地为远程镜像打标签
+      # 这条命令直接在 Docker Hub 上操作，不会下载任何镜像层
+      - name: Retag remote image without pulling
+        run: |
+          skopeo copy \
+            docker://${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} \
+            docker://${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
+
+      # - name: Pull and tag latest 
+      #   run: |
+      #     # 拉取已存在的版本镜像
+      #     docker pull ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }}
+      #     # 仅添加latest标签并推送
+      #     docker tag ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
+      #     docker push ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest 
