@@ -18,6 +18,45 @@ root_dir = Path(__file__).parent
 STATIC_DIR = root_dir / "static"
 
 
+def clear_flashinfer_cache():
+    os.system("flashinfer clear-cache")
+
+
+def delete_flash_attn():
+    "删除 flash_attn，避免报错"
+    import shutil
+    import os
+    from pathlib import Path
+    from loguru import logger
+
+    root_path = Path(__file__).parent.parent
+    flash_attn_path = root_path.joinpath(
+        ".venv/lib/python3.11/site-packages/flash_attn"
+    )
+
+    try:
+        # 检查路径是否存在
+        if os.path.exists(flash_attn_path):
+            # 删除整个目录树
+            shutil.rmtree(flash_attn_path)
+            logger.info(f"成功删除: {flash_attn_path}")
+
+    except PermissionError:
+        logger.error("权限不足，无法删除 flash_attn")
+    except Exception as e:
+        logger.error(f"删除 flash_attn 失败: {e}")
+
+
+def pre_processing():
+    "前置处理"
+    # 删除日志
+    delete_log()
+    # 删除 垃圾flash attn
+    delete_flash_attn()
+    # 清理 flashinfer 缓存
+    clear_flashinfer_cache()
+
+
 def kill_child_processes(parent_pid, including_parent=False):
     "杀死子进程/僵尸进程"
     try:
@@ -263,6 +302,7 @@ def start_model_worker(config: dict):
                         + f" --log_level {log_level}"  # 日志水平
                         + f" --task_type {task_type}"  # 日志水平
                         + f" --limit_worker_concurrency {limit_worker_concurrency}"  # 限制worker并发数
+                        + f" --model_type {model_type}"  # 默认类型
                     )
                     # 处理为 None的情况
                     if port:

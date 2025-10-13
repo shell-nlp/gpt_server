@@ -23,38 +23,11 @@ from gpt_server.utils import (
     start_api_server,
     start_model_worker,
     delete_log,
+    pre_processing,
 )
 
 
-def delete_flash_attn():
-    "删除 flash_attn，避免报错"
-    import shutil
-    import os
-    from pathlib import Path
-    from loguru import logger
-
-    root_path = Path(__file__).parent.parent.parent
-    flash_attn_path = root_path.joinpath(
-        ".venv/lib/python3.11/site-packages/flash_attn"
-    )
-
-    try:
-        # 检查路径是否存在
-        if os.path.exists(flash_attn_path):
-            # 删除整个目录树
-            shutil.rmtree(flash_attn_path)
-            logger.info(f"成功删除: {flash_attn_path}")
-
-    except PermissionError:
-        logger.error("权限不足，无法删除 flash_attn")
-    except Exception as e:
-        logger.error(f"删除 flash_attn 失败: {e}")
-
-
-# 删除日志
-delete_log()
-
-delete_flash_attn()
+pre_processing()
 
 config_path = os.path.join(root_dir, "gpt_server/script/config.yaml")
 env = os.getenv("ENV")

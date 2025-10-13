@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.6.4"
+version = "0.6.5"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -16,16 +16,16 @@ dependencies = [
     "loguru>=0.7.2",
     "openai==1.99.1",
     "setuptools==75.2.0",
-    "streamlit==1.39.0",
+    "streamlit>=1.50.0",
     "torch==2.8.0",
     "torchvision==0.23.0",
-    "vllm==0.10.2",
+    "vllm==0.11.0",
     "qwen_vl_utils",
     "evalscope[perf,rag]==0.16.1",
     "modelscope==1.26.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.5.2",
+    "sglang[all]>=0.5.3.post1",
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.35.1",
@@ -35,9 +35,10 @@ dependencies = [
 
 [tool.uv]
 default-groups = [] # 默认只安装dependencies中的库
+prerelease = "allow"
 override-dependencies = [
     "setuptools==77.0.3",
-    "transformers==4.56.1",  #  infinity-emb
+    "transformers==4.57.0",  #  infinity-emb
     "soundfile==0.13.1",     # infinity
     "xgrammar==0.1.24",      #  sglang[all]==0.4.5 depends on xgrammar==0.1.17
     "outlines-core==0.2.11", # sglang 和 vllm 的冲突

@@ -309,6 +309,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--limit_worker_concurrency", type=int, default=1024)
         # port
         parser.add_argument("--port", type=int, default=None)
+        # model_type
+        parser.add_argument("--model_type", type=str, default="auto")
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -331,6 +333,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         if args.punc_model:
             os.environ["punc_model"] = args.punc_model
 
+        os.environ["model_type"] = args.model_type
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching
         os.environ["gpu_memory_utilization"] = args.gpu_memory_utilization
         os.environ["kv_cache_quant_policy"] = args.kv_cache_quant_policy
