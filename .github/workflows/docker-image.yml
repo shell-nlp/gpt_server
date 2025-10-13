@@ -46,7 +46,7 @@ jobs:
     steps:
       # 清理磁盘空间
       - name: Maximize build space
-        uses: easimon/maximize-build-space-action@v10
+        uses: easimon/maximize-build-space@master
         with:
           root-reserve-mb: 5120
           swap-size-mb: 1024
