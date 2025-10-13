@@ -44,6 +44,16 @@ jobs:
     if: github.ref  == 'refs/heads/set_latest'
     runs-on: ubuntu-latest 
     steps:
+      # 清理磁盘空间
+      - name: Maximize build space
+        uses: easimon/maximize-build-space-action@v10
+        with:
+          root-reserve-mb: 5120
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+        
       - name: Checkout code 
         uses: actions/checkout@v3
  
