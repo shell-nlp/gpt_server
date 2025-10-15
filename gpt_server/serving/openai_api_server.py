@@ -40,31 +40,19 @@ from fastchat.constants import (
     WORKER_API_EMBEDDING_BATCH_SIZE,
     ErrorCode,
 )
-from fastchat.conversation import Conversation, SeparatorStyle
 from fastchat.protocol.openai_api_protocol import (
-    ChatCompletionRequest,
-    ChatCompletionResponse,
-    ChatCompletionResponseStreamChoice,
-    ChatCompletionStreamResponse,
-    ChatMessage,
-    ChatCompletionResponseChoice,
     CompletionRequest,
     CompletionResponse,
-    CompletionResponseChoice,
-    DeltaMessage,
     CompletionResponseStreamChoice,
     CompletionStreamResponse,
-    EmbeddingsRequest,
     EmbeddingsResponse,
     ErrorResponse,
     LogProbs,
-    ModelCard,
     ModelList,
     ModelPermission,
     UsageInfo,
 )
 from fastchat.protocol.api_protocol import (
-    APIChatCompletionRequest,
     APITokenCheckRequest,
     APITokenCheckResponse,
     APITokenCheckResponseItem,
@@ -850,32 +838,6 @@ async def speech(request: OpenAISpeechRequest):
         )
 
 
-@app.post("/v1/audio/speech2", dependencies=[Depends(check_api_key)], deprecated=True)
-async def speech(request: SpeechRequest):
-    os.makedirs(OUTPUT_DIR, exist_ok=True)  # 即使存在也不会报错
-    list_voices = await edge_tts.list_voices()
-    support_list_voices = [i["ShortName"] for i in list_voices]
-    if request.voice not in support_list_voices:
-        return JSONResponse(
-            ErrorResponse(
-                message=f"不支持voice:{request.voice}", code=ErrorCode.INVALID_MODEL
-            ).dict(),
-            status_code=400,
-        )
-    filename = f"{uuid.uuid4()}.mp3"
-    output_path = os.path.join(OUTPUT_DIR, filename)
-    rate = 1.0
-    if request.speed >= 1:
-        rate = f"+{int((request.speed - 1) * 100)}%"
-    else:
-        rate = f"-{int((1-request.speed) * 100)}%"
-    communicate = edge_tts.Communicate(
-        text=request.input, voice=request.voice, rate=rate
-    )
-    await communicate.save(output_path)
-    return FileResponse(output_path, media_type="audio/mpeg", filename=filename)
-
-
 async def get_transcriptions(payload: Dict[str, Any]):
     controller_address = app_settings.controller_address
     model_name = payload["model"]
@@ -1006,11 +968,6 @@ async def rerank(request: RerankRequest):
     dependencies=[Depends(check_api_key)],
     response_class=responses.ORJSONResponse,
 )
-@app.post(
-    "/v1/engines/{model_name}/embeddings",
-    dependencies=[Depends(check_api_key)],
-    response_class=responses.ORJSONResponse,
-)
 async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = None):
     """Creates embeddings for the text"""
     if request.model is None:
@@ -1112,68 +1069,6 @@ async def count_tokens(request: APITokenCheckRequest):
         )
 
     return APITokenCheckResponse(prompts=checkedList)
-
-
-@app.post("/api/v1/chat/completions")
-async def create_chat_completion(request: APIChatCompletionRequest):
-    """Creates a completion for the chat message"""
-    error_check_ret = check_model(request.model)
-    if error_check_ret is not None:
-        return error_check_ret
-
-    worker_addr = get_worker_address(request.model)
-
-    gen_params = get_gen_params(
-        request.model,
-        worker_addr,
-        request.messages,
-        temperature=request.temperature,
-        top_p=request.top_p,
-        top_k=request.top_k,
-        presence_penalty=request.presence_penalty,
-        frequency_penalty=request.frequency_penalty,
-        max_tokens=request.max_tokens,
-        echo=False,
-        stop=request.stop,
-    )
-
-    if request.repetition_penalty is not None:
-        gen_params["repetition_penalty"] = request.repetition_penalty
-
-    if request.stream:
-        generator = chat_completion_stream_generator(
-            request.model, gen_params, request.n, worker_addr
-        )
-        return StreamingResponse(generator, media_type="text/event-stream")
-
-    choices = []
-    chat_completions = []
-    for i in range(request.n):
-        content = asyncio.create_task(generate_completion(gen_params, worker_addr))
-        chat_completions.append(content)
-    try:
-        all_tasks = await asyncio.gather(*chat_completions)
-    except Exception as e:
-        return create_error_response(ErrorCode.INTERNAL_ERROR, str(e))
-    usage = UsageInfo()
-    for i, content in enumerate(all_tasks):
-        if content["error_code"] != 0:
-            return create_error_response(content["error_code"], content["text"])
-        choices.append(
-            ChatCompletionResponseChoice(
-                index=i,
-                message=ChatMessage(role="assistant", content=content["text"]),
-                finish_reason=content.get("finish_reason", "stop"),
-            )
-        )
-        task_usage = UsageInfo.parse_obj(content["usage"])
-        for usage_key, usage_value in task_usage.dict().items():
-            setattr(usage, usage_key, getattr(usage, usage_key) + usage_value)
-
-    return ChatCompletionResponse(model=request.model, choices=choices, usage=usage)
-
-
-### END GENERAL API - NOT OPENAI COMPATIBLE ###
 
 
 def create_openai_api_server():
