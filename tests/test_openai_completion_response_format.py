@@ -8,7 +8,6 @@ model = "qwen"
 output = client.chat.completions.create(
     model=model,
     messages=[{"role": "user", "content": "南京到北京多远"}],
-    response_format={"type": "text"},
 )
 print(output.choices[0].message.content)
 print("-" * 100)

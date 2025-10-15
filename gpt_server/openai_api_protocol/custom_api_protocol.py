@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, TypeAlias, Union
+import uuid
 from fastchat.protocol.openai_api_protocol import (
     EmbeddingsRequest,
     ChatCompletionRequest,
@@ -13,6 +14,175 @@ from fastchat.protocol.openai_api_protocol import (
     CompletionResponseChoice,
 )
 from pydantic import Field, BaseModel
+from openai.types.responses import (
+    ResponseFunctionToolCall,
+    ResponseInputItemParam,
+    ResponseOutputItem,
+    ResponseOutputMessage,
+    ResponseOutputText,
+    ResponseReasoningItem,
+)
+from openai.types.responses.tool import Tool
+
+ResponseInputOutputItem: TypeAlias = Union[
+    ResponseInputItemParam,
+    "ResponseReasoningItem",
+    ResponseFunctionToolCall,
+]
+# try:  # For older openai versions (< 1.100.0)
+from openai.types.responses import ResponseTextConfig
+
+# except ImportError:  # For newer openai versions (>= 1.100.0)
+#     from openai.types.responses import ResponseFormatTextConfig as ResponseTextConfig
+
+
+class ErrorInfo(BaseModel):
+    message: str
+    type: str
+    param: str | None = None
+    code: int
+
+
+class ErrorResponseV2(BaseModel):
+    error: ErrorInfo
+
+
+class ResponseReasoningParam(BaseModel):
+    """Reasoning parameters for responses."""
+
+    effort: Optional[Literal["low", "medium", "high"]] = Field(
+        default="medium",
+        description="Constrains effort on reasoning for reasoning models.",
+    )
+
+
+class ResponseTool(BaseModel):
+    """Tool definition for responses."""
+
+    type: Literal["web_search_preview", "code_interpreter"] = Field(
+        description="Type of tool to enable"
+    )
+
+
+class RequestResponseMetadata(BaseModel):
+    request_id: str
+    final_usage_info: UsageInfo | None = None
+
+
+class ResponsesRequest(BaseModel):
+    """Request body for v1/responses endpoint."""
+
+    # Core OpenAI API fields (ordered by official documentation)
+    background: Optional[bool] = False
+    include: Optional[
+        List[
+            Literal[
+                "code_interpreter_call.outputs",
+                "computer_call_output.output.image_url",
+                "file_search_call.results",
+                "message.input_image.image_url",
+                "message.output_text.logprobs",
+                "reasoning.encrypted_content",
+            ]
+        ]
+    ] = None
+    input: Union[str, List[ResponseInputOutputItem]]
+    instructions: Optional[str] = None
+    max_output_tokens: Optional[int] = None
+    max_tool_calls: Optional[int] = None
+    metadata: Optional[Dict[str, Any]] = None
+    model: Optional[str] = None
+    parallel_tool_calls: Optional[bool] = True
+    previous_response_id: Optional[str] = None
+    reasoning: Optional[ResponseReasoningParam] = None
+    service_tier: Literal["auto", "default", "flex", "scale", "priority"] = "auto"
+    store: Optional[bool] = True
+    stream: Optional[bool] = False
+    temperature: Optional[float] = None
+    text: ResponseTextConfig | None = None
+    tool_choice: Literal["auto", "required", "none"] = "auto"
+    tools: List[Tool] = Field(default_factory=list)
+    top_logprobs: Optional[int] = 0
+    top_p: Optional[float] = None
+    truncation: Optional[Literal["auto", "disabled"]] = "disabled"
+    user: Optional[str] = None
+
+    # Extra SGLang parameters
+    request_id: str = Field(
+        default_factory=lambda: f"resp_{uuid.uuid4().hex}",
+        description="The request_id related to this request. If the caller does not set it, a random uuid will be generated.",
+    )
+    priority: int = Field(default=0, description="Request priority")
+    extra_key: Optional[str] = Field(
+        default=None,
+        description="Extra key for classifying the request (e.g. cache_salt)",
+    )
+    cache_salt: Optional[str] = Field(
+        default=None, description="Cache salt for request caching"
+    )
+
+    # SGLang-specific sampling parameters
+    frequency_penalty: float = 0.0
+    presence_penalty: float = 0.0
+    stop: Optional[Union[str, List[str]]] = None
+    top_k: int = -1
+    min_p: float = 0.0
+    repetition_penalty: float = 1.0
+
+    # Default sampling parameters
+    _DEFAULT_SAMPLING_PARAMS = {
+        "temperature": 0.7,
+        "top_p": 1.0,
+        "top_k": -1,
+        "min_p": 0.0,
+        "repetition_penalty": 1.0,
+    }
+
+    def to_sampling_params(
+        self, default_max_tokens: int, default_params: Optional[Dict] = None
+    ) -> Dict[str, Any]:
+        """Convert to sampling parameters for generation."""
+        if default_params is None:
+            default_params = {}
+
+        # Use max_output_tokens if available, otherwise use max_tokens for backwards compatibility
+        if self.max_output_tokens is not None:
+            max_tokens = min(self.max_output_tokens, default_max_tokens)
+        else:
+            max_tokens = default_max_tokens
+
+        # Avoid exceed the context length by minus 2 token
+        max_tokens -= 2
+
+        # Get parameters with defaults
+        temperature = self.temperature
+        if temperature is None:
+            temperature = default_params.get(
+                "temperature", self._DEFAULT_SAMPLING_PARAMS["temperature"]
+            )
+
+        top_p = self.top_p
+        if top_p is None:
+            top_p = default_params.get("top_p", self._DEFAULT_SAMPLING_PARAMS["top_p"])
+
+        params = {
+            "max_new_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": top_p,
+            "frequency_penalty": self.frequency_penalty,
+            "presence_penalty": self.presence_penalty,
+            "stop": self.stop,
+            "top_k": self.top_k,
+            "min_p": self.min_p,
+            "repetition_penalty": self.repetition_penalty,
+        }
+
+        # Apply any additional default parameters
+        for key, value in default_params.items():
+            if key not in params or params[key] is None:
+                params[key] = value
+
+        return params
 
 
 class ImagesGenRequest(BaseModel):

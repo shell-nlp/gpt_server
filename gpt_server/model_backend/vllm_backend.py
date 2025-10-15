@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict, AsyncGenerator
 from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
-from vllm.sampling_params import GuidedDecodingParams
+from vllm.sampling_params import StructuredOutputsParams
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
@@ -140,16 +140,16 @@ class VllmBackend(ModelBackend):
                 json_schema = response_format["json_schema"]
                 assert json_schema is not None
                 guided_json = json_schema["schema"]
-
-            guided_decoding = GuidedDecodingParams.from_optional(
+            guided_decoding = StructuredOutputsParams(
                 json=guided_json,
                 regex=None,
                 choice=None,
                 grammar=None,
                 json_object=guided_json_object,
-                backend="xgrammar",
                 whitespace_pattern=None,
             )
+            if response_format["type"] == "text":
+                guided_decoding = None
         sampling = SamplingParams(
             top_p=top_p,
             top_k=top_k,
@@ -160,7 +160,7 @@ class VllmBackend(ModelBackend):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             repetition_penalty=repetition_penalty,
-            guided_decoding=guided_decoding,
+            structured_outputs=guided_decoding,
         )
         lora_request = None
         for lora in self.lora_requests:

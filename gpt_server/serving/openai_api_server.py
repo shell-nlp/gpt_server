@@ -9,6 +9,7 @@
 
 import asyncio
 import argparse
+from http import HTTPStatus
 import json
 import threading
 import orjson
@@ -261,7 +262,7 @@ def get_gen_params(
 ) -> Dict[str, Any]:
     images = []
     if isinstance(messages, str):
-        prompt = messages
+        messages = [messages]
         images = []
 
     prompt = ""
@@ -387,6 +388,10 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomChatCompletionResponse,
     CustomChatCompletionResponseChoice,
     CustomCompletionResponseChoice,
+    ResponsesRequest,
+    ErrorResponseV2,
+    ErrorInfo,
+    RequestResponseMetadata,
 )
 
 
@@ -398,6 +403,132 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
 def get_model_address_map():
     global model_address_map
     return model_address_map
+
+
+response_store_lock = asyncio.Lock()
+response_store = {}
+
+
+@app.post(
+    "/v1/responses",
+    dependencies=[Depends(check_api_key)],
+    response_class=responses.ORJSONResponse,
+)
+async def responses_api(request: ResponsesRequest):
+    error_check_ret = check_model(request.model)
+    if error_check_ret is not None:
+        return error_check_ret
+    worker_addr = get_worker_address(request.model)
+    max_tokens = 1024 * 8
+    if request.max_output_tokens:
+        max_tokens = request.max_output_tokens
+    # ----------- 需要进行转化映射 -----------
+    # Handle the previous response ID.
+    prev_response_id = request.previous_response_id
+    if prev_response_id is not None:
+        async with response_store_lock:
+            prev_response = response_store.get(prev_response_id)
+        if prev_response is None:
+            return ErrorResponseV2(
+                error=ErrorInfo(
+                    message=f"Response with id '{prev_response_id}' not found.",
+                    type="invalid_request_error",
+                    code=HTTPStatus.NOT_FOUND,
+                )
+            )
+    else:
+        prev_response = None
+
+    request_metadata = RequestResponseMetadata(request_id=request.request_id)
+    # if raw_request:
+    #     raw_request.state.request_metadata = request_metadata
+    # 如果 input str ok | list[str] ok | list[dict] ok
+    if isinstance(request.input, list) and isinstance(request.input[0], dict):
+        for item in request.input:
+            if isinstance(item["content"], list):
+                for i in item["content"]:
+                    if i["type"] == "text":
+                        i["type"] = "input_text"
+                    elif i["type"] == "image_url":
+                        i["type"] = "input_image"
+                        i["image_url"] = i["image_url"]["url"]
+                    else:
+                        return create_error_response(
+                            ErrorCode.VALIDATION_TYPE_ERROR,
+                            f"Only text and image_url input supported now, your input type {i['type']}",
+                        )
+    messages = request.input
+    response_format = None
+    if request.text:
+        response_format = {}
+        response_format["type"] = request.text.format.type
+        if "json_schema" == request.text.format.type:
+            response_format["json_schema"] = request.text.format.json_schema
+
+    reasoning_parser = None
+    enable_thinking = True
+    # ----------- 需要进行转化映射 -----------
+    gen_params = get_gen_params(
+        request.model,
+        "",
+        messages=messages,
+        temperature=request.temperature,
+        top_p=request.top_p,
+        top_k=request.top_k,
+        presence_penalty=request.presence_penalty,
+        frequency_penalty=request.frequency_penalty,
+        max_tokens=max_tokens,
+        echo=False,
+        stop=request.stop,
+        tools=request.tools,
+        tool_choice=request.tool_choice,
+        response_format=response_format,
+        reasoning_parser=reasoning_parser,
+        enable_thinking=enable_thinking,
+    )
+    if gen_params["max_new_tokens"] is None:
+        gen_params["max_new_tokens"] = 1024 * 16
+
+    if request.stream:
+        generator = chat_completion_stream_generator(
+            request.model, gen_params, request.n, worker_addr
+        )
+        return StreamingResponse(generator, media_type="text/event-stream")
+
+    choices = []
+    chat_completions = []
+    for i in range(request.n):
+        content = asyncio.create_task(generate_completion(gen_params, worker_addr))
+        chat_completions.append(content)
+    try:
+        all_tasks = await asyncio.gather(*chat_completions)
+    except Exception as e:
+        return create_error_response(ErrorCode.INTERNAL_ERROR, str(e))
+    usage = UsageInfo()
+    for i, content in enumerate(all_tasks):
+        if isinstance(content, str):
+            content = json.loads(content)
+
+        if content["error_code"] != 0:
+            return create_error_response(content["error_code"], content["text"])
+        choices.append(
+            CustomChatCompletionResponseChoice(
+                index=i,
+                message=CustomChatMessage(
+                    role="assistant",
+                    content=content["text"],
+                    tool_calls=content.get("tool_calls", None),
+                ),
+                finish_reason=content.get("finish_reason", "stop"),
+            )
+        )
+        if "usage" in content:
+            task_usage = UsageInfo.parse_obj(content["usage"])
+            for usage_key, usage_value in task_usage.dict().items():
+                setattr(usage, usage_key, getattr(usage, usage_key) + usage_value)
+    return CustomChatCompletionResponse(
+        model=request.model, choices=choices, usage=usage
+    )
 
 
 @app.post(
