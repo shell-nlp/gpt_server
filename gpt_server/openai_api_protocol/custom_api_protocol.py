@@ -1,3 +1,4 @@
+from time import time
 from typing import Any, Dict, List, Literal, Optional, TypeAlias, Union
 import uuid
 from fastchat.protocol.openai_api_protocol import (
@@ -17,11 +18,35 @@ from pydantic import Field, BaseModel
 from openai.types.responses import (
     ResponseFunctionToolCall,
     ResponseInputItemParam,
-    ResponseOutputItem,
     ResponseOutputMessage,
     ResponseOutputText,
     ResponseReasoningItem,
+    ResponseOutputItem,
+    ResponseCreatedEvent,
+    ResponseInProgressEvent,
+    ResponseOutputItemAddedEvent,
+    ResponseContentPartAddedEvent,
+    ResponseContentPartDoneEvent,
+    ResponseOutputItemDoneEvent,
+    ResponseCompletedEvent,
+    ResponseTextConfig,
+    ResponseReasoningTextDeltaEvent,
+    ResponseReasoningTextDoneEvent,
+    ResponseReasoningPartAddedEvent,
+    ResponseReasoningPartDoneEvent,
+    ResponseCodeInterpreterCallInProgressEvent,
+    ResponseCodeInterpreterCallCodeDeltaEvent,
+    ResponseWebSearchCallInProgressEvent,
+    ResponseWebSearchCallSearchingEvent,
+    ResponseWebSearchCallCompletedEvent,
+    ResponseCodeInterpreterCallCodeDoneEvent,
+    ResponseCodeInterpreterCallInterpretingEvent,
+    ResponseCodeInterpreterCallCompletedEvent,
+    ResponseStatus,
+    ResponseTextDeltaEvent,
+    ResponseTextDoneEvent,
 )
+from openai.types.responses.response import IncompleteDetails
 from openai.types.responses.tool import Tool
 
 ResponseInputOutputItem: TypeAlias = Union[
@@ -29,11 +54,28 @@ ResponseInputOutputItem: TypeAlias = Union[
     "ResponseReasoningItem",
     ResponseFunctionToolCall,
 ]
-# try:  # For older openai versions (< 1.100.0)
-from openai.types.responses import ResponseTextConfig
 
-# except ImportError:  # For newer openai versions (>= 1.100.0)
-#     from openai.types.responses import ResponseFormatTextConfig as ResponseTextConfig
+StreamingResponsesResponse: TypeAlias = (
+    ResponseCreatedEvent
+    | ResponseInProgressEvent
+    | ResponseCompletedEvent
+    | ResponseOutputItemAddedEvent
+    | ResponseOutputItemDoneEvent
+    | ResponseContentPartAddedEvent
+    | ResponseContentPartDoneEvent
+    | ResponseReasoningTextDeltaEvent
+    | ResponseReasoningTextDoneEvent
+    | ResponseReasoningPartAddedEvent
+    | ResponseReasoningPartDoneEvent
+    | ResponseCodeInterpreterCallInProgressEvent
+    | ResponseCodeInterpreterCallCodeDeltaEvent
+    | ResponseWebSearchCallInProgressEvent
+    | ResponseWebSearchCallSearchingEvent
+    | ResponseWebSearchCallCompletedEvent
+    | ResponseCodeInterpreterCallCodeDoneEvent
+    | ResponseCodeInterpreterCallInterpretingEvent
+    | ResponseCodeInterpreterCallCompletedEvent
+)
 
 
 class ErrorInfo(BaseModel):
@@ -45,6 +87,26 @@ class ErrorInfo(BaseModel):
 
 class ErrorResponseV2(BaseModel):
     error: ErrorInfo
+
+
+class InputTokensDetails(BaseModel):
+    cached_tokens: int
+    input_tokens_per_turn: list[int] = Field(default_factory=list)
+    cached_tokens_per_turn: list[int] = Field(default_factory=list)
+
+
+class OutputTokensDetails(BaseModel):
+    reasoning_tokens: int = 0
+    tool_output_tokens: int = 0
+    output_tokens_per_turn: list[int] = Field(default_factory=list)
+
+
+class ResponseUsage(BaseModel):
+    input_tokens: int
+    input_tokens_details: InputTokensDetails
+    output_tokens: int
+    output_tokens_details: OutputTokensDetails
+    total_tokens: int
 
 
 class ResponseReasoningParam(BaseModel):
@@ -129,60 +191,87 @@ class ResponsesRequest(BaseModel):
     min_p: float = 0.0
     repetition_penalty: float = 1.0
 
-    # Default sampling parameters
-    _DEFAULT_SAMPLING_PARAMS = {
-        "temperature": 0.7,
-        "top_p": 1.0,
-        "top_k": -1,
-        "min_p": 0.0,
-        "repetition_penalty": 1.0,
-    }
 
-    def to_sampling_params(
-        self, default_max_tokens: int, default_params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
-        """Convert to sampling parameters for generation."""
-        if default_params is None:
-            default_params = {}
+class ResponsesResponse(BaseModel):
+    """Response body for v1/responses endpoint."""
 
-        # Use max_output_tokens if available, otherwise use max_tokens for backwards compatibility
-        if self.max_output_tokens is not None:
-            max_tokens = min(self.max_output_tokens, default_max_tokens)
-        else:
-            max_tokens = default_max_tokens
+    id: str = Field(default_factory=lambda: f"resp_{time.time()}")
+    object: Literal["response"] = "response"
+    created_at: int = Field(default_factory=lambda: int(time.time()))
+    model: str
 
-        # Avoid exceed the context length by minus 2 token
-        max_tokens -= 2
+    output: List[
+        Union[ResponseOutputItem, ResponseReasoningItem, ResponseFunctionToolCall]
+    ] = Field(default_factory=list)
+    status: Literal["queued", "in_progress", "completed", "failed", "cancelled"]
+    usage: Optional[UsageInfo] = None
+    parallel_tool_calls: bool = True
+    tool_choice: str = "auto"
+    tools: List[ResponseTool] = Field(default_factory=list)
+    max_tool_calls: int | None = None
+    # OpenAI compatibility fields. not all are used at the moment.
+    # Recommend checking https://platform.openai.com/docs/api-reference/responses
+    error: Optional[dict] = None
+    incomplete_details: Optional[dict] = None  # TODO(v) support this input
+    instructions: Optional[str] = None
+    max_output_tokens: Optional[int] = None
+    previous_response_id: Optional[str] = None
+    reasoning: Optional[dict] = (
+        # Unused. No model supports this. For GPT-oss, system prompt sets
+        # the field, not server args.
+        None  # {"effort": Optional[str], "summary": Optional[str]}
+    )
+    service_tier: Literal["auto", "default", "flex", "scale", "priority"]
+    store: Optional[bool] = None
+    temperature: Optional[float] = None
+    text: Optional[dict] = None  # e.g. {"format": {"type": "text"}}
+    top_logprobs: int | None = None
+    top_p: Optional[float] = None
+    truncation: Optional[str] = None
+    user: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
 
-        # Get parameters with defaults
-        temperature = self.temperature
-        if temperature is None:
-            temperature = default_params.get(
-                "temperature", self._DEFAULT_SAMPLING_PARAMS["temperature"]
-            )
-
-        top_p = self.top_p
-        if top_p is None:
-            top_p = default_params.get("top_p", self._DEFAULT_SAMPLING_PARAMS["top_p"])
-
-        params = {
-            "max_new_tokens": max_tokens,
-            "temperature": temperature,
-            "top_p": top_p,
-            "frequency_penalty": self.frequency_penalty,
-            "presence_penalty": self.presence_penalty,
-            "stop": self.stop,
-            "top_k": self.top_k,
-            "min_p": self.min_p,
-            "repetition_penalty": self.repetition_penalty,
-        }
-
-        # Apply any additional default parameters
-        for key, value in default_params.items():
-            if key not in params or params[key] is None:
-                params[key] = value
-
-        return params
+    @classmethod
+    def from_request(
+        cls,
+        request: ResponsesRequest,
+        created_time: int,
+        output: list[ResponseOutputItem],
+        status: ResponseStatus,
+        usage: ResponseUsage | None = None,
+    ) -> "ResponsesResponse":
+        incomplete_details: IncompleteDetails | None = None
+        if status == "incomplete":
+            incomplete_details = IncompleteDetails(reason="max_output_tokens")
+        # TODO: implement the other reason for incomplete_details,
+        # which is content_filter
+        # incomplete_details = IncompleteDetails(reason='content_filter')
+        return cls(
+            id=request.request_id,
+            created_at=created_time,
+            incomplete_details=incomplete_details,
+            instructions=request.instructions,
+            metadata=request.metadata,
+            model=request.model,
+            output=output,
+            parallel_tool_calls=request.parallel_tool_calls,
+            temperature=request.temperature,
+            tool_choice=request.tool_choice,
+            tools=request.tools,
+            top_p=request.top_p,
+            # background=request.background,
+            max_output_tokens=request.max_output_tokens,
+            max_tool_calls=request.max_tool_calls,
+            previous_response_id=request.previous_response_id,
+            reasoning=request.reasoning,
+            service_tier=request.service_tier,
+            status=status,
+            text=request.text,
+            top_logprobs=request.top_logprobs,
+            truncation=request.truncation,
+            user=request.user,
+            usage=usage,
+        )
 
 
 class ImagesGenRequest(BaseModel):
