@@ -16,7 +16,7 @@ import orjson
 import os
 import time
 import traceback
-from typing import Callable, Generator, Optional, Union, Dict, List, Any
+from typing import AsyncGenerator, Callable, Generator, Optional, Union, Dict, List, Any
 
 import aiohttp
 import fastapi
@@ -491,7 +491,8 @@ async def create_responses(request: ResponsesRequest):
 
     if request.stream:
         generator = responses_stream_generator(request, gen_params, worker_addr)
-        return StreamingResponse(generator, media_type="text/event-stream")
+        content = _convert_stream_to_sse_events(generator=generator)
+        return StreamingResponse(content, media_type="text/event-stream")
 
     content = await generate_completion(gen_params, worker_addr)
     if isinstance(content, str):
@@ -525,6 +526,19 @@ async def create_responses(request: ResponsesRequest):
         tools=[],  # TODO
         service_tier=request.service_tier,
     )
+
+
+async def _convert_stream_to_sse_events(
+    generator: AsyncGenerator["StreamingResponsesResponse", None],
+) -> AsyncGenerator[str, None]:
+    """Convert the generator to a stream of events in SSE format"""
+    async for event in generator:
+        event_type = getattr(event, "type", "unknown")
+        # https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format
+        event_data = (
+            f"event: {event_type}\ndata: {event.model_dump_json(indent=None)}\n\n"
+        )
+        yield event_data
 
 
 @app.post(
@@ -766,8 +780,9 @@ async def _process_simple_streaming_events(
         max_output_tokens=request.max_output_tokens,
         previous_response_id=request.previous_response_id,
         store=request.store,
-        tools=None,  # TODO
-    )
+        tools=[],  # TODO
+        service_tier=request.service_tier
+    ).model_dump()
     yield _increment_sequence_number_and_return(
         ResponseCompletedEvent(
             type="response.completed",
@@ -798,16 +813,12 @@ async def responses_stream_generator(
         processer = None
         # TODO 没有考虑 use_harmony:
         processer = _process_simple_streaming_events
-        initial_response = ResponseCreatedEvent(
-            type="response.created",
-            sequence_number=-1,
-            response=ResponsesResponse.from_request(
-                request=request,
-                created_time=created_time,
-                output=[],
-                status="in_progress",
-                usage=None,
-            ),
+        initial_response = ResponsesResponse.from_request(
+            request=request,
+            created_time=created_time,
+            output=[],
+            status="in_progress",
+            usage=None,
         ).model_dump()
         yield _increment_sequence_number_and_return(
             ResponseCreatedEvent(
