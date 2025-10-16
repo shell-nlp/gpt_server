@@ -43,7 +43,6 @@ from fastchat.constants import (
 )
 from fastchat.protocol.openai_api_protocol import (
     CompletionRequest,
-    CompletionResponse,
     CompletionResponseStreamChoice,
     CompletionStreamResponse,
     EmbeddingsResponse,
@@ -51,7 +50,6 @@ from fastchat.protocol.openai_api_protocol import (
     LogProbs,
     ModelList,
     ModelPermission,
-    UsageInfo,
 )
 from fastchat.protocol.api_protocol import (
     APITokenCheckRequest,
@@ -262,7 +260,6 @@ def get_gen_params(
 ) -> Dict[str, Any]:
     images = []
     if isinstance(messages, str):
-        messages = [messages]
         images = []
 
     prompt = ""
@@ -391,10 +388,10 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     ResponsesRequest,
     ErrorResponseV2,
     ErrorInfo,
-    RequestResponseMetadata,
     ResponsesResponse,
     ResponseOutputMessage,
     ResponseOutputText,
+    UsageInfo,
 )
 from vllm.utils import random_uuid
 
@@ -525,7 +522,8 @@ async def create_responses(request: ResponsesRequest):
         max_output_tokens=max_tokens,
         previous_response_id=previous_response_id,
         store=request.store,
-        tools=None,  # TODO
+        tools=[],  # TODO
+        service_tier=request.service_tier,
     )
 
 
@@ -610,6 +608,7 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
 
 from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomChatCompletionStreamResponse,
+    CompletionResponse,
     CustomChatCompletionResponseStreamChoice,
     CustomDeltaMessage,
     StreamingResponsesResponse,
@@ -949,12 +948,14 @@ async def create_completion(request: CompletionRequest):
                     finish_reason=content.get("finish_reason", "stop"),
                 )
             )
-            task_usage = UsageInfo.parse_obj(content["usage"])
-            for usage_key, usage_value in task_usage.dict().items():
+            task_usage = UsageInfo.model_validate(content["usage"])
+            for usage_key, usage_value in task_usage.model_dump().items():
+                if usage_value is None:  # 不支持None的操作
+                    continue
                 setattr(usage, usage_key, getattr(usage, usage_key) + usage_value)
 
         return CompletionResponse(
-            model=request.model, choices=choices, usage=UsageInfo.parse_obj(usage)
+            model=request.model, choices=choices, usage=UsageInfo.model_validate(usage)
         )
 
 

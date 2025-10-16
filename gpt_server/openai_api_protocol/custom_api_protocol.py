@@ -1,19 +1,7 @@
-from time import time
+import time
 from typing import Any, Dict, List, Literal, Optional, TypeAlias, Union
 import uuid
-from fastchat.protocol.openai_api_protocol import (
-    EmbeddingsRequest,
-    ChatCompletionRequest,
-    ChatCompletionResponse,
-    ChatMessage,
-    ChatCompletionResponseChoice,
-    ChatCompletionStreamResponse,
-    ChatCompletionResponseStreamChoice,
-    UsageInfo,
-    DeltaMessage,
-    ModelCard,
-    CompletionResponseChoice,
-)
+
 from pydantic import Field, BaseModel
 from openai.types.responses import (
     ResponseFunctionToolCall,
@@ -48,6 +36,7 @@ from openai.types.responses import (
 )
 from openai.types.responses.response import IncompleteDetails
 from openai.types.responses.tool import Tool
+import shortuuid
 
 ResponseInputOutputItem: TypeAlias = Union[
     ResponseInputItemParam,
@@ -76,6 +65,15 @@ StreamingResponsesResponse: TypeAlias = (
     | ResponseCodeInterpreterCallInterpretingEvent
     | ResponseCodeInterpreterCallCompletedEvent
 )
+
+
+class UsageInfo(BaseModel):
+    prompt_tokens: int = 0
+    total_tokens: int = 0
+    completion_tokens: Optional[int] = 0
+    # only used to return cached tokens when --enable-cache-report is set
+    prompt_tokens_details: Optional[Dict[str, int]] = None
+    reasoning_tokens: Optional[int] = 0
 
 
 class ErrorInfo(BaseModel):
@@ -160,12 +158,12 @@ class ResponsesRequest(BaseModel):
     service_tier: Literal["auto", "default", "flex", "scale", "priority"] = "auto"
     store: Optional[bool] = True
     stream: Optional[bool] = False
-    temperature: Optional[float] = None
+    temperature: Optional[float] = 0.7
     text: ResponseTextConfig | None = None
     tool_choice: Literal["auto", "required", "none"] = "auto"
     tools: List[Tool] = Field(default_factory=list)
     top_logprobs: Optional[int] = 0
-    top_p: Optional[float] = None
+    top_p: Optional[float] = 1
     truncation: Optional[Literal["auto", "disabled"]] = "disabled"
     user: Optional[str] = None
 
@@ -363,15 +361,52 @@ class RerankRequest(BaseModel):
     # max_chunks_per_doc: Optional[int] = Field(default=None, alias="max_tokens_per_doc")
 
 
-class CustomModelCard(ModelCard):
+class ModelPermission(BaseModel):
+    id: str = Field(default_factory=lambda: f"modelperm-{shortuuid.random()}")
+    object: str = "model_permission"
+    created: int = Field(default_factory=lambda: int(time.time()))
+    allow_create_engine: bool = False
+    allow_sampling: bool = True
+    allow_logprobs: bool = True
+    allow_search_indices: bool = True
+    allow_view: bool = True
+    allow_fine_tuning: bool = False
+    organization: str = "*"
+    group: Optional[str] = None
+    is_blocking: str = False
+
+
+class CustomModelCard(BaseModel):
+    id: str
+    object: str = "model"
+    created: int = Field(default_factory=lambda: int(time.time()))
+    root: Optional[str] = None
+    parent: Optional[str] = None
+    permission: List[ModelPermission] = []
     owned_by: str = "gpt_server"
 
 
-class CustomEmbeddingsRequest(EmbeddingsRequest):
+class CustomEmbeddingsRequest(BaseModel):
+    model: Optional[str] = None
+    engine: Optional[str] = None
+    input: Union[str, List[Any]]
+    user: Optional[str] = None
+    encoding_format: Optional[str] = None
     query: Optional[str] = None
 
 
-class CustomChatCompletionRequest(ChatCompletionRequest):
+class CustomChatCompletionRequest(BaseModel):
+    model: str
+    temperature: Optional[float] = 0.7
+    top_p: Optional[float] = 1.0
+    top_k: Optional[int] = -1
+    n: Optional[int] = 1
+    max_tokens: Optional[int] = None
+    stop: Optional[Union[str, List[str]]] = None
+    stream: Optional[bool] = False
+    presence_penalty: Optional[float] = 0.0
+    frequency_penalty: Optional[float] = 0.0
+    user: Optional[str] = None
     tools: Optional[list] = None
     tool_choice: Optional[Union[Literal["none"], Literal["auto"], Any]] = "auto"
     messages: Union[
@@ -385,36 +420,74 @@ class CustomChatCompletionRequest(ChatCompletionRequest):
     enable_thinking: bool = True
 
 
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+
 class CustomChatMessage(ChatMessage):
     tool_calls: Optional[list] = None
 
 
-class CustomChatCompletionResponseChoice(ChatCompletionResponseChoice):
+class CustomChatCompletionResponseChoice(BaseModel):
+    index: int
     message: CustomChatMessage
     finish_reason: Optional[Literal["stop", "length", "tool_calls", "error"]] = None
 
 
-class CustomCompletionResponseChoice(CompletionResponseChoice):
+class LogProbs(BaseModel):
+    text_offset: List[int] = Field(default_factory=list)
+    token_logprobs: List[Optional[float]] = Field(default_factory=list)
+    tokens: List[str] = Field(default_factory=list)
+    top_logprobs: List[Optional[Dict[str, float]]] = Field(default_factory=list)
+
+
+class CustomCompletionResponseChoice(BaseModel):
     """completion 的响应结构"""
+
+    index: int
+    text: str
+    logprobs: Optional[LogProbs] = None
 
     finish_reason: Optional[Literal["stop", "length", "tool_calls", "error"]] = None
 
 
-class CustomChatCompletionResponse(ChatCompletionResponse):
+class CustomChatCompletionResponse(BaseModel):
+    id: str = Field(default_factory=lambda: f"chatcmpl-{shortuuid.random()}")
+    object: str = "chat.completion"
+    created: int = Field(default_factory=lambda: int(time.time()))
+    model: str
+    usage: UsageInfo
     choices: List[CustomChatCompletionResponseChoice]
 
 
 # chat.completion.chunk
-class CustomDeltaMessage(DeltaMessage):
+class CustomDeltaMessage(BaseModel):
+    role: Optional[str] = None
+    content: Optional[str] = None
     tool_calls: Optional[list] = None
     reasoning_content: Optional[str] = None
 
 
-class CustomChatCompletionResponseStreamChoice(ChatCompletionResponseStreamChoice):
+class CustomChatCompletionResponseStreamChoice(BaseModel):
+    index: int
     delta: CustomDeltaMessage
     finish_reason: Optional[Literal["stop", "length", "tool_calls", "error"]] = None
 
 
-class CustomChatCompletionStreamResponse(ChatCompletionStreamResponse):
+class CustomChatCompletionStreamResponse(BaseModel):
+    id: str = Field(default_factory=lambda: f"chatcmpl-{shortuuid.random()}")
+    object: str = "chat.completion.chunk"
+    created: int = Field(default_factory=lambda: int(time.time()))
+    model: str
     usage: Optional[UsageInfo] = Field(default=None)
     choices: List[CustomChatCompletionResponseStreamChoice]
+
+
+class CompletionResponse(BaseModel):
+    id: str = Field(default_factory=lambda: f"cmpl-{shortuuid.random()}")
+    object: str = "text_completion"
+    created: int = Field(default_factory=lambda: int(time.time()))
+    model: str
+    choices: List[CustomCompletionResponseChoice]
+    usage: UsageInfo
