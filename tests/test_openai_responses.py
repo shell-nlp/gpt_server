@@ -4,9 +4,28 @@ from openai import OpenAI
 client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
 
 stream = True
-input_ = "你是谁"
-input_ = [{"role": "user", "content": "你是谁"}]
-response = client.responses.create(model="qwen", input=input_, stream=stream)
+input_ = [{"role": "user", "content": "南京天气怎么样"}]
+tools = [
+    {
+        "type": "function",
+        "name": "get_weather",
+        "description": "Get the current weather in a given location",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string",
+                    "description": "City and state, e.g., 'San Francisco, CA'",
+                },
+                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+            },
+            "required": ["location"],
+        },
+    },
+]
+response = client.responses.create(
+    model="qwen", input=input_, stream=stream, tools=tools
+)
 
 
 if stream:
