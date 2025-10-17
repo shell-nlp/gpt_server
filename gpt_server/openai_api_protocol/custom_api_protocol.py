@@ -116,14 +116,6 @@ class ResponseReasoningParam(BaseModel):
     )
 
 
-class ResponseTool(BaseModel):
-    """Tool definition for responses."""
-
-    type: Literal["web_search_preview", "code_interpreter"] = Field(
-        description="Type of tool to enable"
-    )
-
-
 class RequestResponseMetadata(BaseModel):
     request_id: str
     final_usage_info: UsageInfo | None = None
@@ -205,7 +197,7 @@ class ResponsesResponse(BaseModel):
     usage: Optional[UsageInfo] = None
     parallel_tool_calls: bool = True
     tool_choice: str = "auto"
-    tools: List[ResponseTool] = Field(default_factory=list)
+    tools: List[Tool] = Field(default_factory=list)
     max_tool_calls: int | None = None
     # OpenAI compatibility fields. not all are used at the moment.
     # Recommend checking https://platform.openai.com/docs/api-reference/responses
@@ -359,6 +351,13 @@ class RerankRequest(BaseModel):
     top_n: Optional[int] = None
     return_documents: Optional[bool] = False
     # max_chunks_per_doc: Optional[int] = Field(default=None, alias="max_tokens_per_doc")
+
+
+class EmbeddingsResponse(BaseModel):
+    object: str = "list"
+    data: List[Dict[str, Any]]
+    model: str
+    usage: UsageInfo
 
 
 class ModelPermission(BaseModel):

@@ -12,7 +12,6 @@ import argparse
 from http import HTTPStatus
 import json
 import threading
-import orjson
 import os
 import time
 import traceback
@@ -32,6 +31,7 @@ try:
     from pydantic.v1 import BaseSettings, validator
 except ImportError:
     from pydantic import BaseSettings
+import orjson
 import shortuuid
 import tiktoken
 import uvicorn
@@ -45,7 +45,6 @@ from fastchat.protocol.openai_api_protocol import (
     CompletionRequest,
     CompletionResponseStreamChoice,
     CompletionStreamResponse,
-    EmbeddingsResponse,
     ErrorResponse,
     LogProbs,
     ModelList,
@@ -381,6 +380,7 @@ async def show_available_models():
 
 from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomChatCompletionRequest,
+    EmbeddingsResponse,
     CustomChatMessage,
     CustomChatCompletionResponse,
     CustomChatCompletionResponseChoice,
@@ -467,6 +467,12 @@ async def create_responses(request: ResponsesRequest):
 
     reasoning_parser = None
     enable_thinking = True
+    ## 转化工具
+    tools = []
+    for tool in request.tools:
+        tool_dict = tool.model_dump()
+        type_ = tool_dict.pop("type")
+        tools.append({"type": type_, "function": tool_dict})
     # ----------- 需要进行转化映射 -----------
     gen_params = get_gen_params(
         request.model,
@@ -480,7 +486,7 @@ async def create_responses(request: ResponsesRequest):
         max_tokens=max_tokens,
         echo=False,
         stop=request.stop,
-        tools=request.tools,
+        tools=tools,
         tool_choice=request.tool_choice,
         response_format=response_format,
         reasoning_parser=reasoning_parser,
@@ -514,6 +520,10 @@ async def create_responses(request: ResponsesRequest):
         type="message",
     )
     output.append(message)
+    tool_calls = content.get("tool_calls", None)
+    if tool_calls:
+        responses_tools = tool_calls2responses_tools(tool_calls)
+        output.extend(responses_tools)
     return ResponsesResponse(
         model=request.model,
         output=output,
@@ -523,7 +533,7 @@ async def create_responses(request: ResponsesRequest):
         max_output_tokens=max_tokens,
         previous_response_id=previous_response_id,
         store=request.store,
-        tools=[],  # TODO
+        tools=request.tools,  # TODO
         service_tier=request.service_tier,
     )
 
@@ -614,6 +624,8 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
         if "usage" in content:
             task_usage = UsageInfo.parse_obj(content["usage"])
             for usage_key, usage_value in task_usage.dict().items():
+                if usage_value is None:
+                    continue
                 setattr(usage, usage_key, getattr(usage, usage_key) + usage_value)
     return CustomChatCompletionResponse(
         model=request.model, choices=choices, usage=usage
@@ -636,6 +648,7 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     ResponseContentPartDoneEvent,
     ResponseOutputItemDoneEvent,
     ResponseCompletedEvent,
+    ResponseFunctionToolCall,
 )
 from contextlib import AsyncExitStack
 
@@ -687,6 +700,7 @@ async def _process_simple_streaming_events(
     current_content_index += 1
     first_delta_sent = True
     final_content = ""
+    tool_calls = None
     async for content in generate_completion_stream(gen_params, worker_addr):
         try:
             error_code = content["error_code"]
@@ -698,6 +712,7 @@ async def _process_simple_streaming_events(
             yield "data: [DONE]\n\n"
             return
         delta_text = content.get("text", "")
+        tool_calls = content.get("tool_calls", None)
         final_content += delta_text
         yield _increment_sequence_number_and_return(
             ResponseTextDeltaEvent(
@@ -771,6 +786,11 @@ async def _process_simple_streaming_events(
         type="message",
     )
     output.append(message)
+    # tool_calls=[ChatCompletionMessageToolCall(id='chatcmpl-BeBhvTW4bjGu6JWJQz6s8k', function=Function(arguments='{"location": "南京", "unit": "celsius"}', name='get_weather'), type='function', index=None)]
+    if tool_calls:
+        responses_tools = tool_calls2responses_tools(tool_calls=tool_calls)
+        output.extend(responses_tools)
+
     final_response = ResponsesResponse(
         model=request.model,
         output=output,
@@ -780,8 +800,8 @@ async def _process_simple_streaming_events(
         max_output_tokens=request.max_output_tokens,
         previous_response_id=request.previous_response_id,
         store=request.store,
-        tools=[],  # TODO
-        service_tier=request.service_tier
+        tools=request.tools,  # TODO
+        service_tier=request.service_tier,
     ).model_dump()
     yield _increment_sequence_number_and_return(
         ResponseCompletedEvent(
@@ -790,6 +810,22 @@ async def _process_simple_streaming_events(
             response=final_response,
         )
     )
+
+
+def tool_calls2responses_tools(tool_calls: list) -> list:
+    responses_tools = []
+    for tool in tool_calls:
+        responses_tools.append(
+            ResponseFunctionToolCall(
+                type="function_call",
+                arguments=tool["function"]["arguments"],
+                call_id=tool["id"],
+                name=tool["function"]["name"],
+                id=tool["id"],
+                status="completed",
+            )
+        )
+    return responses_tools
 
 
 async def responses_stream_generator(
@@ -1371,7 +1407,7 @@ async def create_embeddings(request: CustomEmbeddingsRequest, model_name: str = 
             total_tokens=token_num,
             completion_tokens=None,
         ),
-    ).dict(exclude_none=True)
+    ).model_dump(exclude_none=True)
 
 
 async def get_classify(payload: Dict[str, Any]):
