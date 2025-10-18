@@ -9,6 +9,7 @@
 
 import asyncio
 import argparse
+import copy
 from http import HTTPStatus
 import json
 import threading
@@ -443,21 +444,71 @@ async def create_responses(request: ResponsesRequest):
     # if raw_request:
     #     raw_request.state.request_metadata = request_metadata
     # 如果 input str ok | list[str] ok | list[dict] ok
+    # [{'role': 'user', 'content': "What's the weather like in Paris today?"},
+    # ResponseFunctionToolCall(arguments='{"latitude": 48.8566, "longitude": 2.3522}', call_id='chatcmpl-nKMcidp7CRjgCy2rmY67RJ', name='get_weather', type='function_call', id='chatcmpl-nKMcidp7CRjgCy2rmY67RJ', status='completed'),
+    # {'type': 'function_call_output', 'call_id': 'chatcmpl-nKMcidp7CRjgCy2rmY67RJ', 'output': 'Current temperature at (48.8566, 2.3522) is 20°C.'}]
+    tool_name_cache_dict = {}
     if isinstance(request.input, list) and isinstance(request.input[0], dict):
-        for item in request.input:
-            if isinstance(item["content"], list):
-                for i in item["content"]:
-                    if i["type"] == "text":
-                        i["type"] = "input_text"
-                    elif i["type"] == "image_url":
-                        i["type"] = "input_image"
-                        i["image_url"] = i["image_url"]["url"]
-                    else:
-                        return create_error_response(
-                            ErrorCode.VALIDATION_TYPE_ERROR,
-                            f"Only text and image_url input supported now, your input type {i['type']}",
-                        )
+        new_input = []
+        for idx, item in enumerate(request.input):
+            new_item = copy.deepcopy(item)
+            content = new_item.get("content")
+            if content:
+                if isinstance(content, list):
+                    for i in new_item["content"]:
+                        if i["type"] == "text":
+                            i["type"] = "input_text"
+                        elif i["type"] == "image_url":
+                            i["type"] = "input_image"
+                            i["image_url"] = i["image_url"]["url"]
+                        elif (
+                            i["type"] == "output_text" and new_item["type"] == "message"
+                        ):
+                            new_item = {
+                                "role": "assistant",
+                                "content": i["text"],
+                            }
+                        else:
+                            return create_error_response(
+                                ErrorCode.VALIDATION_TYPE_ERROR,
+                                f"Only text and image_url input supported now, your input type {i['type']}",
+                            )
+                new_input.append(new_item)
+            else:
+                type_ = item["type"]
+                if type_ == "function_call":
+                    tool_name_cache_dict[item["call_id"]] = item["name"]
+                    arguments = item["arguments"]
+                    if isinstance(arguments, str):
+                        arguments = json.loads(arguments)
+                    new_item = {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": item["call_id"],
+                                "type": "function",
+                                "function": {
+                                    "name": item["name"],
+                                    "arguments": arguments,
+                                },
+                            }
+                        ],
+                    }
+                    new_input.append(new_item)
+                elif type_ == "function_call_output":
+                    tool_name = tool_name_cache_dict[item["call_id"]]
+                    new_item = {
+                        "role": "tool",
+                        "name": tool_name,
+                        "content": item["output"],
+                    }
+                    new_input.append(new_item)
+                else:
+                    new_input.append(item)
+        request.input = new_input
     messages = request.input
+    # logger.warning(f"message: {messages}")
     response_format = None
     if request.text:
         response_format = {}
@@ -519,11 +570,13 @@ async def create_responses(request: ResponsesRequest):
         status="completed",
         type="message",
     )
-    output.append(message)
+
     tool_calls = content.get("tool_calls", None)
     if tool_calls:
         responses_tools = tool_calls2responses_tools(tool_calls)
         output.extend(responses_tools)
+    else:
+        output.append(message)
     return ResponsesResponse(
         model=request.model,
         output=output,
@@ -790,6 +843,8 @@ async def _process_simple_streaming_events(
     if tool_calls:
         responses_tools = tool_calls2responses_tools(tool_calls=tool_calls)
         output.extend(responses_tools)
+    else:
+        output.append(message)
 
     final_response = ResponsesResponse(
         model=request.model,

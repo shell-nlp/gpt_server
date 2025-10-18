@@ -39,9 +39,7 @@ from openai.types.responses.tool import Tool
 import shortuuid
 
 ResponseInputOutputItem: TypeAlias = Union[
-    ResponseInputItemParam,
-    "ResponseReasoningItem",
-    ResponseFunctionToolCall,
+    ResponseInputItemParam, "ResponseReasoningItem", ResponseFunctionToolCall, Any
 ]
 
 StreamingResponsesResponse: TypeAlias = (
