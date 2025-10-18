@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 # 新版本 opnai
 client = OpenAI(api_key="EMPTY", base_url="http://localhost:8082/v1")
-model = "qwen"
+model = "qwen3"
 # 方式一
 output = client.chat.completions.create(
     model=model,
@@ -36,5 +36,5 @@ output = client.beta.chat.completions.parse(
     response_format=Distance,
 )
 
-print(output.choices[0].message.parsed.dict())
+print(output.choices[0].message.parsed.model_dump())
 print()

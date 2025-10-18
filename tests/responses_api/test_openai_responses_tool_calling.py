@@ -29,14 +29,12 @@ tools = [
     },
 ]
 
-input_messages = [
-    {"role": "user", "content": "南京天气怎么样？"}
-]
+input_messages = [{"role": "user", "content": "南京天气怎么样？"}]
 
 
 def main():
     base_url = "http://0.0.0.0:8082/v1"
-    model = "qwen"
+    model = "qwen3"
     client = OpenAI(base_url=base_url, api_key="empty")
     response = client.responses.create(
         model=model, input=input_messages, tools=tools, tool_choice="required"

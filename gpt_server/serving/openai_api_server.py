@@ -456,23 +456,24 @@ async def create_responses(request: ResponsesRequest):
             if content:
                 if isinstance(content, list):
                     for i in new_item["content"]:
-                        if i["type"] == "text":
-                            i["type"] = "input_text"
-                        elif i["type"] == "image_url":
-                            i["type"] = "input_image"
-                            i["image_url"] = i["image_url"]["url"]
-                        elif (
-                            i["type"] == "output_text" and new_item["type"] == "message"
-                        ):
+                        # if i["type"] == "text":
+                        #     i["type"] = "input_text"
+                        # if i["type"] == "image_url":
+                        #     i["type"] = "input_image"
+                        #     i["image_url"] = i["image_url"]["url"]
+                        if i["type"] == "output_text" and new_item["type"] == "message":
                             new_item = {
                                 "role": "assistant",
                                 "content": i["text"],
                             }
+                        if i["type"] == "input_image":
+                            i["type"] = "image_url"
+                            i["image_url"] = {"url": i["image_url"]}
+                        if i["type"] == "input_text":
+                            i["type"] = "text"
+
                         else:
-                            return create_error_response(
-                                ErrorCode.VALIDATION_TYPE_ERROR,
-                                f"Only text and image_url input supported now, your input type {i['type']}",
-                            )
+                            pass
                 new_input.append(new_item)
             else:
                 type_ = item["type"]
@@ -508,7 +509,6 @@ async def create_responses(request: ResponsesRequest):
                     new_input.append(item)
         request.input = new_input
     messages = request.input
-    # logger.warning(f"message: {messages}")
     response_format = None
     if request.text:
         response_format = {}
