@@ -408,7 +408,7 @@ def get_model_address_map():
 
 
 response_store_lock = asyncio.Lock()
-response_store = {}
+response_store: dict[str, ResponsesResponse] = {}
 
 
 @app.post(
@@ -508,6 +508,12 @@ async def create_responses(request: ResponsesRequest):
                 else:
                     new_input.append(item)
         request.input = new_input
+    elif isinstance(request.input, str):
+        # if request.instructions:
+        #     messages = [{"role": "system", "content": request.instructions}]
+        # messages = [{"role": "user", "content": request.input}]
+        pass
+
     messages = request.input
     response_format = None
     if request.text:

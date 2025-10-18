@@ -108,7 +108,7 @@ class ResponseUsage(BaseModel):
 class ResponseReasoningParam(BaseModel):
     """Reasoning parameters for responses."""
 
-    effort: Optional[Literal["low", "medium", "high"]] = Field(
+    effort: Optional[Literal["minimal", "low", "medium", "high"]] = Field(
         default="medium",
         description="Constrains effort on reasoning for reasoning models.",
     )
