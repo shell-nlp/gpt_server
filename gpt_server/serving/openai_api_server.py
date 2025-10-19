@@ -409,6 +409,7 @@ def get_model_address_map():
 
 response_store_lock = asyncio.Lock()
 response_store: dict[str, ResponsesResponse] = {}
+msg_store = {}
 
 
 @app.post(
@@ -417,6 +418,8 @@ response_store: dict[str, ResponsesResponse] = {}
     response_class=responses.ORJSONResponse,
 )
 async def create_responses(request: ResponsesRequest):
+    request.store = False  # 暂时关闭
+    global response_store, msg_store
     error_check_ret = check_model(request.model)
     if error_check_ret is not None:
         return error_check_ret
@@ -441,12 +444,16 @@ async def create_responses(request: ResponsesRequest):
     else:
         prev_response = None
 
-    # if raw_request:
-    #     raw_request.state.request_metadata = request_metadata
-    # 如果 input str ok | list[str] ok | list[dict] ok
-    # [{'role': 'user', 'content': "What's the weather like in Paris today?"},
-    # ResponseFunctionToolCall(arguments='{"latitude": 48.8566, "longitude": 2.3522}', call_id='chatcmpl-nKMcidp7CRjgCy2rmY67RJ', name='get_weather', type='function_call', id='chatcmpl-nKMcidp7CRjgCy2rmY67RJ', status='completed'),
-    # {'type': 'function_call_output', 'call_id': 'chatcmpl-nKMcidp7CRjgCy2rmY67RJ', 'output': 'Current temperature at (48.8566, 2.3522) is 20°C.'}]
+    if request.store:
+        messages = _construct_input_messages(
+            request=request, prev_response=prev_response
+        )
+        request.input = messages
+        if previous_response_id:
+            msg_store[previous_response_id] = messages
+        else:
+            msg_store[request.request_id] = messages
+        # msg_store[previous_response_id] = messages
     tool_name_cache_dict = {}
     if isinstance(request.input, list) and isinstance(request.input[0], dict):
         new_input = []
@@ -583,18 +590,59 @@ async def create_responses(request: ResponsesRequest):
         output.extend(responses_tools)
     else:
         output.append(message)
-    return ResponsesResponse(
-        model=request.model,
+    created_time = int(time.time())
+    response = ResponsesResponse.from_request(
+        request,
+        created_time=created_time,
         output=output,
         status="completed",
         usage=None,  # TODO
-        instructions=request.instructions,
-        max_output_tokens=max_tokens,
-        previous_response_id=previous_response_id,
-        store=request.store,
-        tools=request.tools,  # TODO
-        service_tier=request.service_tier,
     )
+    if request.store:
+        async with response_store_lock:
+            stored_response = response_store.get(response.id)
+            # If the response is already cancelled, don't update it.
+            if stored_response is None or stored_response.status != "cancelled":
+                response_store[response.id] = response
+    return response
+
+
+def _construct_input_messages(
+    request: ResponsesRequest,
+    prev_response: ResponsesResponse | None = None,
+) -> list:
+    global response_store, msg_store
+    messages = []
+    if request.instructions:
+        messages.append(
+            {
+                "role": "system",
+                "content": request.instructions,
+            }
+        )
+    # Prepend the conversation history.
+    if prev_response is not None:
+        prev_msg = msg_store.get(prev_response.id)
+        if prev_msg:
+            messages.extend(prev_msg)
+        # Add the previous output.
+        for output_item in prev_response.output:
+            # NOTE: We skip the reasoning output.
+            if isinstance(output_item, ResponseOutputMessage):
+                for content in output_item.content:
+                    messages.append(
+                        {
+                            "role": "assistant",
+                            "content": content.text,
+                        }
+                    )
+    # Append the new input.
+    # Responses API supports simple text inputs without chat format.
+    if isinstance(request.input, str):
+        messages.append({"role": "user", "content": request.input})
+    else:
+        messages.extend(request.input)  # type: ignore
+    return messages
 
 
 async def _convert_stream_to_sse_events(
@@ -720,6 +768,7 @@ async def _process_simple_streaming_events(
     gen_params,
     worker_addr,
 ):
+    global response_store, msg_store
     current_output_index = 0
     current_content_index = 0
     current_item_id = ""
@@ -851,24 +900,25 @@ async def _process_simple_streaming_events(
         output.extend(responses_tools)
     else:
         output.append(message)
-
-    final_response = ResponsesResponse(
-        model=request.model,
+    created_time = int(time.time())
+    response = ResponsesResponse.from_request(
+        request,
+        created_time=created_time,
         output=output,
         status="completed",
         usage=None,  # TODO
-        instructions=request.instructions,
-        max_output_tokens=request.max_output_tokens,
-        previous_response_id=request.previous_response_id,
-        store=request.store,
-        tools=request.tools,  # TODO
-        service_tier=request.service_tier,
-    ).model_dump()
+    )
+    if request.store:
+        async with response_store_lock:
+            stored_response = response_store.get(response.id)
+            # If the response is already cancelled, don't update it.
+            if stored_response is None or stored_response.status != "cancelled":
+                response_store[response.id] = response
     yield _increment_sequence_number_and_return(
         ResponseCompletedEvent(
             type="response.completed",
             sequence_number=-1,
-            response=final_response,
+            response=response.model_dump(),
         )
     )
 

@@ -259,6 +259,7 @@ class ResponsesResponse(BaseModel):
             truncation=request.truncation,
             user=request.user,
             usage=usage,
+            store=request.store,
         )
 
 
