@@ -204,15 +204,11 @@ class ResponsesResponse(BaseModel):
     instructions: Optional[str] = None
     max_output_tokens: Optional[int] = None
     previous_response_id: Optional[str] = None
-    reasoning: Optional[dict] = (
-        # Unused. No model supports this. For GPT-oss, system prompt sets
-        # the field, not server args.
-        None  # {"effort": Optional[str], "summary": Optional[str]}
-    )
+    reasoning: Optional[ResponseReasoningParam] = None
     service_tier: Literal["auto", "default", "flex", "scale", "priority"]
     store: Optional[bool] = None
     temperature: Optional[float] = None
-    text: Optional[dict] = None  # e.g. {"format": {"type": "text"}}
+    text: Optional[ResponseTextConfig] = None  # e.g. {"format": {"type": "text"}}
     top_logprobs: int | None = None
     top_p: Optional[float] = None
     truncation: Optional[str] = None

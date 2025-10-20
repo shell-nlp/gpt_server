@@ -524,6 +524,7 @@ async def create_responses(request: ResponsesRequest):
     messages = request.input
     response_format = None
     if request.text:
+        logger.info("使用 response_format")
         response_format = {}
         response_format["type"] = request.text.format.type
         if "json_schema" == request.text.format.type:

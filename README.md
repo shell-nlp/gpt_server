@@ -25,6 +25,7 @@
 |     | 功能          | 说明                                                                |
 |-----|-------------|-------------------------------------------------------------------|
 | 🎨  | **OpenAI服务接口**     | 支持 `OpenAI` 服务接口规范，兼容所有支持 OpenAI的项目工程                                          |
+| 💎  | **支持 `Responses API` 接口**     | 全球首个兼容 `OpenAI`  `Responses API` 接口                |
 | 🚀  | **多后端引擎推理** | 支持 `vLLM`、`SGLang`、`LMDeploy`、`HF`多种高性能推理引擎 |
 | 🎯  | **Embedding/Reranker** | 支持所有兼容`Sentence_Transformers`的语义向量或重排模型，支持了Infinity后端，**Embedding**推理速度大于onnx/tensorrt，支持动态组批 |
 | 🎛️ | **Text-moderation（文本审核，分类）**   | 支持`OpenAI` 服务接口规范的文本审核，分类                                                |
@@ -37,15 +38,14 @@
 
 <br>
 
-- 支持guided_decoding,强制模型按照Schema的要求进行JSON格式输出。
-- 支持了**Tools（Function Calling）**功能,并优化Tools解析方式，大大提高tools的调用成功率。兼容**LangChain**的 **bind_tools**、**with_structured_output**写法（目前支持Qwen系列、GLM系列）
-- 支持了**cohere**库接口规范的 /v1/rerank 接口,在dify中可用。
-- 全球唯一扩展了**openai**库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
-- 全球唯一支持了**openai**库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
-- 全球唯一支持了**openai**库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
-- 全球唯一支持了**openai**库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
-- 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/generations）,基于diffusers后端(代码样例见gpt_server/tests/test_image_gen.py)
-- 全球唯一支持了**openai**库的SD,文生图模型接口（sd, /v1/images/edits）,基于diffusers后端(代码样例见gpt_server/tests/test_image_edit.py)
+### 其它特性
+- 支持了`cohere`库接口规范的 /v1/rerank 接口,在dify中可用。
+- 扩展了`OpenAI`库,实现Reranker模型（rerank, /v1/rerank）。(代码样例见gpt_server/tests/test_openai_rerank.py)
+- 支持了`OpenAI`库的文本审核模型接口（text-moderation, /v1/moderations）。(代码样例见gpt_server/tests/test_openai_moderation.py)
+- 支持了`OpenAI`库的TTS模型接口（tts, /v1/audio/speech）(代码样例见gpt_server/tests/test_openai_tts_stream.py)
+- 支持了`OpenAI`库的ASR模型接口（asr, /v1/audio/transcriptions）,基于fanasr后端(代码样例见gpt_server/tests/test_openai_transcriptions.py)
+- 支持了`OpenAI`库的SD,文生图模型接口（sd, /v1/images/generations）,基于diffusers后端(代码样例见gpt_server/tests/test_image_gen.py)
+- 支持了`OpenAI`库的SD,文生图模型接口（sd, /v1/images/edits）,基于diffusers后端(代码样例见gpt_server/tests/test_image_edit.py)
 
 
 ## 📘 配置文档 
@@ -127,13 +127,13 @@
 * [X] 支持 语音转文本 ASR 模型
 * [X] 支持 文本审核 模型
 * [X] 支持 function call 功能 (tools)（Qwen系列、ChatGLM系列已经支持,后面有需求再继续扩展）
-* [X] 支持多模态模型（初步支持glm-4v,其它模型后续慢慢支持）
+* [X] 支持多模态模型
 * [X] 支持Embedding模型动态组批(实现方式：infinity后端)
 * [X] 支持Reranker模型动态组批(实现方式：infinity后端)
 * [X] 可视化启动界面(不稳定,对开发人员来说比较鸡肋，后期将弃用！)
-* [X] 并行的function call功能（tools）
 * [X] 支持 文生图 模型
 * [X] 支持 图片编辑 模型
+* [X] 支持 Responses API
 * [ ] 支持 pip install 方式进行安装
 
 
