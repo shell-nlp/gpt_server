@@ -311,6 +311,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--port", type=int, default=None)
         # model_type
         parser.add_argument("--model_type", type=str, default="auto")
+        # hf_overrides
+        parser.add_argument("--hf_overrides", type=str, default="")
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
         if args.backend == "vllm":
@@ -332,6 +334,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["vad_model"] = args.vad_model
         if args.punc_model:
             os.environ["punc_model"] = args.punc_model
+        if args.hf_overrides:
+            os.environ["hf_overrides"] = args.hf_overrides
 
         os.environ["model_type"] = args.model_type
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching

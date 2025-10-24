@@ -12,6 +12,8 @@ class ModelConfig(BaseSettings):
     dtype: str = "auto"
     num_gpus: int = 1
     lora: str | None = None
+    hf_overrides: dict | None = None
+    """HuggingFace 配置覆盖参数"""
 
 
 def get_model_config() -> ModelConfig:

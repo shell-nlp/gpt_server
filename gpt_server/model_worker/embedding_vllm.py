@@ -1,14 +1,12 @@
 import os
 from typing import List
-import asyncio
 from loguru import logger
 
-from infinity_emb import AsyncEngineArray, EngineArgs, AsyncEmbeddingEngine
-from infinity_emb.inference.select_model import get_engine_type_from_config
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_worker.utils import get_embedding_mode
 import numpy as np
-from vllm import LLM
+from vllm import LLM, EmbeddingRequestOutput, ScoringRequestOutput
+from gpt_server.settings import get_model_config
 
 label_to_category = {
     "S": "sexual",
@@ -21,6 +19,24 @@ label_to_category = {
     "V": "violence",
     "OK": "OK",
 }
+
+
+def template_format(queries: List[str], documents: List[str]):
+    model_config = get_model_config()
+    hf_overrides = model_config.hf_overrides
+    if hf_overrides:
+        if hf_overrides["architectures"][0] == "Qwen3ForSequenceClassification":
+            logger.info("使用 Qwen3ForSequenceClassification 模板格式化...")
+            prefix = '<|im_start|>system\nJudge whether the Document meets the requirements based on the Query and the Instruct provided. Note that the answer can only be "yes" or "no".<|im_end|>\n<|im_start|>user\n'
+            suffix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
+            instruction = "Given a web search query, retrieve relevant passages that answer the query"
+
+            query_template = f"{prefix}<Instruct>: {instruction}\n<Query>: {{query}}\n"
+            document_template = f"<Document>: {{doc}}{suffix}"
+            queries = [query_template.format(query=query) for query in queries]
+            documents = [document_template.format(doc=doc) for doc in documents]
+            return queries, documents
+    return queries, documents
 
 
 class EmbeddingWorker(ModelWorkerBase):
@@ -44,18 +60,20 @@ class EmbeddingWorker(ModelWorkerBase):
             conv_template,
             model_type="embedding",
         )
-        tensor_parallel_size = int(os.getenv("num_gpus", "1"))
-        max_model_len = os.getenv("max_model_len", None)
-        gpu_memory_utilization = float(os.getenv("gpu_memory_utilization", 0.6))
-        enable_prefix_caching = bool(os.getenv("enable_prefix_caching", False))
-
+        model_config = get_model_config()
+        hf_overrides = model_config.hf_overrides
         self.mode = get_embedding_mode(model_path=model_path)
+        runner = "auto"
+        if self.model == "rerank":
+            runner = "pooling"
         self.engine = LLM(
             model=model_path,
-            tensor_parallel_size=tensor_parallel_size,
-            max_model_len=max_model_len,
-            gpu_memory_utilization=gpu_memory_utilization,
-            enable_prefix_caching=enable_prefix_caching,
+            tensor_parallel_size=model_config.num_gpus,
+            max_model_len=model_config.max_model_len,
+            gpu_memory_utilization=model_config.gpu_memory_utilization,
+            enable_prefix_caching=model_config.enable_prefix_caching,
+            runner=runner,
+            hf_overrides=hf_overrides,
         )
 
         logger.warning(f"模型：{model_names[0]}")
@@ -69,13 +87,20 @@ class EmbeddingWorker(ModelWorkerBase):
         if self.mode == "embedding":
             texts = list(map(lambda x: x.replace("\n", " "), texts))
             # ----------
-            outputs = self.engine.embed(texts)
+            outputs: list[EmbeddingRequestOutput] = self.engine.embed(texts)
             embedding = [o.outputs.embedding for o in outputs]
             embeddings_np = np.array(embedding)
             # ------ L2归一化（沿axis=1，即对每一行进行归一化）-------
             norm = np.linalg.norm(embeddings_np, ord=2, axis=1, keepdims=True)
             normalized_embeddings_np = embeddings_np / norm
             embedding = normalized_embeddings_np.tolist()
+        elif self.mode == "rerank":
+            query = params.get("query", None)
+            data_1 = [query] * len(texts)
+            data_2 = texts
+            data_1, data_2 = template_format(queries=data_1, documents=data_2)
+            scores: list[ScoringRequestOutput] = self.engine.score(data_1, data_2)
+            embedding = [[score.outputs.score] for score in scores]
 
         ret["embedding"] = embedding
         return ret

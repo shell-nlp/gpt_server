@@ -93,6 +93,21 @@ models:
     workers:
     - gpus:
       - 2
+# 部署 qwen3-reranker 样例
+- qwen3-reranker:
+    alias: null
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/Qwen/Qwen3-Reranker-0___6B/
+      dtype: auto
+      task_type: reranker
+      hf_overrides: { "architectures": [ "Qwen3ForSequenceClassification" ], "classifier_from_token": [ "no", "yes" ], "is_original_qwen3_reranker": True }
+    model_type: embedding
+    work_mode: vllm
+    device: gpu
+    workers:
+    - gpus:
+      - 6
 
 - jina-reranker:
     # 多模态多语言的重排模型，这个模型task_type 只能是 auto
