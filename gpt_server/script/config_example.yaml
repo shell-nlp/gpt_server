@@ -25,6 +25,7 @@ model_worker_args:
   limit_worker_concurrency: 1024 # worker的最大并发数,默认为 1024
 
 models:
+# --------------- 支持的大语言模型样例 ---------------
 - qwen:
     # 大语言模型
     #自定义的模型名称
@@ -63,7 +64,7 @@ models:
       #   - 1
 
 
-
+# --------------- 支持的多模态模型样例 ---------------
 - internvl2:
     # 多模态模型
     #自定义的模型名称
@@ -80,7 +81,7 @@ models:
     - gpus:
       # - 1
       - 0
-
+# --------------- 支持的rerank模型样例 ---------------
 - bge-reranker-base:
     # rerank模型
     alias: null # 别名   
@@ -93,7 +94,7 @@ models:
     workers:
     - gpus:
       - 2
-# 部署 qwen3-reranker 样例
+
 - qwen3-reranker:
     alias: null
     enable: true
@@ -108,7 +109,7 @@ models:
     workers:
     - gpus:
       - 6
-
+# --------------- 支持的多模态多语言的重排模型样例 ---------------
 - jina-reranker:
     # 多模态多语言的重排模型，这个模型task_type 只能是 auto
     alias: null
@@ -122,9 +123,8 @@ models:
     workers:
     - gpus:
       - 5
-
+# --------------- 支持的文本embedding模型样例 ---------------
 - acge_text_embedding:
-    # 文本embedding模型
     alias: text-embedding-ada-002 # 别名   
     enable: true # false true
     model_config:
@@ -136,9 +136,8 @@ models:
     workers:
     - gpus:
       - 2
-
+# --------------- 支持的vl-embedding 模型样例 --------------- 
 - bge-vl:
-    # vl-embedding 模型
     alias: null
     enable: true
     model_config:
@@ -149,9 +148,8 @@ models:
     workers:
     - gpus:
       - 2
-
+# --------------- 支持的文本审核模型样例 --------------- 
 - text-moderation:
-    # 文本审核模型
     alias: omni-moderation-latest
     enable: true
     model_config:
@@ -162,8 +160,8 @@ models:
     workers:
     - gpus:
       - 2
+# --------------- 支持的最新支持ASR模型样例 --------------- 
 - SenseVoiceSmall:
-    ## 最新支持ASR模型
     alias: null
     enable: true
     model_config:
@@ -175,8 +173,8 @@ models:
     workers:
     - gpus:
       - 2
+# --------------- 支持的TTS 模型的配置方式样例 --------------- 
 - tts:
-    # TTS 模型的配置方式
     alias: null
     enable: true
     model_config:
@@ -187,9 +185,9 @@ models:
     workers:
     - gpus:
       - 6
-
+# --------------- 支持的文生图模型样例 --------------- 
 - flux:
-    # 文生图模型
+
     alias: null
     enable: true
     model_config:
@@ -201,8 +199,19 @@ models:
     - gpus:
       - 7
 
+- qwen-image:
+    alias: null
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/Qwen/Qwen-Image/
+    model_type: qwen_image
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 7
+# --------------- 支持的图片编辑模型样例 --------------- 
 - image-edit:
-    # 图片编辑模型
     alias: null
     enable: true
     model_config:

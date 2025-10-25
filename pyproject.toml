@@ -28,7 +28,7 @@ dependencies = [
     "sglang[all]>=0.5.3.post1",
     "flashinfer-python",
     "flashtts>=0.1.7",
-    "diffusers>=0.35.1",
+    "diffusers>=0.35.2",
     #"sqlmodel>=0.0.24",
     "autoawq>=0.2.9",
 ]
@@ -38,7 +38,7 @@ default-groups = [] # 默认只安装dependencies中的库
 prerelease = "allow"
 override-dependencies = [
     "setuptools==77.0.3",
-    "transformers==4.57.0",  #  infinity-emb
+    "transformers==4.57.1",  #  infinity-emb
     "soundfile==0.13.1",     # infinity
     "xgrammar==0.1.24",      #  sglang[all]==0.4.5 depends on xgrammar==0.1.17
     "outlines-core==0.2.11", # sglang 和 vllm 的冲突

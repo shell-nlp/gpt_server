@@ -61,6 +61,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-10-25 支持了 qwen_image 文生图模型
 2025-9-7   支持了 文本编辑模型 (代码样例见gpt_server/tests/test_image_edit.py)
 2025-8-8   初步支持了 embedding 的 vllm 加速
 2025-6-17  支持了 jina-reranker-m0 全球首个支持多模态多语言的重排模型
@@ -367,6 +368,7 @@ Chat UI界面:
 | Models / BackEnd | model_type |
 | :--------------: | :--------: |
 |    flux     | flux  |
+|    qwen_image     | qwen_image  |
 
 <br>
 
