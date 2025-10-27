@@ -29,7 +29,7 @@ dependencies = [
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.35.2",
-    #"sqlmodel>=0.0.24",
+    "sqlmodel>=0.0.27",
     "autoawq>=0.2.9",
 ]
 

@@ -6,7 +6,6 @@ from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.responses import StreamingResponse, JSONResponse
 import requests
 
-from fastchat.constants import WORKER_HEART_BEAT_INTERVAL
 from fastchat.conversation import Conversation
 from fastchat.utils import pretty_print_semaphore
 
@@ -19,11 +18,11 @@ def build_logger():
 
 worker = None
 logger = None
-
+WORKER_HEART_BEAT_INTERVAL = 6
 app = FastAPI()
 
 
-def heart_beat_worker(obj):
+def heart_beat_worker(obj: "BaseModelWorker"):
     while True:
         time.sleep(WORKER_HEART_BEAT_INTERVAL)
         obj.send_heart_beat()
@@ -96,7 +95,7 @@ class BaseModelWorker:
 
         url = self.controller_addr + "/register_worker"
         data = {
-            "worker_name": self.worker_addr,
+            "worker_addr": self.worker_addr,
             "check_heart_beat": True,
             "worker_status": self.get_status(),
             "multimodal": self.multimodal,
@@ -105,12 +104,6 @@ class BaseModelWorker:
         assert r.status_code == 200
 
     def send_heart_beat(self):
-        # logger.info(
-        #     f"Send heart beat. Models: {self.model_names}. "
-        #     f"Semaphore: {pretty_print_semaphore(self.semaphore)}. "
-        #     f"call_ct: {self.call_ct}. "
-        #     f"worker_id: {self.worker_id}. "
-        # )
 
         url = self.controller_addr + "/receive_heart_beat"
 
@@ -119,7 +112,7 @@ class BaseModelWorker:
                 ret = requests.post(
                     url,
                     json={
-                        "worker_name": self.worker_addr,
+                        "worker_addr": self.worker_addr,
                         "queue_length": self.get_queue_length(),
                     },
                     timeout=5,

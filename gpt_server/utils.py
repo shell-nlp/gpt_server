@@ -104,7 +104,7 @@ def run_cmd(cmd: str, *args, **kwargs):
 
 def start_controller(controller_host, controller_port, dispatch_method):
     """启动fastchat控制器"""
-    cmd = f"python -m gpt_server.serving.controller --host {controller_host} --port {controller_port} --dispatch-method {dispatch_method} "
+    cmd = f"python -m gpt_server.serving.controller_v2 --host {controller_host} --port {controller_port} --dispatch-method {dispatch_method} "
     cmd += "> /dev/null 2>&1"  # 完全静默（Linux/macOS）
     controller_process = Process(target=run_cmd, args=(cmd,))
     controller_process.start()
@@ -402,10 +402,10 @@ def get_free_tcp_port():
     return port
 
 
-def is_port_in_use(port):
+def is_port_in_use(port: int):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
-            s.bind(("localhost", port))
+            s.bind(("localhost", int(port)))
             return False
         except:
             return True
@@ -442,6 +442,8 @@ if __name__ == "__main__":
     # /home/dev/model/KirillR/QwQ-32B-Preview-AWQ
     # get_model_types()
     # from lmdeploy.serve.async_engine import get_names_from_model
+    print(is_port_in_use(48082))
+    assert 0
     from lmdeploy.serve.async_engine import best_match_model, MODELS
     from lmdeploy.model import HFChatTemplate
     from lmdeploy.archs import get_model_arch

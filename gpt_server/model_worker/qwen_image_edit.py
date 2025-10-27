@@ -63,7 +63,7 @@ class QwenImageEditWorker(ModelWorkerBase):
             "num_inference_steps": 50,
         }
         with torch.inference_mode():
-            output = self.pipe(**inputs)
+            output = await asyncio.to_thread(self.pipe, **inputs)
             image = output.images[0]
 
         result = {}

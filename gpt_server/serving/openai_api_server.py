@@ -48,8 +48,6 @@ from fastchat.protocol.openai_api_protocol import (
     CompletionStreamResponse,
     ErrorResponse,
     LogProbs,
-    ModelList,
-    ModelPermission,
 )
 from fastchat.protocol.api_protocol import (
     APITokenCheckRequest,
@@ -356,7 +354,11 @@ async def get_conv(model_name: str, worker_addr: str):
     return conv_template
 
 
-from gpt_server.openai_api_protocol.custom_api_protocol import CustomModelCard
+from gpt_server.openai_api_protocol.custom_api_protocol import (
+    CustomModelCard,
+    ModelList,
+    ModelPermission,
+)
 
 
 @app.get(

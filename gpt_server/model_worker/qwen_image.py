@@ -1,3 +1,4 @@
+import asyncio
 import os
 from typing import List
 import uuid
@@ -65,21 +66,24 @@ class QwenImageWorker(ModelWorkerBase):
         logger.warning(f"模型：{model_names[0]}")
 
     async def get_image_output(self, params):
+        self.call_ct += 1
         prompt = params["prompt"]
         if contains_chinese(prompt):
             prompt += positive_magic["zh"]
         else:
             prompt += positive_magic["en"]
         response_format = params.get("response_format", "b64_json")
-        image = self.pipe(
-            prompt,
-            negative_prompt=" ",
-            height=height,
-            width=width,
-            num_inference_steps=50,
-            true_cfg_scale=4.0,
-            generator=torch.Generator(self.device).manual_seed(0),
-        ).images[0]
+        inputs = {
+            "prompt": prompt,
+            "negative_prompt": " ",
+            "height": height,
+            "width": width,
+            "num_inference_steps": 50,
+            "true_cfg_scale": 4.0,
+            "generator": torch.Generator(self.device).manual_seed(0),
+        }
+        output = await asyncio.to_thread(self.pipe, **inputs)
+        image = output.images[0]
         result = {}
         if response_format == "b64_json":
             # Convert PIL image to base64

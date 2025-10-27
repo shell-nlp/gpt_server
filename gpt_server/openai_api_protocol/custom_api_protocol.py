@@ -380,6 +380,11 @@ class CustomModelCard(BaseModel):
     owned_by: str = "gpt_server"
 
 
+class ModelList(BaseModel):
+    object: str = "list"
+    data: List[CustomModelCard] = []
+
+
 class CustomEmbeddingsRequest(BaseModel):
     model: Optional[str] = None
     engine: Optional[str] = None
