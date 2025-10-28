@@ -12,7 +12,7 @@ dependencies = [
     "ffmpy",
     "fschat==0.2.36",
     "infinity-emb[all]==0.0.77",
-    "lmdeploy==0.10.0",
+    "lmdeploy==0.10.2",
     "loguru>=0.7.2",
     "openai==1.99.1",
     "setuptools==75.2.0",
@@ -25,7 +25,7 @@ dependencies = [
     "modelscope==1.26.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.5.3.post1",
+    "sglang[all]>=0.5.4",
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.35.2",
@@ -40,7 +40,6 @@ override-dependencies = [
     "setuptools==77.0.3",
     "transformers==4.57.1",  #  infinity-emb
     "soundfile==0.13.1",     # infinity
-    "xgrammar==0.1.24",      #  sglang[all]==0.4.5 depends on xgrammar==0.1.17
     "outlines-core==0.2.11", # sglang 和 vllm 的冲突
     "peft>=0.17.0",          # 和 lmdeloy 冲突
 ]
