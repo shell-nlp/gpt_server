@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.6.5"
+version = "0.6.6"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
