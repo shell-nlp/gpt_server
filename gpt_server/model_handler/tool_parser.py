@@ -318,18 +318,17 @@ def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
     tools_called = tool_call_info.tools_called
     text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
     tool_calls = [i.model_dump() for i in tool_calls]
-    if tools and tools_called:  # 如果传入tools
-        logger.info(f"工具解析成功, tool_calls: {tool_calls}")
-        ret["text"] = ""
-        ret["tool_calls"] = tool_calls
-        ret["finish_reason"] = "tool_calls"
-        return json.dumps(ret).encode() + b"\0"
-    else:
-        logger.info(f"工具解析失败, tool_calls: {tool_calls}")
-        ret["text"] = ""
-        ret["tool_calls"] = tool_calls
-        ret["finish_reason"] = "tool_calls"
-        return json.dumps(ret).encode() + b"\0"
+    # -----------------------------------
+    ret["text"] = ""
+    ret["tool_calls"] = tool_calls
+    ret["finish_reason"] = (
+        "tool_calls" if tools and tools_called else ret.get("finish_reason", "stop")
+    )
+    if tools:
+        logger.info(
+            f" 工具解析{'成功' if tools_called else '失败'}, tool_calls: {tool_calls}"
+        )
+    return json.dumps(ret).encode() + b"\0"
 
 
 if __name__ == "__main__":
