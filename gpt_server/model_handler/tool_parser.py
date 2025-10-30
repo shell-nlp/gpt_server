@@ -258,13 +258,18 @@ class Qwen2d5ToolParser(ToolParser):
             # get tool_call in text
             match_result_list = re.findall(self.pattern, text, re.DOTALL)
             tool_calls = []
+            index = -1
             for match_result in match_result_list:
+                index += 1
                 action = json.loads(match_result)
                 name, arguments = action["name"], json.dumps(
                     action["arguments"], ensure_ascii=False
                 )
                 tool_calls.append(
-                    ToolCall(function=FunctionCall(name=name, arguments=arguments))
+                    ToolCall(
+                        index=index,
+                        function=FunctionCall(name=name, arguments=arguments),
+                    )
                 )
 
             # get text outside of tags
@@ -332,7 +337,13 @@ def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
 
 
 if __name__ == "__main__":
-    full_text = """Action: get_weather
+    from transformers import AutoTokenizer
+
+    glm_full_text = """Action: get_weather
 Action Input: {"location": "Nanjing", "unit": "celsius"}"""
-    tool_parser2 = ToolParserManager.module_dict["glm"]()
-    tool_parser(full_text=full_text, tool_parser=tool_parser2, tools=True, ret={})
+    qwen_full_text = """<tool_call>{"name": "get_weather", "arguments": {"location": "Nanjing", "unit": "celsius"}}</tool_call>"""
+    tokenizer = AutoTokenizer.from_pretrained(
+        "/home/dev/model/Qwen/Qwen3-30B-A3B-Instruct-2507/"
+    )
+    tool_parser2 = ToolParserManager.module_dict["qwen2_5"](tokenizer=tokenizer)
+    tool_parser(full_text=qwen_full_text, tool_parser=tool_parser2, tools=True, ret={})

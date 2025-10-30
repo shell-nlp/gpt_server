@@ -5,7 +5,7 @@
     {%- else %}
         {{- 'You are a helpful assistant. \n\n' }}
     {%- endif %}
-    {{- "# Tools\n\n您可以调用一个或多个function来协助处理用户查询。\n\n在<tools></tools> XML标签中提供了function的签名(即函数的结构信息):\n<tools>" }}
+    {{- "# Tools\n\n你每次只能调用一个function来协助处理用户查询。\n\n在<tools></tools> XML标签中提供了function的签名(即函数的结构信息):\n<tools>" }}
     {%- for tool in tools %}
         {{- "\n" }}
         {{- tool | tojson }}

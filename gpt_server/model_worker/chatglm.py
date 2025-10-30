@@ -5,7 +5,6 @@ from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 import torch
 from loguru import logger
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_handler.prompts import MODELS
 from gpt_server.model_handler.tool_parser import tool_parser, ToolParserManager
 
 

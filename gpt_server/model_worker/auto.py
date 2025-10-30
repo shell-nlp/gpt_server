@@ -6,7 +6,6 @@ from loguru import logger
 import torch
 import traceback
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_handler.prompts import MODELS
 from gpt_server.model_handler.tool_parser import tool_parser, ToolParserManager
 from gpt_server.model_handler.chat_template.get_chat_template import get_chat_template
 
