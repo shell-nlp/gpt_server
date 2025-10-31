@@ -687,6 +687,18 @@ wheels = [
 ]
 
 [[package]]
+name = "colorlog"
+version = "6.10.1"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/a2/61/f083b5ac52e505dfc1c624eafbf8c7589a0d7f32daa398d2e7590efa5fda/colorlog-6.10.1.tar.gz", hash = "sha256:eb4ae5cb65fe7fec7773c2306061a8e63e02efc2c72eba9d27b0fa23c94f1321", size = 17162, upload-time = "2025-10-16T16:14:11.978Z" }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6d/c1/e419ef3723a074172b68aaa89c9f3de486ed4c2399e2dbd8113a4fdcaf9e/colorlog-6.10.1-py3-none-any.whl", hash = "sha256:2d7e8348291948af66122cff006c9f8da6255d224e7cf8e37d8de2df3bad8c9c", size = 11743, upload-time = "2025-10-16T16:14:10.512Z" },
+]
+
+[[package]]
 name = "colpali-engine"
 version = "0.3.8"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
@@ -899,10 +911,9 @@ wheels = [
 
 [[package]]
 name = "datasets"
-version = "3.0.1"
+version = "3.6.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
-    { name = "aiohttp" },
     { name = "dill" },
     { name = "filelock" },
     { name = "fsspec", extra = ["http"] },
@@ -917,9 +928,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "xxhash" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/3b/1b/ce839a6a127935f8e87a8d5887e7dfa76cbdbe94ee7ac04c855221ea1e0a/datasets-3.0.1.tar.gz", hash = "sha256:40d63b09e76a3066c32e746d6fdc36fd3f29ed2acd49bf5b1a2100da32936511", size = 1875319, upload-time = "2024-09-26T08:25:47.995Z" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/1a/89/d3d6fef58a488f8569c82fd293ab7cbd4250244d67f425dcae64c63800ea/datasets-3.6.0.tar.gz", hash = "sha256:1b2bf43b19776e2787e181cfd329cb0ca1a358ea014780c3581e0f276375e041", size = 569336, upload-time = "2025-05-07T15:15:02.659Z" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/be/3e/e58d4db4cfe71e3ed07d169af24db30cfd582e16f977378bd43fd7ec1998/datasets-3.0.1-py3-none-any.whl", hash = "sha256:db080aab41c8cc68645117a0f172e5c6789cbc672f066de0aa5a08fc3eebc686", size = 471557, upload-time = "2024-09-26T08:25:45.234Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/20/34/a08b0ee99715eaba118cbe19a71f7b5e2425c2718ef96007c325944a1152/datasets-3.6.0-py3-none-any.whl", hash = "sha256:25000c4a2c0873a710df127d08a202a06eab7bf42441a6bc278b499c2f72cd1b", size = 491546, upload-time = "2025-05-07T15:14:59.742Z" },
 ]
 
 [[package]]
@@ -1034,6 +1045,26 @@ wheels = [
 ]
 
 [[package]]
+name = "docstring-parser"
+version = "0.17.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b2/9d/c3b43da9515bd270df0f80548d9944e389870713cc1fe2b8fb35fe2bcefd/docstring_parser-0.17.0.tar.gz", hash = "sha256:583de4a309722b3315439bb31d64ba3eebada841f2e2cee23b99df001434c912", size = 27442, upload-time = "2025-07-21T07:35:01.868Z" }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/55/e2/2537ebcff11c1ee1ff17d8d0b6f4db75873e3b0fb32c2d4a2ee31ecb310a/docstring_parser-0.17.0-py3-none-any.whl", hash = "sha256:cf2569abd23dce8099b300f9b4fa8191e9582dda731fd533daf54c4551658708", size = 36896, upload-time = "2025-07-21T07:35:00.684Z" },
+]
+
+[[package]]
+name = "dotenv"
+version = "0.9.9"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "python-dotenv" },
+]
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b2/b7/545d2c10c1fc15e48653c91efde329a790f2eecfbbf2bd16003b5db2bab0/dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9", size = 1892, upload-time = "2025-02-19T22:15:01.647Z" },
+]
+
+[[package]]
 name = "edge-tts"
 version = "7.0.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
@@ -1126,25 +1157,28 @@ wheels = [
 
 [[package]]
 name = "evalscope"
-version = "0.16.1"
+version = "1.1.1"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
-    { name = "accelerate" },
+    { name = "colorlog" },
     { name = "datasets" },
-    { name = "immutabledict" },
+    { name = "docstring-parser" },
+    { name = "dotenv" },
     { name = "jieba" },
     { name = "jsonlines" },
     { name = "langdetect" },
-    { name = "latex2sympy2-extended" },
+    { name = "latex2sympy2-extended", extra = ["antlr4-9-3"] },
     { name = "matplotlib" },
     { name = "modelscope", extra = ["framework"] },
     { name = "nltk" },
     { name = "openai" },
+    { name = "overrides" },
     { name = "pandas" },
     { name = "pillow" },
-    { name = "pyarrow" },
+    { name = "pydantic" },
     { name = "pyyaml" },
     { name = "requests" },
+    { name = "rich" },
     { name = "rouge-chinese" },
     { name = "rouge-score" },
     { name = "sacrebleu" },
@@ -1152,21 +1186,20 @@ dependencies = [
     { name = "seaborn" },
     { name = "sympy" },
     { name = "tabulate" },
-    { name = "torch" },
-    { name = "torchvision" },
     { name = "tqdm" },
     { name = "transformers" },
     { name = "word2number" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/94/13/616bf9c33b0769db44a2bae32b54d33cf7129874392682aa76326a51e085/evalscope-0.16.1.tar.gz", hash = "sha256:fffdfea81a039bfc172300a68b4e110a5f85933026ef498adbbd019e68443904", size = 929086, upload-time = "2025-06-03T12:18:00.356Z" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e8/3f/d67b73ce19789e914d6a78740fa7bfd0c07f161bc239b92cd3c26541f2fb/evalscope-1.1.1.tar.gz", hash = "sha256:372775cdd4e5c703bf60d43b37d698de8913709c1198ba28d8fdeeadc8287d17", size = 706228, upload-time = "2025-10-27T09:13:15.04Z" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ea/76/639641578bdc92d25211eb8dae24d1fae19e40cd1649e17946f6ad8a5dc3/evalscope-0.16.1-py3-none-any.whl", hash = "sha256:19c72997bd9d0d7be29e8b98d78e18b4a0c499f8d03b9fb4f81220af8eb5776c", size = 1123828, upload-time = "2025-06-03T12:17:58.291Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/79/d1/afc8b23345ad8f11a5e1f8c6c3112a8679604d833bdbc02aa06787952fd1/evalscope-1.1.1-py3-none-any.whl", hash = "sha256:f7794666b99c64d68c386f5c15c44a6d333890439738251ab5ed2c89ac527202", size = 942567, upload-time = "2025-10-27T09:13:13.729Z" },
 ]
 
 [package.optional-dependencies]
 perf = [
     { name = "aiohttp" },
     { name = "fastapi" },
+    { name = "jinja2" },
     { name = "numpy" },
     { name = "rich" },
     { name = "sse-starlette" },
@@ -1181,6 +1214,7 @@ rag = [
     { name = "langchain-openai" },
     { name = "mteb" },
     { name = "ragas" },
+    { name = "torch" },
     { name = "webdataset" },
 ]
 
@@ -1597,7 +1631,7 @@ requires-dist = [
     { name = "autoawq", specifier = ">=0.2.9" },
     { name = "diffusers", specifier = ">=0.35.2" },
     { name = "edge-tts", specifier = ">=7.0.0" },
-    { name = "evalscope", extras = ["perf", "rag"], specifier = "==0.16.1" },
+    { name = "evalscope", extras = ["perf", "rag"], specifier = ">=1.1.1" },
     { name = "fastapi", specifier = "==0.115.0" },
     { name = "ffmpy" },
     { name = "flashinfer-python" },
@@ -1607,7 +1641,7 @@ requires-dist = [
     { name = "infinity-emb", extras = ["all"], specifier = "==0.0.77" },
     { name = "lmdeploy", specifier = "==0.10.2" },
     { name = "loguru", specifier = ">=0.7.2" },
-    { name = "modelscope", specifier = "==1.26.0" },
+    { name = "modelscope", specifier = ">=1.31.0" },
     { name = "openai", specifier = "==1.99.1" },
     { name = "qwen-vl-utils" },
     { name = "setuptools", specifier = "==75.2.0" },
@@ -1966,15 +2000,6 @@ source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz", hash = "sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9", size = 190490, upload-time = "2024-09-15T18:07:39.745Z" }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/76/c6/c88e154df9c4e1a2a66ccf0005a88dfb2650c1dffb6f5ce603dfbd452ce3/idna-3.10-py3-none-any.whl", hash = "sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3", size = 70442, upload-time = "2024-09-15T18:07:37.964Z" },
-]
-
-[[package]]
-name = "immutabledict"
-version = "4.2.1"
-source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e0/c5/4240186fbabc58fba41bbe17c5f0cd37ffd4c0b85a5029ab104f946df175/immutabledict-4.2.1.tar.gz", hash = "sha256:d91017248981c72eb66c8ff9834e99c2f53562346f23e7f51e7a5ebcf66a3bcc", size = 6228, upload-time = "2024-11-17T13:25:21.555Z" }
-wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/59/56/25ca7b848164b7d93dbd5fc97dd7751700c93e324fe854afbeb562ee2f98/immutabledict-4.2.1-py3-none-any.whl", hash = "sha256:c56a26ced38c236f79e74af3ccce53772827cef5c3bce7cab33ff2060f756373", size = 4700, upload-time = "2024-11-17T13:25:19.52Z" },
 ]
 
 [[package]]
@@ -2517,6 +2542,11 @@ wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/6d/eb/a5e8b06b924b4149cf498e1598116bad1e91ab23046c2dfc2c498154d393/latex2sympy2_extended-1.10.1-py3-none-any.whl", hash = "sha256:917a23e8f3b6edea88a56978fbbe87ed9fca4197f8277646be57b4660710347c", size = 207460, upload-time = "2025-02-27T16:02:45.941Z" },
 ]
 
+[package.optional-dependencies]
+antlr4-9-3 = [
+    { name = "antlr4-python3-runtime" },
+]
+
 [[package]]
 name = "lazy-loader"
 version = "0.4"
@@ -2943,16 +2973,18 @@ wheels = [
 
 [[package]]
 name = "modelscope"
-version = "1.26.0"
+version = "1.31.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
+    { name = "filelock" },
     { name = "requests" },
+    { name = "setuptools" },
     { name = "tqdm" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/48/3c/76d1701761590012b331742d6c67babc3b048df166d5ef99a8c6b0c80c2f/modelscope-1.26.0.tar.gz", hash = "sha256:3178d82ce795ba1a5472eacefda517e1f2162186e4f9f9641cf6587d2c368bc1", size = 4390303, upload-time = "2025-05-14T12:55:09.891Z" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/cf/7b/49c48e37b16528ca78ed5b5a077f0eeb9de653f34fcfcab35d5e5917d130/modelscope-1.31.0.tar.gz", hash = "sha256:7d0be3c898bc32b48b4f9cd1e98795bda32de1763f746c918f5ef34661a67661", size = 4440505, upload-time = "2025-10-15T09:39:07.856Z" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/8e/6e/50fed6b37503accb0199153d3c18884380797b40491b11bd03279cd2d698/modelscope-1.26.0-py3-none-any.whl", hash = "sha256:fdb23191cdf8d5811accefc09ef4594f3b7c5f1d165af9194dc64eba96780c3a", size = 5855598, upload-time = "2025-05-14T12:55:05.055Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/bb/a8/26bda5fdbcb9ad18c52d81961520b3b55bc082969a46dc8b18495ef7726b/modelscope-1.31.0-py3-none-any.whl", hash = "sha256:16fc2d4209d508cd8b511c07ef74d92531aa0ee1f4c303a19e0234f60a7371a9", size = 5923095, upload-time = "2025-10-15T09:39:04.686Z" },
 ]
 
 [package.optional-dependencies]
@@ -2963,6 +2995,7 @@ framework = [
     { name = "einops" },
     { name = "pillow" },
     { name = "python-dateutil" },
+    { name = "pyyaml" },
     { name = "scipy" },
     { name = "setuptools" },
     { name = "simplejson" },
@@ -3843,6 +3876,15 @@ wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/4d/68/b420b6a3beaadbf8e9f2a82132120027efd6424634013fbeca8c2fed7467/outlines_core-0.2.11-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:76b2512417c68863f8f227a080e87f755682dfd895e23b021121318be11da579", size = 2112861, upload-time = "2025-05-19T10:12:36.742Z" },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/78/d6/7c2a016f7a5eab2f3df2b3a258f270872c78fe0dd7d9fbee87429f1b6b1f/outlines_core-0.2.11-cp313-cp313-win32.whl", hash = "sha256:707eeb3d190485f55a27ad9a6ad70df86688fa2bf405894a118283be7f59bd55", size = 1765574, upload-time = "2025-05-19T10:12:37.98Z" },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/a5/39/4c07f1d1f8e6ed85db9fe73a021113795a05aae8a84f36f0bdebb08bfde8/outlines_core-0.2.11-cp313-cp313-win_amd64.whl", hash = "sha256:ad46698564c9b13cbfbc744067de12be73bd740d7b2de20ec6b979ad7511f7c9", size = 2060567, upload-time = "2025-05-19T10:12:39.228Z" },
+]
+
+[[package]]
+name = "overrides"
+version = "7.7.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/36/86/b585f53236dec60aba864e050778b25045f857e17f6e5ea0ae95fe80edd2/overrides-7.7.0.tar.gz", hash = "sha256:55158fa3d93b98cc75299b1e67078ad9003ca27945c76162c1c0766d6f91820a", size = 22812, upload-time = "2024-01-27T21:01:33.423Z" }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/2c/ab/fc8290c6a4c722e5514d80f62b2dc4c4df1a68a41d1364e625c35990fcf3/overrides-7.7.0-py3-none-any.whl", hash = "sha256:c7ed9d062f78b8e4c1a7b70bd8796b35ead4d9f510227ef9c5dc7626c60d7e49", size = 17832, upload-time = "2024-01-27T21:01:31.393Z" },
 ]
 
 [[package]]
