@@ -8,9 +8,7 @@ from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
 from vllm.lora.request import LoRARequest
 from transformers import PreTrainedTokenizer
 from vllm.entrypoints.chat_utils import (
-    ConversationMessage,
     apply_hf_chat_template,
-    load_chat_template,
     parse_chat_messages_futures,
 )
 from gpt_server.settings import get_model_config
@@ -40,6 +38,7 @@ class VllmBackend(ModelBackend):
                         lora_local_path=lora_path,
                     )
                 )
+        from vllm.config.kv_transfer import KVTransferConfig
 
         self.engine_args = AsyncEngineArgs(
             model_path,
@@ -53,6 +52,10 @@ class VllmBackend(ModelBackend):
             dtype=model_config.dtype,
             max_model_len=model_config.max_model_len,
             guided_decoding_backend="xgrammar",
+            # 支持LMCache的KV传输
+            kv_transfer_config=KVTransferConfig(
+                kv_connector="LMCacheConnectorV1", kv_role="kv_both"
+            ),
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         self.tokenizer = tokenizer

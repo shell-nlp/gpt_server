@@ -1,9 +1,7 @@
 import asyncio
 import base64
 from io import BytesIO
-import os
 from typing import Any, Dict, AsyncGenerator, List, Optional
-from fastchat.utils import is_partial_stop
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
 from PIL import Image

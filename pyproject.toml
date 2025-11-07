@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.6.6"
+version = "0.6.7"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -14,7 +14,7 @@ dependencies = [
     "infinity-emb[all]==0.0.77",
     "lmdeploy==0.10.2",
     "loguru>=0.7.2",
-    "openai==1.99.1",
+    "openai==2.6.1",
     "setuptools==75.2.0",
     "streamlit>=1.50.0",
     "torch==2.8.0",
@@ -25,12 +25,13 @@ dependencies = [
     "modelscope>=1.31.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.5.4",
+    "sglang[all]>=0.5.5",
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.35.2",
     "sqlmodel>=0.0.27",
     "autoawq>=0.2.9",
+    "lmcache>=0.3.9.post1",
 ]
 
 [tool.uv]
