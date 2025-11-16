@@ -51,6 +51,9 @@
 ## 📘 配置文档 
 
 
+- **[GPT Server - DeepWiki文档（可直接AI提问使用方式）](https://deepwiki.com/shell-nlp/gpt_server "deepwiki文档")**
+<br>
+
 - **[配置详细说明](https://blog.csdn.net/q506610466/article/details/151360406 "详细配置说明")**
 <br>
 
@@ -61,6 +64,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-11-16 支持了 jinaai/jina-reranker-v3 模型
 2025-10-25 支持了 qwen_image 文生图模型
 2025-9-7   支持了 文本编辑模型 (代码样例见gpt_server/tests/test_image_edit.py)
 2025-8-8   初步支持了 embedding 的 vllm 加速
@@ -135,7 +139,7 @@
 * [X] 支持 文生图 模型
 * [X] 支持 图片编辑 模型
 * [X] 支持 Responses API
-* [ ] 支持 pip install 方式进行安装
+
 
 
 ## ⚙️ 快速开始
@@ -272,8 +276,9 @@ Chat UI界面:
 [SGLang](https://docs.sglang.ai/supported_models/generative_models.html) 
 
 #### 注意：
-- **现可以通过在 `config.yaml`中 设置 `model_type: auto`** 支持所有vllm/sglang/lmdeploy 当前版本已经支持的大语言模型和多模态语言模型，embedding、reranker等非语言模型除外。
-- 下面的项目兼容表未来将移除或者重构
+- **现可以通过在 `config.yaml`中 设置 `model_type: auto`** 支持所有vllm/sglang/lmdeploy 当前版本已经支持的大语言模型和多模态语言模型。
+
+- 下面的项目兼容表未来将移除或者重构，没有在表中的模型也可能兼容，实际情况情参考官方。
 
 ### **LLM**
 
@@ -298,9 +303,8 @@ Chat UI界面:
 |InternVL2.5--3.5  |  internvl  |   ×   |   ×   |         √          |        √         |   ×    |
 |  MiniCPM-V-2.6   |  minicpmv  |   ×   |   √   |         √          |        ×         |   ×    |
 |  MiniCPM-V-4.5   |  minicpmv  |   ×   |   √   |         ×          |        ×         |   ×    |
-|     Qwen2-VL     |    qwen    |   ×   |   √   |         ×          |        √         |   √    |
-|    Qwen2.5-VL    |    qwen    |   ×   |   √   |         ×          |        √         |   √    |
-|       QVQ        |    qwen    |   ×   |   √   |         ×          |        ×         |   ×    |
+|     Qwen-VL 2.0--3.0     |    qwen    |   ×   |   √   |         √         |        √         |   √    |
+|       QVQ        |    qwen    |   ×   |   √   |         √          |        √         |   √    |
 <br>
 
 ### Embedding/Rerank/Classify模型
@@ -332,6 +336,7 @@ Chat UI界面:
 | jina-reranker-m0                                                                    | √   | ×        |×        |
 | bge-reranker                                                                        | √   | √        |×        |
 | bce-reranker                                                                        | √   | √        |×        |
+| jina-reranker-v3                                                                     | √   | ×        |×        |
 
 目前 **ritrieve_zh_v1** C-MTEB榜单排行第一(MTEB: https://huggingface.co/spaces/mteb/leaderboard)
 
