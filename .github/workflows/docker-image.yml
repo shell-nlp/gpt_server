@@ -16,6 +16,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 清理磁盘空间
+      - name: Clean up Docker build cache 
+        run: docker system prune -af --volumes 
+
+      - name: Free up disk space 
+        run: |
+          sudo rm -rf /usr/share/dotnet 
+          sudo rm -rf /opt/ghc 
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       # 检出代码
       - name: Checkout code
         uses: actions/checkout@v3
@@ -84,4 +95,4 @@ jobs:
       #     docker pull ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }}
       #     # 仅添加latest标签并推送
       #     docker tag ${{ secrets.DOCKER_USERNAME }}/gpt_server:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
-      #     docker push ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest 
+      #     docker push ${{ secrets.DOCKER_USERNAME }}/gpt_server:latest
