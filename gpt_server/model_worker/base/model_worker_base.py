@@ -101,6 +101,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             except ValueError as e:
                 logger.warning(e)
                 self.model_config = {}
+            self.max_position_embeddings = getattr(
+                self.model_config, "max_position_embeddings", 512
+            )
             # logger.info(f"模型配置：{self.model_config}")
             self.vision_config = getattr(self.model_config, "vision_config", None)
             is_vision = self.vision_config is not None
