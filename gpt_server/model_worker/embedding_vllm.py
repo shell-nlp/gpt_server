@@ -87,7 +87,10 @@ class EmbeddingWorker(ModelWorkerBase):
         if self.mode == "embedding":
             texts = list(map(lambda x: x.replace("\n", " "), texts))
             # ----------
-            outputs: list[EmbeddingRequestOutput] = self.engine.embed(texts)
+            outputs: list[EmbeddingRequestOutput] = self.engine.embed(
+                texts,
+                truncate_prompt_tokens=self.max_position_embeddings - 4,
+            )
             embedding = [o.outputs.embedding for o in outputs]
             embeddings_np = np.array(embedding)
             # ------ L2归一化（沿axis=1，即对每一行进行归一化）-------
