@@ -274,6 +274,7 @@ class ImagesGenRequest(BaseModel):
         default="url",
         description="生成图像时返回的格式。必须为“ur”或“b64_json”之一。URL仅在图像生成后60分钟内有效。",
     )
+    size: str | None = None
 
 
 # copy from https://github.com/remsky/Kokoro-FastAPI/blob/master/api/src/routers/openai_compatible.py

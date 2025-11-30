@@ -7,15 +7,10 @@ import shortuuid
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_worker.utils import pil_to_base64
 import torch
-from diffusers import DiffusionPipeline
+from diffusers import ZImagePipeline
 from gpt_server.utils import STATIC_DIR
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-
-positive_magic = {
-    "en": ", Ultra HD, 4K, cinematic composition.",  # for english prompt
-    "zh": ", 超清，4K，电影级构图.",  # for chinese prompt
-}
 
 aspect_ratios = {
     "1:1": (1328, 1328),
@@ -36,7 +31,7 @@ def contains_chinese(text):
     return bool(pattern.search(text))
 
 
-class QwenImageWorker(ModelWorkerBase):
+class ZImageWorker(ModelWorkerBase):
     def __init__(
         self,
         controller_addr: str,
@@ -59,7 +54,7 @@ class QwenImageWorker(ModelWorkerBase):
         )
         backend = os.environ["backend"]
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.pipe = DiffusionPipeline.from_pretrained(
+        self.pipe = ZImagePipeline.from_pretrained(
             model_path, torch_dtype=torch.bfloat16
         ).to(self.device)
 
@@ -72,9 +67,9 @@ class QwenImageWorker(ModelWorkerBase):
         inputs = {
             "prompt": prompt,
             "negative_prompt": " ",
-            "num_inference_steps": 50,
-            "true_cfg_scale": 4.0,
-            "generator": torch.Generator(self.device).manual_seed(0),
+            "num_inference_steps": 8,
+            "guidance_scale": 0.0,
+            "generator": torch.Generator(self.device).manual_seed(42),
         }
         size = params.get("size", None)
         if size:
@@ -120,4 +115,4 @@ class QwenImageWorker(ModelWorkerBase):
 
 
 if __name__ == "__main__":
-    QwenImageWorker.run()
+    ZImageWorker.run()

@@ -1079,10 +1079,11 @@ wheels = [
 
 [[package]]
 name = "diffusers"
-version = "0.35.2"
-source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+version = "0.36.0.dev0"
+source = { git = "https://gitee.com/liuyu_1997/diffusers.git#152f7ca357c066c4af3d1a58cdf17662ef5a2f87" }
 dependencies = [
     { name = "filelock" },
+    { name = "httpx" },
     { name = "huggingface-hub" },
     { name = "importlib-metadata" },
     { name = "numpy" },
@@ -1090,10 +1091,6 @@ dependencies = [
     { name = "regex" },
     { name = "requests" },
     { name = "safetensors" },
-]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/03/68/288ca23c7c05c73e87ffe5efffc282400ac9b017f7a9bb03883f4310ea15/diffusers-0.35.2.tar.gz", hash = "sha256:30ecd552303edfcfe1724573c3918a8462ee3ab4d529bdbd4c0045f763affded", size = 3366711, upload-time = "2025-10-15T04:05:17.213Z" }
-wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/2a/2e/38d9824f8c6bb048c5ba21c6d4da54c29c162a46b58b3ef907a360a76d3e/diffusers-0.35.2-py3-none-any.whl", hash = "sha256:d50d5e74fdd6dcf55e5c1d304bc52cc7c2659abd1752740d736d7b54078b4db5", size = 4121649, upload-time = "2025-10-15T04:05:14.391Z" },
 ]
 
 [[package]]
@@ -1695,7 +1692,7 @@ wheels = [
 
 [[package]]
 name = "gpt-server"
-version = "0.6.7"
+version = "0.6.8"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
@@ -1729,7 +1726,7 @@ dependencies = [
 requires-dist = [
     { name = "accelerate", specifier = ">=1.0.1" },
     { name = "autoawq", specifier = ">=0.2.9" },
-    { name = "diffusers", specifier = ">=0.35.2" },
+    { name = "diffusers", git = "https://gitee.com/liuyu_1997/diffusers.git" },
     { name = "edge-tts", specifier = ">=7.0.0" },
     { name = "evalscope", extras = ["perf", "rag"], specifier = ">=1.1.1" },
     { name = "fastapi", specifier = "==0.115.0" },

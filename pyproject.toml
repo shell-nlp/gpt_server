@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.6.7"
+version = "0.6.8"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -54,6 +54,9 @@ gpt_server = "gpt_server.cli:main"
 [[tool.uv.index]]
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
+
+[tool.uv.sources]
+diffusers = { git = "https://gitee.com/liuyu_1997/diffusers.git" }
 
 # [[tool.uv.index]]
 # name = "vllm-custom"

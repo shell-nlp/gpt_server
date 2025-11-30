@@ -1274,6 +1274,7 @@ async def images_generations(request: ImagesGenRequest):
         "prompt": request.prompt,
         "output_format": request.output_format,
         "response_format": request.response_format,
+        "size": request.size,
     }
     result = await get_images_gen(payload=payload)
     return result
