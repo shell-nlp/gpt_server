@@ -210,6 +210,19 @@ models:
     workers:
     - gpus:
       - 7
+      
+- z_image:
+    alias: null
+    enable: true
+    model_config:
+      model_name_or_path: /home/dev/model/Tongyi-MAI/Z-Image-Turbo/
+    model_type: z_image
+    work_mode: hf
+    device: gpu
+    workers:
+    - gpus:
+      - 7
+
 # --------------- 支持的图片编辑模型样例 --------------- 
 - image-edit:
     alias: null

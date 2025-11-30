@@ -64,6 +64,7 @@
 <summary><b>2025</b></summary>
  
 ```plaintext
+2025-11-30 支持了 z-image 文生图 模型
 2025-11-16 支持了 jinaai/jina-reranker-v3 模型
 2025-10-25 支持了 qwen_image 文生图模型
 2025-9-7   支持了 文本编辑模型 (代码样例见gpt_server/tests/test_image_edit.py)
@@ -369,11 +370,13 @@ Chat UI界面:
 
 ### **文生图** 模型
 [Flux 模型地址](https://huggingface.co/black-forest-labs/FLUX.1-dev)
+[z-image 模型地址](https://modelscope.cn/models/Tongyi-MAI/Z-Image-Turbo)
 
 | Models / BackEnd | model_type |
 | :--------------: | :--------: |
 |    flux     | flux  |
 |    qwen_image     | qwen_image  |
+|    z_image     | z_image  |
 
 <br>
 
