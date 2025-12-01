@@ -4,6 +4,7 @@ import sys
 import ray
 from dotenv import load_dotenv
 from loguru import logger
+import json
 
 load_dotenv()
 os.environ["OPENBLAS_NUM_THREADS"] = (
@@ -41,6 +42,7 @@ with open(config_path, "r") as f:
 # print(config)
 def main():
     # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------
+    logger.info(f"config:\n{json.dumps(config,ensure_ascii=False,indent=2)}")
     start_api_server(config=config)
     # ----------------------------启动 Model Worker 服务----------------------------------------------------
     start_model_worker(config=config)
