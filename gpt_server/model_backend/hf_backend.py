@@ -54,6 +54,9 @@ class HFBackend(ModelBackend):
                     continue
                 self.model.load_adapter(model_id=lora_path, adapter_name=lora_name)
 
+    def shutdown(self):
+        pass
+
     async def stream_chat(self, params: Dict[str, Any]):
         # params 已不需要传入 prompt
         messages = params["messages"]

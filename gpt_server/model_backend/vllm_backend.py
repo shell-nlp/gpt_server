@@ -61,6 +61,9 @@ class VllmBackend(ModelBackend):
         self.tokenizer = tokenizer
         self.reasoning_parser_cache = {}
 
+    def shutdown(self):
+        self.engine.shutdown()
+
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         # params 已不需要传入 prompt
         messages = params["messages"]

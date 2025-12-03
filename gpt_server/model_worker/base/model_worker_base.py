@@ -375,6 +375,12 @@ class ModelWorkerBase(BaseModelWorker, ABC):
                 limit_worker_concurrency=limit_worker_concurrency,
             )
 
+        @app.on_event("shutdown")
+        async def shutdown():
+            global worker
+            # 优雅推出
+            worker.backend.shutdown()
+
         uvicorn.run(app, host=host, port=port)
 
 

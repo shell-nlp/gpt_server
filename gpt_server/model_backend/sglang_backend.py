@@ -8,7 +8,7 @@ from PIL import Image
 import sglang as sgl
 from transformers import PreTrainedTokenizer
 from sglang.utils import convert_json_schema_to_str
-
+from sglang.srt.entrypoints.engine import Engine
 from qwen_vl_utils import process_vision_info
 from sglang.srt.managers.io_struct import GenerateReqInput
 from gpt_server.settings import get_model_config
@@ -48,7 +48,7 @@ class SGLangBackend(ModelBackend):
         logger.info(f"model_config: {model_config}")
         self.lora_requests = []
         # ---
-        self.async_engine = sgl.Engine(
+        self.async_engine: Engine = sgl.Engine(
             model_path=model_path,
             trust_remote_code=True,
             mem_fraction_static=model_config.gpu_memory_utilization,
@@ -59,6 +59,9 @@ class SGLangBackend(ModelBackend):
             disable_radix_cache=not model_config.enable_prefix_caching,
         )
         self.tokenizer = tokenizer
+
+    def shutdown(self):
+        self.async_engine.shutdown()
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         # params 已不需要传入 prompt

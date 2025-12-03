@@ -6,3 +6,6 @@ class ModelBackend(ABC):
     @abstractmethod
     def stream_chat(self, params: Dict[str, Any]):
         pass
+
+    def shutdown(self):
+        pass

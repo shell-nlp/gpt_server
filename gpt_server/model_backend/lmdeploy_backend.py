@@ -102,6 +102,9 @@ class LMDeployBackend(ModelBackend):
         # 自定义日志
         self.async_engine.request_logger = CustomRequestLogger(max_log_len=None)
 
+    def shutdown(self):
+        pass
+
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         # params 已不需要传入 prompt
         messages = params["messages"]
