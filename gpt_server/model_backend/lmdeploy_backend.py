@@ -103,7 +103,7 @@ class LMDeployBackend(ModelBackend):
         self.async_engine.request_logger = CustomRequestLogger(max_log_len=None)
 
     def shutdown(self):
-        pass
+        logger.info("lmdeploy后端退出")
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         # params 已不需要传入 prompt

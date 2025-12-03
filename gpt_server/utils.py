@@ -3,7 +3,6 @@ from typing import List, Optional
 import os
 import sys
 import json
-from multiprocessing import Process
 import subprocess
 from loguru import logger
 import torch
@@ -11,11 +10,57 @@ import psutil
 from rich import print
 import signal
 from pathlib import Path
+import atexit
+from typing import List, Dict
 
 ENV = os.environ
 logger.add("logs/gpt_server.log", rotation="100 MB", level="INFO")
 root_dir = Path(__file__).parent
 STATIC_DIR = root_dir / "static"
+
+# 全局登记表：{"name": <subprocess.Popen>}
+_REGISTRY: Dict[str, List[subprocess.Popen]] = {
+    "controller": [],
+    "openai": [],
+    "worker": [],
+}
+
+
+def _register(group: str, proc: subprocess.Popen):
+    _REGISTRY[group].append(proc)
+
+
+def _kill_tree(pid: int, timeout: int = 5):
+    """向 pid 及其所有子进程先 SIGTERM 再 SIGKILL"""
+    try:
+        parent = psutil.Process(pid)
+        children = parent.children(recursive=True)
+    except psutil.NoSuchProcess:
+        return
+    # 先发送 SIGTERM
+    for p in children + [parent]:
+        try:
+            p.terminate()
+        except psutil.NoSuchProcess:
+            pass
+    # 等待超时
+    gone, alive = psutil.wait_procs(children + [parent], timeout=timeout)
+    # 对还活着的强杀
+    for p in alive:
+        try:
+            p.kill()
+        except psutil.NoSuchProcess:
+            pass
+
+
+@atexit.register
+def _graceful_shutdown():
+    """程序退出时一定被执行"""
+    for group, procs in _REGISTRY.items():
+        for p in procs:
+            if p.poll() is None:  # 还在跑
+                logger.info(f"[{group}]  终止进程树 {p.pid}")
+                _kill_tree(p.pid)
 
 
 def clear_flashinfer_cache():
@@ -57,68 +102,47 @@ def pre_processing():
     clear_flashinfer_cache()
 
 
-def kill_child_processes(parent_pid, including_parent=False):
-    "杀死子进程/僵尸进程"
-    try:
-        parent = psutil.Process(parent_pid)
-        children = parent.children(recursive=True)
-        for child in children:
-            try:
-                print(f"终止子进程 {child.pid}...")
-                os.kill(child.pid, signal.SIGTERM)  # 优雅终止
-                child.wait(5)  # 等待子进程最多 5 秒
-            except psutil.NoSuchProcess:
-                pass
-            except psutil.TimeoutExpired():
-                print(f"终止子进程 {child.pid} 超时！强制终止...")
-                os.kill(child.pid, signal.SIGKILL)  # 强制终止
-        if including_parent:
-            print(f"终止父进程 {parent_pid}...")
-            os.kill(parent_pid, signal.SIGTERM)
-    except psutil.NoSuchProcess:
-        print(f"父进程 {parent_pid} 不存在！")
-
-
-# 记录父进程 PID
-parent_pid = os.getpid()
+_SHOULD_EXIT = False
 
 
 def signal_handler(signum, frame):
-    print("\nCtrl-C detected! Cleaning up...")
-    # kill_child_processes(parent_pid, including_parent=False)
-    stop_server()
-    exit(0)  # 正常退出程序
+    global _SHOULD_EXIT
+    logger.info("Ctrl-C  收到，准备优雅退出…")
+    _SHOULD_EXIT = True
 
 
 signal.signal(signal.SIGINT, signal_handler)
 
 
-def run_cmd(cmd: str, *args, **kwargs):
-    logger.info(f"执行命令如下：\n{cmd}\n")
-    # subprocess.run(cmd, shell=True)
-    process = subprocess.Popen(cmd, shell=True)
-    # 等待命令执行完成
-    process.wait()
-    return process.pid
+def run_cmd(cmd: str, group: str = "worker") -> subprocess.Popen:
+    logger.info(f" 执行命令如下：\n{cmd}\n")
+    # 不再用 shell=True 可以避免多一层 /bin/sh 进程；如果必须 shell=True 也能工作
+    proc = subprocess.Popen(cmd, shell=True)
+    _register(group, proc)
+    # 不要 wait()，否则阻塞主线程
+    return proc
 
 
 def start_controller(controller_host, controller_port, dispatch_method):
-    """启动fastchat控制器"""
-    cmd = f"python -m gpt_server.serving.controller_v2 --host {controller_host} --port {controller_port} --dispatch-method {dispatch_method} "
-    cmd += "> /dev/null 2>&1"  # 完全静默（Linux/macOS）
-    controller_process = Process(target=run_cmd, args=(cmd,))
-    controller_process.start()
+    cmd = (
+        f"python -m gpt_server.serving.controller_v2  "
+        f"--host {controller_host} --port {controller_port} "
+        f"--dispatch-method {dispatch_method}"
+    )
+    cmd += "> /dev/null 2>&1"
+    run_cmd(cmd, group="controller")
 
 
 def start_openai_server(host, port, controller_address, api_keys=None):
-    """启动openai api 服务"""
     os.environ["FASTCHAT_WORKER_API_EMBEDDING_BATCH_SIZE"] = "100000"
-
-    cmd = f"python -m gpt_server.serving.openai_api_server --host {host} --port {port} --controller-address {controller_address}"
+    cmd = (
+        f"python -m gpt_server.serving.openai_api_server  "
+        f"--host {host} --port {port} "
+        f"--controller-address {controller_address}"
+    )
     if api_keys:
         cmd += f" --api-keys {api_keys}"
-    openai_server_process = Process(target=run_cmd, args=(cmd,))
-    openai_server_process.start()
+    run_cmd(cmd, group="openai")
 
 
 def start_api_server(config: dict):
@@ -171,7 +195,6 @@ embedding_backend_type = ["vllm", "infinity", "sentence_transformers"]
 
 
 def start_model_worker(config: dict):
-    process = []
     try:
         host = config["model_worker_args"]["host"]
         controller_address = config["model_worker_args"]["controller_address"]
@@ -318,13 +341,7 @@ def start_model_worker(config: dict):
                         cmd += f" --vad_model '{punc_model}'"
                     if hf_overrides:
                         cmd += f" --hf_overrides '{json.dumps(hf_overrides)}'"
-                    p = Process(target=run_cmd, args=(cmd,))
-                    # p.start()
-                    process.append(p)
-    for p in process:
-        p.start()
-    for p in process:
-        p.join()
+                    proc = run_cmd(cmd, group="worker")
 
 
 def start_server(
@@ -353,30 +370,6 @@ def start_server(
     if port not in used_ports:
         # 启动openai_api服务
         start_openai_server(host, port, controller_address, api_keys)
-
-
-def stop_controller():
-    cmd = "ps -ef | grep fastchat.serve | awk '{print $2}' |xargs -I{} kill -9 {}"
-    run_cmd(cmd=cmd)
-
-
-def stop_openai_server():
-    cmd = "ps -ef | grep gpt_server |grep serving | awk '{print $2}' |xargs -I{} kill -9 {}"
-    run_cmd(cmd=cmd)
-
-
-def stop_all_model_worker():
-    cmd = "ps -ef | grep gpt_server |grep model_worker | awk '{print $2}' |xargs -I{} kill -9 {}"
-    run_cmd(cmd=cmd)
-
-
-def stop_server():
-    """停止服务"""
-    stop_all_model_worker()
-    stop_controller()
-    stop_openai_server()
-
-    logger.info("停止服务成功！")
 
 
 def delete_log():
@@ -422,20 +415,6 @@ try:
     local_ip = get_physical_ip()
 except Exception as e:
     local_ip = ENV.get("local_ip", "127.0.0.1")
-
-model_type_mapping = {
-    "yi": "yi",
-    "qwen": "qwen",
-    "glm4": "chatglm",
-    "chatglm3": "chatglm",
-    "internvl2-internlm2": "internvl2",
-    "internlm2": "internlm",
-    "internlm": "internlm",
-    "baichuan2": "baichuan",
-    "llama3": "llama",
-    "mistral": "mistral",
-    "deepseek": "deepseek",
-}
 
 
 if __name__ == "__main__":

@@ -13,11 +13,6 @@ from vllm.entrypoints.chat_utils import (
 )
 from gpt_server.settings import get_model_config
 
-# 解决vllm中 ray集群在 TP>1时死的Bug
-import ray
-
-ray.init(ignore_reinit_error=True, num_cpus=8)
-
 
 class VllmBackend(ModelBackend):
     def __init__(self, model_path, tokenizer: PreTrainedTokenizer) -> None:
@@ -63,6 +58,7 @@ class VllmBackend(ModelBackend):
 
     def shutdown(self):
         self.engine.shutdown()
+        logger.info("vllm后端退出")
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         # params 已不需要传入 prompt

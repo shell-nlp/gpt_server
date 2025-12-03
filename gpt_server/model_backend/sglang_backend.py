@@ -62,6 +62,7 @@ class SGLangBackend(ModelBackend):
 
     def shutdown(self):
         self.async_engine.shutdown()
+        logger.info("sglang后端退出")
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
         # params 已不需要传入 prompt

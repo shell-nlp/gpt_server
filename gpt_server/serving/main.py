@@ -1,3 +1,4 @@
+import time
 import yaml
 import os
 import sys
@@ -20,6 +21,7 @@ original_pythonpath = os.environ.get("PYTHONPATH", "")
 os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
 sys.path.append(root_dir)
 os.environ["LOGDIR"] = os.path.join(root_dir, "logs")
+from gpt_server import utils
 from gpt_server.utils import (
     start_api_server,
     start_model_worker,
@@ -50,3 +52,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # 主线程保持空转，收到 SIGINT 后自然落进 atexit
+    try:
+        while not utils._SHOULD_EXIT:
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        pass
