@@ -91,9 +91,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         multimodal: bool = False,
     ):
         is_vision = False
-        if model_type in ["image"]:
-            pass
-        elif model_type not in ["asr", "tts"]:
+        if model_type not in ["asr", "tts", "image"]:
             try:
                 self.model_config = AutoConfig.from_pretrained(
                     model_path, trust_remote_code=True
@@ -143,7 +141,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         # ---------- 添加 chat_template 信息 ----------
         params["chat_template"] = self.chat_template
         # ---------- 添加多模态信息 ----------
-        if self.vision_config:
+        if hasattr(self, "vision_config") and self.vision_config:
             params["multimodal"] = True
             params["chat_template"] = self.vl_chat_template
         # ---------- 如果传入的是 str 则修改为messages ----------
