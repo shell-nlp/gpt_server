@@ -1,6 +1,5 @@
 import asyncio
 
-import io
 import os
 from typing import List
 import uuid
@@ -14,7 +13,7 @@ from gpt_server.model_worker.utils import (
 )
 from gpt_server.utils import STATIC_DIR
 import torch
-from diffusers import QwenImageEditPipeline
+from diffusers import QwenImageEditPlusPipeline
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
@@ -40,9 +39,8 @@ class QwenImageEditWorker(ModelWorkerBase):
             conv_template,
             model_type="image",
         )
-        backend = os.environ["backend"]
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.pipe = QwenImageEditPipeline.from_pretrained(model_path)
+        self.pipe = QwenImageEditPlusPipeline.from_pretrained(model_path)
         self.pipe.to(torch.bfloat16)
         self.pipe.to(self.device)
         self.pipe.set_progress_bar_config(disable=None)
@@ -51,8 +49,10 @@ class QwenImageEditWorker(ModelWorkerBase):
     async def get_image_output(self, params):
         prompt = params["prompt"]
         response_format = params.get("response_format", "b64_json")
-        bytes_io = await load_base64_or_url(params["image"])
-        image = bytesio2image(bytes_io)
+        image: list = params["image"]
+        image = [bytesio2image(await load_base64_or_url(img)) for img in image]
+        # bytes_io = await load_base64_or_url(params["image"])
+        # image = bytesio2image(bytes_io)
         inputs = {
             "image": image,
             "prompt": prompt,
@@ -60,7 +60,7 @@ class QwenImageEditWorker(ModelWorkerBase):
             "generator": torch.manual_seed(0),
             "true_cfg_scale": 4.0,
             "negative_prompt": " ",
-            "num_inference_steps": 50,
+            "num_inference_steps": 40,
         }
         with torch.inference_mode():
             output = await asyncio.to_thread(self.pipe, **inputs)

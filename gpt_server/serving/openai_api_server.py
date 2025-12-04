@@ -1229,7 +1229,9 @@ async def get_images_edits(payload: Dict[str, Any]):
 @app.post("/v1/images/edits", dependencies=[Depends(check_api_key)])
 async def images_edits(
     model: str = Form(...),
-    image: UploadFile = File(media_type="application/octet-stream"),
+    image: Union[UploadFile, List[UploadFile]] = File(
+        ..., media_type="application/octet-stream"
+    ),
     prompt: Optional[Union[str, List[str]]] = Form(None),
     # negative_prompt: Optional[Union[str, List[str]]] = Form(None),
     response_format: Optional[str] = Form("url"),
@@ -1240,10 +1242,14 @@ async def images_edits(
     error_check_ret = check_model(model)
     if error_check_ret is not None:
         return error_check_ret
+    images = None
+    if not isinstance(image, list):  # 单
+        images = [image]
+    else:
+        images = image
+    image = [base64.b64encode(await img.read()).decode("utf-8") for img in images]
     payload = {
-        "image": base64.b64encode(await image.read()).decode(
-            "utf-8"
-        ),  # bytes → Base64 字符串,
+        "image": image,  # bytes → Base64 字符串,
         "model": model,
         "prompt": prompt,
         "output_format": output_format,
