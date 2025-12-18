@@ -11,6 +11,7 @@ from vllm.entrypoints.chat_utils import (
     apply_hf_chat_template,
     parse_chat_messages_futures,
 )
+from vllm.config.structured_outputs import StructuredOutputsConfig
 from gpt_server.settings import get_model_config
 
 
@@ -46,11 +47,13 @@ class VllmBackend(ModelBackend):
             enable_prefix_caching=model_config.enable_prefix_caching,
             dtype=model_config.dtype,
             max_model_len=model_config.max_model_len,
-            guided_decoding_backend="xgrammar",
+            # guided_decoding_backend="xgrammar",
             # 支持LMCache的KV传输
             kv_transfer_config=KVTransferConfig(
                 kv_connector="LMCacheConnectorV1", kv_role="kv_both"
             ),
+            prefix_caching_hash_algo="xxhash",
+            structured_outputs_config=StructuredOutputsConfig(backend="xgrammar"),
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         self.tokenizer = tokenizer
@@ -86,11 +89,11 @@ class VllmBackend(ModelBackend):
 
         multimodal = params.get("multimodal", False)
         tokenizer = await self.engine.get_tokenizer()
+        model_config = self.engine.model_config
         if multimodal:  # 多模态模型
             # ----------------------------------------------------------------
-            model_config = await self.engine.get_model_config()
             conversation, mm_data_future, _ = parse_chat_messages_futures(
-                messages, model_config, tokenizer, content_format="string"
+                messages, model_config, content_format="string"
             )
 
             prompt = apply_hf_chat_template(
@@ -101,7 +104,7 @@ class VllmBackend(ModelBackend):
                 ),
                 add_generation_prompt=True,
                 tools=tools,
-                model_config=await self.engine.get_model_config(),
+                model_config=model_config,
                 enable_thinking=enable_thinking,
             )
             mm_data = await mm_data_future
@@ -116,7 +119,7 @@ class VllmBackend(ModelBackend):
                 ),
                 add_generation_prompt=True,
                 tools=tools,
-                model_config=await self.engine.get_model_config(),
+                model_config=model_config,
                 enable_thinking=enable_thinking,
             )
             input_ids = params.get("input_ids", None)

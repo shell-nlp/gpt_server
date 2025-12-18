@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.6.8.1"
+version = "0.6.9"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -12,38 +12,45 @@ dependencies = [
     "ffmpy",
     "fschat==0.2.36",
     "infinity-emb[all]==0.0.77",
-    "lmdeploy==0.10.2",
+    "lmdeploy==0.11.0",
     "loguru>=0.7.2",
     "openai==2.6.1",
     "setuptools==75.2.0",
     "streamlit>=1.50.0",
-    "torch==2.8.0",
-    "torchvision==0.23.0",
-    "vllm==0.11.0",
+    "torch==2.9.0",
+    "torchvision==0.24.0",
+    "vllm",
     "qwen_vl_utils",
     "evalscope[perf,rag]>=1.1.1",
     "modelscope>=1.31.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.5.5",
+    "sglang[all]>=0.5.6.post2",
     "flashinfer-python",
     "flashtts>=0.1.7",
-    "diffusers>=0.35.2",
+    "diffusers>=0.36.0",
     "sqlmodel>=0.0.27",
     "autoawq>=0.2.9",
-    "lmcache>=0.3.9.post1",
+    "lmcache>=0.3.11",
 ]
 
 [tool.uv]
-default-groups = [] # 默认只安装dependencies中的库
-prerelease = "allow"
 override-dependencies = [
     "setuptools==77.0.3",
-    "transformers==4.57.1",  #  infinity-emb
+    "transformers==4.57.3",  #  infinity-emb
     "soundfile==0.13.1",     # infinity
     "outlines-core==0.2.11", # sglang 和 vllm 的冲突
     "peft>=0.17.0",          # 和 lmdeloy 冲突
+    "torchvision==0.24.0",
+    "torchaudio==2.9.1",
+    "torch==2.9.0",
+    "llguidance==1.3.0",
+    "starlette==0.49.1",
+    "triton==3.5.1",
+
 ]
+default-groups = [] # 默认只安装dependencies中的库
+prerelease = "allow"
 
 [project.scripts]
 gpt_server = "gpt_server.cli:main"
@@ -55,12 +62,12 @@ gpt_server = "gpt_server.cli:main"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
 
-[tool.uv.sources]
-diffusers = { git = "https://gitee.com/liuyu_1997/diffusers.git" }
+# [tool.uv.sources]
+# diffusers = { git = "https://gitee.com/liuyu_1997/diffusers.git" }
 
-# [[tool.uv.index]]
-# name = "vllm-custom"
-# url = "https://wheels.vllm.ai/006e7a34aeb3e905ca4131a3251fe079f0511e2f"
+[[tool.uv.index]]
+name = "vllm-custom"
+url = "https://wheels.vllm.ai/9e67c4ce985b0b8852603cfe3fcaf8f37de137ed"
 
 [build-system]
 requires = ["setuptools", "wheel"]
