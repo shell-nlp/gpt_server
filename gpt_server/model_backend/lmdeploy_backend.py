@@ -5,6 +5,7 @@ from lmdeploy import (
     TurbomindEngineConfig,
     PytorchEngineConfig,
 )
+from lmdeploy.serve.async_engine import AsyncEngine
 from transformers import PreTrainedTokenizer
 from typing import Any, Dict, AsyncGenerator, List, Optional
 from lmdeploy.archs import get_task
@@ -92,7 +93,7 @@ class LMDeployBackend(ModelBackend):
             )
         pipeline_type, pipeline_class = get_task(model_path)
         logger.info(f"模型架构：{pipeline_type}")
-        self.async_engine = pipeline_class(
+        self.async_engine: AsyncEngine = pipeline_class(
             model_path=model_path,
             backend=backend,
             backend_config=backend_config,
