@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.6.9"
+version = "0.6.10"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -12,26 +12,26 @@ dependencies = [
     "ffmpy",
     "fschat==0.2.36",
     "infinity-emb[all]==0.0.77",
-    "lmdeploy==0.11.0",
+    "lmdeploy==0.11.1",
     "loguru>=0.7.2",
     "openai==2.6.1",
     "setuptools==75.2.0",
     "streamlit>=1.50.0",
     "torch==2.9.0",
     "torchvision==0.24.0",
-    "vllm",
+    "vllm==0.13.0",
     "qwen_vl_utils",
     "evalscope[perf,rag]>=1.1.1",
     "modelscope>=1.31.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.5.6.post2",
+    "sglang[all]>=0.5.7",
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.36.0",
     "sqlmodel>=0.0.27",
     "autoawq>=0.2.9",
-    "lmcache>=0.3.11",
+    "lmcache>=0.3.12",
 ]
 
 [tool.uv]
@@ -65,9 +65,9 @@ default = true
 # [tool.uv.sources]
 # diffusers = { git = "https://gitee.com/liuyu_1997/diffusers.git" }
 
-[[tool.uv.index]]
-name = "vllm-custom"
-url = "https://wheels.vllm.ai/9e67c4ce985b0b8852603cfe3fcaf8f37de137ed"
+# [[tool.uv.index]]
+# name = "vllm-custom"
+# url = "https://wheels.vllm.ai/9e67c4ce985b0b8852603cfe3fcaf8f37de137ed"
 
 [build-system]
 requires = ["setuptools", "wheel"]
