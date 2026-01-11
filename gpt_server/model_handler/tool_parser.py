@@ -262,9 +262,11 @@ class Qwen2d5ToolParser(ToolParser):
             for match_result in match_result_list:
                 index += 1
                 action = json.loads(match_result)
-                name, arguments = action["name"], json.dumps(
-                    action["arguments"], ensure_ascii=False
-                )
+                name = action["name"]
+                try:
+                    arguments = json.dumps(action["arguments"], ensure_ascii=False)
+                except KeyError:
+                    arguments = json.dumps(action["parameters"], ensure_ascii=False)
                 tool_calls.append(
                     ToolCall(
                         index=index,
@@ -292,12 +294,16 @@ class Qwen2d5ToolParser(ToolParser):
             tool_calls = []
             tools_called = False
             index = -1
+            # parameters
             for match_result in match_result_list:
                 index += 1
                 action = json.loads(match_result)
-                name, arguments = action["name"], json.dumps(
-                    action["arguments"], ensure_ascii=False
-                )
+                name = action["name"]
+                try:
+                    arguments = json.dumps(action["arguments"], ensure_ascii=False)
+                except KeyError:
+                    arguments = json.dumps(action["parameters"], ensure_ascii=False)
+
                 tool_calls.append(
                     ToolCall(
                         function=FunctionCall(name=name, arguments=arguments),
