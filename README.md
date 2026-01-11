@@ -370,7 +370,9 @@ Chat UI界面:
 
 ### **文生图** 模型
 [Flux 模型地址](https://huggingface.co/black-forest-labs/FLUX.1-dev)
+<br>
 [Z-Image-Turbo 模型地址](https://modelscope.cn/models/Tongyi-MAI/Z-Image-Turbo)
+<br>
 [Qwen-Image 系列模型地址](https://modelscope.cn/models/Qwen/Qwen-Image-2512)
 
 
@@ -384,6 +386,7 @@ Chat UI界面:
 
 ### **图片编辑** 模型
 [Qwen-Image-Edit 模型地址](https://huggingface.co/Qwen/Qwen-Image-Edit)
+<br>
 [Qwen-Image-Edit-2511 模型地址](https://modelscope.cn/models/Qwen/Qwen-Image-Edit-2511)
 
 | Models / BackEnd | model_type |
