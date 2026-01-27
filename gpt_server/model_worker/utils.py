@@ -83,7 +83,7 @@ class PoolingModel:
             self.model.eval()
             self.model.to(device)  # Move model to device
 
-            def pooling(self, query: str, documents: list):
+            def pooling_(self, query: str, documents: list):
                 results = self.model.rerank(query, documents)
                 embedding = [[i["relevance_score"]] for i in results]
                 ret = {}
@@ -91,7 +91,7 @@ class PoolingModel:
                 ret["token_num"] = 0
                 return ret
 
-            self._pooling = self.pooling
+            self._pooling = pooling_
         elif "JinaVLForRanking" in architectures:
             self.model = AutoModel.from_pretrained(
                 model_path,
@@ -103,7 +103,7 @@ class PoolingModel:
             self.model.eval()
             logger.warning("model_type: JinaVLForRanking")
 
-            def pooling(self, query: str, documents: list):
+            def pooling_(self, query: str, documents: list):
                 texts = documents
                 sentence_pairs = [[query, inp] for inp in texts]
                 query_type = doc_type = "text"
@@ -138,7 +138,7 @@ class PoolingModel:
                 ret["token_num"] = 0
                 return ret
 
-            self._pooling = self.pooling
+            self._pooling = pooling_
         else:
             mode = get_embedding_mode(model_path=model_path)
             if "embedding" == mode:
@@ -146,7 +146,7 @@ class PoolingModel:
                 logger.warning("正在使用 embedding 模型...")
                 encode_kwargs = {"normalize_embeddings": True, "batch_size": 64}
 
-                def pooling(self, query: str, documents: list = None):
+                def pooling_(self, query: str, documents: list = None):
                     texts = documents
                     outputs = self.model.tokenize(texts)
                     token_num = outputs["input_ids"].size(0) * outputs[
@@ -159,13 +159,13 @@ class PoolingModel:
                     ret["token_num"] = token_num
                     return ret
 
-                self._pooling = self.pooling
+                self._pooling = pooling_
 
             elif "rerank" == mode:
                 self.model = sentence_transformers.CrossEncoder(model_name=model_path)
                 logger.warning("正在使用 rerank 模型...")
 
-                def pooling(self, query: str, documents: list):
+                def pooling_(self, query: str, documents: list):
                     sentence_pairs = [[query, doc] for doc in documents]
                     scores = self.model.predict(sentence_pairs)
                     embedding = [[float(score)] for score in scores]
@@ -174,7 +174,7 @@ class PoolingModel:
                     ret["token_num"] = 0  # Rerank token num not typically calculated
                     return ret
 
-                self._pooling = self.pooling
+                self._pooling = pooling_
 
             else:
                 raise Exception(f"不支持的类型 mode: {mode}")
@@ -183,6 +183,16 @@ class PoolingModel:
         if self._pooling is None:
             raise Exception("Model is not initialized or mode is not supported.")
         return self._pooling(self, query, documents)
+
+
+def patch():
+    class _HfFolder:
+        pass
+
+    import huggingface_hub
+
+    huggingface_hub.HfFolder = _HfFolder
+    logger.warning("patch huggingface_hub.HfFolder 成功！")
 
 
 def get_embedding_mode(model_path: str):

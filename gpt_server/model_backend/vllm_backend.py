@@ -49,9 +49,9 @@ class VllmBackend(ModelBackend):
             max_model_len=model_config.max_model_len,
             # guided_decoding_backend="xgrammar",
             # 支持LMCache的KV传输
-            kv_transfer_config=KVTransferConfig(
-                kv_connector="LMCacheConnectorV1", kv_role="kv_both"
-            ),
+            # kv_transfer_config=KVTransferConfig(
+            #     kv_connector="LMCacheConnectorV1", kv_role="kv_both"
+            # ),
             prefix_caching_hash_algo="xxhash",
             structured_outputs_config=StructuredOutputsConfig(backend="xgrammar"),
         )
