@@ -55,7 +55,7 @@ jobs:
     if: github.ref  == 'refs/heads/set_latest'
     runs-on: ubuntu-latest 
     steps:
-      # 清理磁盘空间
+      # 清理磁盘空间1
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
@@ -64,7 +64,17 @@ jobs:
           remove-dotnet: 'true'
           remove-android: 'true'
           remove-haskell: 'true'
-        
+      # 清理磁盘空间2
+      - name: Clean up Docker build cache 
+        run: docker system prune -af --volumes 
+
+      - name: Free up disk space 
+        run: |
+          sudo rm -rf /usr/share/dotnet 
+          sudo rm -rf /opt/ghc 
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          
       - name: Checkout code 
         uses: actions/checkout@v3
  
