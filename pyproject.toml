@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.6.10"
+version = "0.7.0"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -11,21 +11,21 @@ dependencies = [
     "fastapi==0.115.0",
     "ffmpy",
     "fschat==0.2.36",
-    "infinity-emb[all]==0.0.77",
-    "lmdeploy==0.11.1",
     "loguru>=0.7.2",
     "openai==2.6.1",
     "setuptools==75.2.0",
     "streamlit>=1.50.0",
     "torch==2.9.0",
     "torchvision==0.24.0",
-    "vllm==0.14.1",
+    "infinity-emb[all]==0.0.77",
+    "lmdeploy==0.11.1",
+    "vllm==0.15.0",
+    "sglang[all]>=0.5.8",
     "qwen_vl_utils",
     "evalscope[perf,rag]>=1.1.1",
     "modelscope>=1.31.0",
     "edge-tts>=7.0.0",
     "funasr>=1.2.6",
-    "sglang[all]>=0.5.8",
     "flashinfer-python",
     "flashtts>=0.1.7",
     "diffusers>=0.36.0",
@@ -37,7 +37,7 @@ dependencies = [
 [tool.uv]
 override-dependencies = [
     "setuptools==77.0.3",
-    "transformers==5.0.0",       #  infinity-emb
+    "transformers==4.57.6",      #  infinity-emb
     "soundfile==0.13.1",         # infinity
     "outlines-core==0.2.11",     # sglang 和 vllm 的冲突
     "peft>=0.17.0",              # 和 lmdeloy 冲突

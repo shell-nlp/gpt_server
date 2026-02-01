@@ -416,6 +416,92 @@ response_store: dict[str, ResponsesResponse] = {}
 msg_store = {}
 
 
+def responses_input_to_chat_messages_v0(input_data):
+    """
+    将 /v1/responses 的 input 转换为 /v1/chat/completions 的 messages
+    {
+      "input": [
+        {
+          "role": "user",
+          "content": [
+            { "type": "text", "text": "分析这张图并返回 JSON" },
+            {
+              "type": "input_image",
+              "image_url": "https://example.com/dog.png"
+            }
+          ]
+        }
+      ]
+    }
+    """
+    tool_name_cache_dict = {}
+    new_input = []
+    for idx, item in enumerate(input_data):
+        new_item = copy.deepcopy(item)  # dict
+        content = new_item.get("content")
+        if content:
+            if isinstance(content, list):
+                for i in new_item["content"]:
+                    # if i["type"] == "text":
+                    #     i["type"] = "input_text"
+                    # if i["type"] == "image_url":
+                    #     i["type"] = "input_image"
+                    #     i["image_url"] = i["image_url"]["url"]
+                    if i["type"] == "output_text" and new_item["type"] == "message":
+                        new_item = {
+                            "role": "assistant",
+                            "content": i["text"],
+                        }
+                    if i["type"] == "input_image":
+                        i["type"] = "image_url"
+                        i["image_url"] = {"url": i["image_url"]}
+                    if i["type"] == "input_text":
+                        i["type"] = "text"
+
+                    else:
+                        pass
+            new_input.append(new_item)
+        else:
+            type_ = item["type"]
+            if type_ == "function_call":
+                tool_name_cache_dict[item["call_id"]] = item["name"]
+                arguments = item["arguments"]
+                if isinstance(arguments, str):
+                    arguments = json.loads(arguments)
+                new_item = {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": item["call_id"],
+                            "type": "function",
+                            "function": {
+                                "name": item["name"],
+                                "arguments": arguments,
+                            },
+                        }
+                    ],
+                }
+                new_input.append(new_item)
+            elif type_ == "function_call_output":
+                tool_name = tool_name_cache_dict[item["call_id"]]
+                new_item = {
+                    "role": "tool",
+                    "name": tool_name,
+                    "content": item["output"],
+                }
+                new_input.append(new_item)
+            else:
+                new_input.append(item)
+        return new_input
+
+
+def responses_input_to_chat_messages(input_data):
+    """
+    将 /v1/responses 的 input 转换为 /v1/chat/completions 的 messages
+    """
+
+
 @app.post(
     "/v1/responses",
     dependencies=[Depends(check_api_key)],
@@ -458,66 +544,9 @@ async def create_responses(request: ResponsesRequest):
         else:
             msg_store[request.request_id] = messages
         # msg_store[previous_response_id] = messages
-    tool_name_cache_dict = {}
     if isinstance(request.input, list) and isinstance(request.input[0], dict):
-        new_input = []
-        for idx, item in enumerate(request.input):
-            new_item = copy.deepcopy(item)
-            content = new_item.get("content")
-            if content:
-                if isinstance(content, list):
-                    for i in new_item["content"]:
-                        # if i["type"] == "text":
-                        #     i["type"] = "input_text"
-                        # if i["type"] == "image_url":
-                        #     i["type"] = "input_image"
-                        #     i["image_url"] = i["image_url"]["url"]
-                        if i["type"] == "output_text" and new_item["type"] == "message":
-                            new_item = {
-                                "role": "assistant",
-                                "content": i["text"],
-                            }
-                        if i["type"] == "input_image":
-                            i["type"] = "image_url"
-                            i["image_url"] = {"url": i["image_url"]}
-                        if i["type"] == "input_text":
-                            i["type"] = "text"
+        new_input = responses_input_to_chat_messages_v0(request.input)
 
-                        else:
-                            pass
-                new_input.append(new_item)
-            else:
-                type_ = item["type"]
-                if type_ == "function_call":
-                    tool_name_cache_dict[item["call_id"]] = item["name"]
-                    arguments = item["arguments"]
-                    if isinstance(arguments, str):
-                        arguments = json.loads(arguments)
-                    new_item = {
-                        "role": "assistant",
-                        "content": None,
-                        "tool_calls": [
-                            {
-                                "id": item["call_id"],
-                                "type": "function",
-                                "function": {
-                                    "name": item["name"],
-                                    "arguments": arguments,
-                                },
-                            }
-                        ],
-                    }
-                    new_input.append(new_item)
-                elif type_ == "function_call_output":
-                    tool_name = tool_name_cache_dict[item["call_id"]]
-                    new_item = {
-                        "role": "tool",
-                        "name": tool_name,
-                        "content": item["output"],
-                    }
-                    new_input.append(new_item)
-                else:
-                    new_input.append(item)
         request.input = new_input
     elif isinstance(request.input, str):
         # if request.instructions:
@@ -526,6 +555,7 @@ async def create_responses(request: ResponsesRequest):
         pass
 
     messages = request.input
+    logger.warning(f"messages: {messages}")
     response_format = None
     if request.text:
         response_format = {}

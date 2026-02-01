@@ -1,22 +1,37 @@
 import json
 from typing import Any, Dict, AsyncGenerator
-from vllm import SamplingParams, AsyncLLMEngine, AsyncEngineArgs
+from vllm import AsyncLLMEngine, AsyncEngineArgs
 from vllm.sampling_params import StructuredOutputsParams
 from gpt_server.model_backend.base import ModelBackend
 from loguru import logger
-from lmdeploy.serve.openai.reasoning_parser import ReasoningParserManager
 from vllm.lora.request import LoRARequest
 from transformers import PreTrainedTokenizer
-from vllm.entrypoints.chat_utils import (
-    apply_hf_chat_template,
-    parse_chat_messages_futures,
-)
+
 from vllm.config.structured_outputs import StructuredOutputsConfig
 from gpt_server.settings import get_model_config
+from vllm.entrypoints.openai.models.serving import BaseModelPath, OpenAIServingModels
+from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
+from vllm.entrypoints.openai.chat_completion.protocol import (
+    ChatCompletionRequest,
+)
+from vllm.entrypoints.openai.engine.protocol import StreamOptions
+from dataclasses import dataclass, asdict
+
+
+class CustomOpenAIServingChat(OpenAIServingChat):
+    async def render_chat_request(self, request):
+        value = await super().render_chat_request(request)
+        try:
+            prompt = value[1][0]["prompt"]
+            logger.info("prompt:\n" + prompt)
+        except Exception:
+            logger.error("request:\n" + str(value))
+        return value
 
 
 class VllmBackend(ModelBackend):
     def __init__(self, model_path, tokenizer: PreTrainedTokenizer) -> None:
+        self.model_path = model_path
         model_config = get_model_config()
         logger.info(f"model_config: {model_config}")
         max_loras = 1
@@ -56,8 +71,24 @@ class VllmBackend(ModelBackend):
             structured_outputs_config=StructuredOutputsConfig(backend="xgrammar"),
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
-        self.tokenizer = tokenizer
-        self.reasoning_parser_cache = {}
+        models = OpenAIServingModels(
+            engine_client=self.engine,
+            base_model_paths=[
+                BaseModelPath(name=self.model_path, model_path=self.model_path)
+            ],
+            lora_modules=None,
+        )
+        self.serving_chat = CustomOpenAIServingChat(
+            engine_client=self.engine,
+            models=models,
+            response_role="assistant",
+            chat_template=None,
+            chat_template_content_format="auto",
+            request_logger=None,
+            trust_request_chat_template=True,
+            enable_auto_tools=True,
+            tool_parser=None,
+        )
 
     def shutdown(self):
         self.engine.shutdown()
@@ -87,47 +118,6 @@ class VllmBackend(ModelBackend):
         elif isinstance(stop_str, list) and stop_str != []:
             stop.update(stop_str)
 
-        multimodal = params.get("multimodal", False)
-        tokenizer = await self.engine.get_tokenizer()
-        model_config = self.engine.model_config
-        if multimodal:  # 多模态模型
-            # ----------------------------------------------------------------
-            conversation, mm_data_future, _ = parse_chat_messages_futures(
-                messages, model_config, content_format="string"
-            )
-
-            prompt = apply_hf_chat_template(
-                tokenizer,
-                conversation=conversation,
-                chat_template=(
-                    chat_template if chat_template else tokenizer.get_chat_template()
-                ),
-                add_generation_prompt=True,
-                tools=tools,
-                model_config=model_config,
-                enable_thinking=enable_thinking,
-            )
-            mm_data = await mm_data_future
-            inputs = {"multi_modal_data": mm_data, "prompt": prompt}
-        else:
-            conversation = messages
-            prompt = apply_hf_chat_template(
-                tokenizer,
-                conversation=conversation,
-                chat_template=(
-                    chat_template if chat_template else tokenizer.get_chat_template()
-                ),
-                add_generation_prompt=True,
-                tools=tools,
-                model_config=model_config,
-                enable_thinking=enable_thinking,
-            )
-            input_ids = params.get("input_ids", None)
-            inputs = {"prompt": prompt}
-            if input_ids is not None:
-                prompt_token_ids = input_ids.tolist()[0]
-                inputs["prompt_token_ids"] = prompt_token_ids
-        logger.info(f"prompt：\n{prompt}")
         # ----------------------------------------------------------------
         # make sampling params in vllm
         top_p = max(top_p, 1e-5)
@@ -155,95 +145,75 @@ class VllmBackend(ModelBackend):
             )
             if response_format["type"] == "text":
                 guided_decoding = None
-        sampling = SamplingParams(
-            top_p=top_p,
-            top_k=top_k,
-            temperature=temperature,
-            max_tokens=max_new_tokens,
-            stop=list(stop),
-            stop_token_ids=stop_token_ids,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
-            repetition_penalty=repetition_penalty,
-            structured_outputs=guided_decoding,
-        )
+
         lora_request = None
         for lora in self.lora_requests:
             if params["model"] == lora.lora_name:
                 lora_request = lora
                 break
 
-        results_generator = self.engine.generate(
-            prompt=inputs,
-            sampling_params=sampling,
+        request = ChatCompletionRequest(
+            model=self.model_path,
+            messages=messages,
+            seed=33,
+            stream=True,
+            stream_options=StreamOptions(
+                include_usage=True, continuous_usage_stats=True
+            ),
+            max_tokens=max_new_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+            presence_penalty=presence_penalty,
+            frequency_penalty=frequency_penalty,
+            repetition_penalty=repetition_penalty,
+            stop=stop,
+            stop_token_ids=stop_token_ids,
+            structured_outputs=asdict(guided_decoding) if guided_decoding else None,
             request_id=request_id,
-            lora_request=lora_request,
+            chat_template=chat_template,
+            tools=tools,
         )
-        current_text = ""
-        previous_text = ""
-        previous_token_ids = []
-        current_token_ids = []
-        delta_token_ids = []
-        async for request_output in results_generator:
-            current_text = request_output.outputs[0].text
-            delta_text = current_text[len(previous_text) :]
-            aborted = False
-
-            prompt_tokens = len(request_output.prompt_token_ids)
-            completion_tokens = sum(
-                len(output.token_ids) for output in request_output.outputs
-            )
-            usage = {
-                "prompt_tokens": prompt_tokens,
-                "completion_tokens": completion_tokens,
-                "total_tokens": prompt_tokens + completion_tokens,
-            }
-            ret = {
-                "text": delta_text,
-                "error_code": 0,
-                "usage": usage,
-                "finish_reason": request_output.outputs[0].finish_reason,
-            }
-            reasoning_parser_type = params.get("reasoning_parser", None)
-            if reasoning_parser_type:
-                reasoning_parser = None
-                current_token_ids = list(request_output.outputs[0].token_ids)
-                delta_token_ids = current_token_ids[len(previous_token_ids) :]
-                if reasoning_parser_type in self.reasoning_parser_cache:
-                    reasoning_parser = self.reasoning_parser_cache.get(
-                        reasoning_parser_type
-                    )
-                else:
-                    reasoning_parser = ReasoningParserManager.get(
-                        reasoning_parser_type
-                    )(self.tokenizer)
-                    self.reasoning_parser_cache[reasoning_parser_type] = (
-                        reasoning_parser
-                    )
-                reasoning_delta = reasoning_parser.extract_reasoning_content_streaming(
-                    previous_text=previous_text,
-                    current_text=current_text,
-                    delta_text=delta_text,  #
-                    previous_token_ids=previous_token_ids,  #
-                    current_token_ids=current_token_ids,
-                    delta_token_ids=delta_token_ids,  #
-                )
-                if reasoning_delta is not None:
-                    ret["text"] = (
-                        reasoning_delta.content if reasoning_delta.content else ""
-                    )
-                    ret["reasoning_content"] = (
-                        reasoning_delta.reasoning_content
-                        if reasoning_delta.reasoning_content
-                        else ""
-                    )
-                # previous_text = current_text
-                previous_token_ids = current_token_ids
-
-            yield ret
-            previous_text = current_text
-            if aborted:
+        response = await self.serving_chat.create_chat_completion(
+            request=request,
+            raw_request=None,
+        )
+        output_text = ""
+        async for chunk in response:
+            # data: {"id":"chatcmpl-bf6de7d56c9bfecc","object":"chat.completion.chunk","created":1769947499,"model":"qwem3vl","choices":[{"index":0,"delta":{"content":"你好","reasoning_content":null},"logprobs":null,"finish_reason":null,"token_ids":null}],"usage":{"prompt_tokens":10,"total_tokens":11,"completion_tokens":1}}
+            # data: [DONE]
+            chunk = chunk.strip("data: ").strip()
+            if chunk == "[DONE]":
                 break
-        logger.info(f"Lora: {request_output.lora_request}")
-        logger.info(current_text)
+            chunk_dict = json.loads(chunk)
+            choices = chunk_dict["choices"]
+            if not choices:
+                continue
+            usage = chunk_dict["usage"]
+            try:
+                text = choices[0]["delta"]["content"]
+            except Exception:
+                logger.error(
+                    f"Error in processing chunk: {chunk_dict}",
+                )
+            output_text += text
+            ret = {
+                "text": text,
+                "usage": usage,
+                "error_code": 0,
+                "finish_reason": choices[0]["finish_reason"],
+                "reasoning_content": choices[0]["delta"]["reasoning_content"],
+            }
+            yield ret
+
+        # logger.info(f"Lora: {request_output.lora_request}")
+        logger.info(output_text)
         logger.info(usage)
+
+
+if __name__ == "__main__":
+    s = 'data: {"id":"chatcmpl-bf6de7d56c9bfecc","object":"chat.completion.chunk","created":1769947499,"model":"qwem3vl","choices":[{"index":0,"delta":{"content":"你好","reasoning_content":null},"logprobs":null,"finish_reason":null,"token_ids":null}],"usage":{"prompt_tokens":10,"total_tokens":11,"completion_tokens":1}}'
+    v = s.strip("data: ").strip()
+    import json
+
+    print(json.loads(v))
