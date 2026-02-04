@@ -173,7 +173,7 @@ class VllmBackend(ModelBackend):
             request_id=request_id,
             chat_template=chat_template,
             tools=tools,
-            tool_choice=params.get("tool_choice", "none"),
+            # tool_choice=params.get("tool_choice", None),
             chat_template_kwargs=None,
         )
         response = await self.serving_chat.create_chat_completion(

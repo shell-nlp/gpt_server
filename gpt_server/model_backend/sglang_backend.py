@@ -115,7 +115,7 @@ class SGLangBackend(ModelBackend):
             top_k=top_k,
             top_p=top_p if top_p != 0 else 0.01,
             rid=request_id,
-            tool_choice=params.get("tool_choice", "auto"),
+            # tool_choice=params.get("tool_choice", "auto"),
             chat_template_kwargs=None,
         )
 
