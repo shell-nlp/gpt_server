@@ -8,20 +8,44 @@ from vllm.entrypoints.openai.chat_completion.protocol import (
     ChatCompletionRequest,
 )
 import os
-import numpy as np
+from loguru import logger
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1,6"
 model_path = "/home/dev/model/Qwen/Qwen3-30B-A3B-Instruct-2507/"
-
 model = "qwem3vl"
 
 
 class CustomOpenAIServingChat(OpenAIServingChat):
     async def render_chat_request(self, request):
         value = await super().render_chat_request(request)
-        prompt = value[1][0]["prompt"]
-        print("prompt:", prompt)
+        try:
+            prompt = value[1][0]["prompt"]
+            logger.info("prompt:\n" + prompt)
+        except Exception:
+            logger.error("request:\n" + str(value))
         return value
+
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "Get the current weather in a given location",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "The city and state, e.g. San Francisco, CA",
+                    },
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                },
+                "required": ["location"],
+            },
+        },
+    }
+]
 
 
 async def main():
@@ -30,7 +54,7 @@ async def main():
         model=model_path,
         runner="auto",
         convert="auto",
-        tensor_parallel_size=1,
+        tensor_parallel_size=2,
         max_model_len=10240,
     )
     engine = AsyncLLMEngine.from_engine_args(engine_args)
@@ -50,17 +74,21 @@ async def main():
         chat_template=None,
         chat_template_content_format="auto",
         request_logger=None,
+        enable_auto_tools=True,
+        tool_parser="hermes",
     )
 
     # 4. 创建 embedding 请求
     request = ChatCompletionRequest(
         model=model,
-        messages=[{"role": "user", "content": "你是谁"}],
+        messages=[{"role": "user", "content": "南京天气怎么样"}],
         max_tokens=100,
         temperature=1.0,
         seed=33,
         stream=True,
         stream_options=StreamOptions(include_usage=True, continuous_usage_stats=True),
+        tools=tools,
+        parallel_tool_calls=False,
     )
 
     # 5. 调用 create_chat 方法

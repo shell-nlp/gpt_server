@@ -15,7 +15,7 @@ from vllm.entrypoints.openai.chat_completion.protocol import (
     ChatCompletionRequest,
 )
 from vllm.entrypoints.openai.engine.protocol import StreamOptions
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
 
 
 class CustomOpenAIServingChat(OpenAIServingChat):
@@ -49,7 +49,7 @@ class VllmBackend(ModelBackend):
                         lora_local_path=lora_path,
                     )
                 )
-        from vllm.config.kv_transfer import KVTransferConfig
+        # from vllm.config.kv_transfer import KVTransferConfig
 
         self.engine_args = AsyncEngineArgs(
             model_path,
@@ -171,10 +171,9 @@ class VllmBackend(ModelBackend):
             stop_token_ids=stop_token_ids,
             structured_outputs=asdict(guided_decoding) if guided_decoding else None,
             request_id=request_id,
-            chat_template=chat_template,
             tools=tools,
             # tool_choice=params.get("tool_choice", None),
-            chat_template_kwargs=None,
+            chat_template_kwargs={"enable_thinking": enable_thinking},
         )
         response = await self.serving_chat.create_chat_completion(
             request=request,

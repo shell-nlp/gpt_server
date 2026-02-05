@@ -10,6 +10,7 @@ from sglang.srt.entrypoints.openai.protocol import (
     ChatCompletionRequest,
     StreamOptions,
     ErrorResponse,
+    MessageProcessingResult,
 )
 from sglang.srt.entrypoints.engine import (
     _launch_subprocesses,
@@ -20,6 +21,16 @@ from sglang.srt.entrypoints.engine import (
 
 from sglang.srt.server_args import ServerArgs
 from starlette.responses import StreamingResponse
+
+
+class CustomOpenAIServingChat(OpenAIServingChat):
+    def _process_messages(self, request, is_multimodal):
+        value: MessageProcessingResult = super()._process_messages(
+            request, is_multimodal
+        )
+        prompt = value.prompt
+        logger.info("prompt:\n" + prompt)
+        return value
 
 
 class SGLangBackend(ModelBackend):
@@ -49,10 +60,9 @@ class SGLangBackend(ModelBackend):
             )
         )
         self.tokenizer_manager = tokenizer_manager
-        self.serving_chat = OpenAIServingChat(
+        self.serving_chat = CustomOpenAIServingChat(
             tokenizer_manager=tokenizer_manager, template_manager=template_manager
         )
-        self.tokenizer = tokenizer
 
     def shutdown(self):
         logger.info("sglang后端退出")
@@ -63,15 +73,6 @@ class SGLangBackend(ModelBackend):
         tools = params.get("tools", None)
         chat_template = params.get("chat_template", None)
         enable_thinking = bool(params.get("enable_thinking", True))
-        prompt = self.tokenizer.apply_chat_template(
-            messages,
-            chat_template=chat_template,
-            tokenize=False,
-            add_generation_prompt=True,
-            tools=tools,
-            enable_thinking=enable_thinking,
-        )
-        logger.info(f"prompt：\n{prompt}")
         request_id = params.get("request_id", "0")
         temperature = float(params.get("temperature", 0.8))
         top_p = float(params.get("top_p", 0.8))
@@ -116,7 +117,7 @@ class SGLangBackend(ModelBackend):
             top_p=top_p if top_p != 0 else 0.01,
             rid=request_id,
             # tool_choice=params.get("tool_choice", "auto"),
-            chat_template_kwargs=None,
+            chat_template_kwargs={"enable_thinking": enable_thinking},
         )
 
         response = await self.serving_chat.handle_request(

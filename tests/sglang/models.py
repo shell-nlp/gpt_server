@@ -22,6 +22,14 @@ model_path = "/home/dev/model/Qwen/Qwen2___5-VL-7B-Instruct/"
 model = "qwem3vl"
 
 
+class CustomOpenAIServingChat(OpenAIServingChat):
+    def _process_messages(self, request, is_multimodal):
+        value = super()._process_messages(request, is_multimodal)
+        prompt = value.prompt
+        print("prompt:\n" + prompt)
+        return value
+
+
 async def main():
     kwargs = {
         "model_path": model_path,
@@ -44,7 +52,7 @@ async def main():
         )
     )
 
-    serving_chat = OpenAIServingChat(
+    serving_chat = CustomOpenAIServingChat(
         tokenizer_manager=tokenizer_manager, template_manager=template_manager
     )
     request = ChatCompletionRequest(
