@@ -6,6 +6,7 @@ class ModelConfig(BaseSettings):
     """模型名称或者路径"""
     backend: str = "vllm"
     enable_prefix_caching: bool = False
+    enable_chunked_prefill: bool | None = None
     max_model_len: int | None = None
     gpu_memory_utilization: float = 0.8
     kv_cache_quant_policy: int = 0

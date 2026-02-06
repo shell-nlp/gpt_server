@@ -4,7 +4,7 @@ from typing import List
 import json
 import sys
 import shutil
-from abc import ABC, abstractmethod
+from abc import ABC
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -163,9 +163,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             elif isinstance(tool_choice, dict):
                 tools = pop_matching_tool(tools=tools, tool_choice=tool_choice)
                 tool_name = tool_choice["function"]["name"]
-                params[
-                    "extra_prompt"
-                ] = f"""<tool_call>
+                params["extra_prompt"] = f"""<tool_call>
 {{"name": "{tool_name}", "arguments": 
     """
         params["tools"] = tools
@@ -293,6 +291,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             "--controller_address", type=str, default="http://localhost:21001"
         )
         parser.add_argument("--enable_prefix_caching", type=str, default="False")
+        parser.add_argument("--enable_chunked_prefill", type=str, default="False")
         parser.add_argument("--dtype", type=str, default="auto")
         parser.add_argument("--max_model_len", type=str, default=None)
         parser.add_argument("--gpu_memory_utilization", type=str, default="0.8")
@@ -340,6 +339,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
         os.environ["model_type"] = args.model_type
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching
+        os.environ["enable_chunked_prefill"] = args.enable_chunked_prefill
         os.environ["gpu_memory_utilization"] = args.gpu_memory_utilization
         os.environ["kv_cache_quant_policy"] = args.kv_cache_quant_policy
         os.environ["dtype"] = args.dtype

@@ -222,6 +222,9 @@ def start_model_worker(config: dict):
                     enable_prefix_caching = engine_config.get(
                         "enable_prefix_caching", "False"
                     )
+                    enable_chunked_prefill = engine_config.get(
+                        "enable_chunked_prefill", "False"
+                    )
                     dtype = engine_config.get("dtype", "auto")
                     lora = engine_config.get("lora", None)
                     max_model_len = engine_config.get("max_model_len", None)
@@ -321,6 +324,7 @@ def start_model_worker(config: dict):
                         + f" --controller_address {controller_address}"
                         + f" --dtype {dtype}"
                         + f" --enable_prefix_caching {enable_prefix_caching}"  # 是否开启 prefix cache
+                        + f" --enable_chunked_prefill {enable_chunked_prefill}"  # 是否开启 chunked prefill
                         + f" --gpu_memory_utilization {gpu_memory_utilization}"  # 占用GPU比例
                         + f" --kv_cache_quant_policy {kv_cache_quant_policy}"  # kv cache 量化策略
                         + f" --log_level {log_level}"  # 日志水平

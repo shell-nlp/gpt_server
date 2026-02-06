@@ -56,7 +56,7 @@ class VllmBackend(ModelBackend):
             tensor_parallel_size=model_config.num_gpus,
             trust_remote_code=True,
             gpu_memory_utilization=model_config.gpu_memory_utilization,
-            enable_chunked_prefill=False,
+            enable_chunked_prefill=model_config.enable_chunked_prefill,
             enable_lora=enable_lora,
             max_loras=max_loras,
             enable_prefix_caching=model_config.enable_prefix_caching,
