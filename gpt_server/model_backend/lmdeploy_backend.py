@@ -5,7 +5,7 @@ from lmdeploy import (
     TurbomindEngineConfig,
     PytorchEngineConfig,
 )
-from lmdeploy.serve.async_engine import AsyncEngine
+from lmdeploy.serve.core.async_engine import AsyncEngine
 from transformers import PreTrainedTokenizer
 from typing import Any, Dict, AsyncGenerator, List, Optional
 from lmdeploy.archs import get_task
