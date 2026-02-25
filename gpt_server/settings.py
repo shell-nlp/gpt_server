@@ -15,6 +15,7 @@ class ModelConfig(BaseSettings):
     lora: str | None = None
     hf_overrides: dict | None = None
     """HuggingFace 配置覆盖参数"""
+    reasoning_parser: str | None = None
 
 
 def get_model_config() -> ModelConfig:

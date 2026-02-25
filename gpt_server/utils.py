@@ -238,6 +238,7 @@ def start_model_worker(config: dict):
                     punc_model = engine_config.get("punc_model", "")
                     task_type = engine_config.get("task_type", "auto")
                     hf_overrides = engine_config.get("hf_overrides", "")
+                    reasoning_parser = engine_config.get("reasoning_parser", "")
 
                 else:
                     logger.error(
@@ -345,6 +346,9 @@ def start_model_worker(config: dict):
                         cmd += f" --vad_model '{punc_model}'"
                     if hf_overrides:
                         cmd += f" --hf_overrides '{json.dumps(hf_overrides)}'"
+                    if reasoning_parser:
+                        cmd += f" --reasoning_parser {reasoning_parser}"
+
                     proc = run_cmd(cmd, group="worker")
 
 

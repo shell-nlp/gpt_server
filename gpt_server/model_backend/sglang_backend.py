@@ -48,6 +48,10 @@ class SGLangBackend(ModelBackend):
             "context_length": model_config.max_model_len,
             "grammar_backend": "xgrammar",
             "disable_radix_cache": not model_config.enable_prefix_caching,
+            # https://docs.sglang.io/advanced_features/separate_reasoning.html
+            "reasoning_parser": model_config.reasoning_parser
+            if model_config.reasoning_parser
+            else None,
         }
         server_args = ServerArgs(**kwargs)
 
@@ -126,6 +130,7 @@ class SGLangBackend(ModelBackend):
         try:
             if isinstance(response, StreamingResponse):
                 output_text = ""
+                reasoning_content_text = ""
                 pre_usage = None
                 async for chunk in response.body_iterator:
                     # data: {"id":"chatcmpl-bf6de7d56c9bfecc","object":"chat.completion.chunk","created":1769947499,"model":"qwem3vl","choices":[{"index":0,"delta":{"content":"你好","reasoning_content":null},"logprobs":null,"finish_reason":null,"token_ids":null}],"usage":{"prompt_tokens":10,"total_tokens":11,"completion_tokens":1}}
@@ -142,6 +147,7 @@ class SGLangBackend(ModelBackend):
                         usage = pre_usage
                     pre_usage = usage
                     try:
+                        reasoning_content = choices[0]["delta"]["reasoning_content"]
                         text = choices[0]["delta"]["content"]
                         if text is None:
                             text = ""
@@ -150,16 +156,19 @@ class SGLangBackend(ModelBackend):
                             f"Error in processing chunk: {chunk_dict}",
                         )
                     output_text += text
+                    if reasoning_content:
+                        reasoning_content_text += reasoning_content
                     ret = {
                         "text": text,
                         "usage": usage,
                         "error_code": 0,
                         "finish_reason": choices[0]["finish_reason"],
-                        "reasoning_content": choices[0]["delta"]["reasoning_content"],
+                        "reasoning_content": reasoning_content,
                     }
                     yield ret
-                logger.info(output_text)
-                logger.info(usage)
+                logger.info(f"reasoning_content: \n{reasoning_content_text}")
+                logger.info(f"output_text: \n{output_text}")
+                logger.info(f"usage: {usage}")
 
             elif isinstance(response, ErrorResponse):
                 pass

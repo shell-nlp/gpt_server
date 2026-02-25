@@ -88,6 +88,10 @@ class VllmBackend(ModelBackend):
             trust_request_chat_template=True,
             enable_auto_tools=True,
             tool_parser=None,
+            # https://docs.vllm.ai/en/latest/features/reasoning_outputs/
+            reasoning_parser=model_config.reasoning_parser
+            if model_config.reasoning_parser
+            else "",
         )
 
     def shutdown(self):
@@ -180,6 +184,7 @@ class VllmBackend(ModelBackend):
             raw_request=None,
         )
         output_text = ""
+        reasoning_content_text = ""
         async for chunk in response:
             # data: {"id":"chatcmpl-bf6de7d56c9bfecc","object":"chat.completion.chunk","created":1769947499,"model":"qwem3vl","choices":[{"index":0,"delta":{"content":"你好","reasoning_content":null},"logprobs":null,"finish_reason":null,"token_ids":null}],"usage":{"prompt_tokens":10,"total_tokens":11,"completion_tokens":1}}
             # data: [DONE]
@@ -193,23 +198,27 @@ class VllmBackend(ModelBackend):
             usage = chunk_dict["usage"]
             try:
                 text = choices[0]["delta"]["content"]
+                reasoning_content = choices[0]["delta"]["reasoning_content"]
             except Exception:
                 logger.error(
                     f"Error in processing chunk: {chunk_dict}",
                 )
             output_text += text
+            if reasoning_content:
+                reasoning_content_text += reasoning_content
             ret = {
                 "text": text,
                 "usage": usage,
                 "error_code": 0,
                 "finish_reason": choices[0]["finish_reason"],
-                "reasoning_content": choices[0]["delta"]["reasoning_content"],
+                "reasoning_content": reasoning_content,
             }
             yield ret
 
         # logger.info(f"Lora: {request_output.lora_request}")
-        logger.info(output_text)
-        logger.info(usage)
+        logger.info(f"reasoning_content: \n{reasoning_content_text}")
+        logger.info(f"output_text: \n{output_text}")
+        logger.info(f"usage: {usage}")
 
 
 if __name__ == "__main__":

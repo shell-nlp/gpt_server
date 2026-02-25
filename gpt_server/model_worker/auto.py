@@ -1,4 +1,3 @@
-import asyncio
 import json
 from typing import List
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
@@ -7,7 +6,6 @@ import torch
 import traceback
 from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
 from gpt_server.model_handler.tool_parser import tool_parser, ToolParserManager
-from gpt_server.model_handler.chat_template.get_chat_template import get_chat_template
 
 
 class AutoWorker(ModelWorkerBase):

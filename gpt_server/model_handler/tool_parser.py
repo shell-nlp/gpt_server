@@ -44,7 +44,6 @@ class ExtractedToolCallInformation(BaseModel):
 
 @ToolParserManager.register_module(["glm"])
 class GLMToolParser(ToolParser):
-
     def __init__(self, tokenizer: object = None):
         super().__init__(tokenizer)
         self.position = 0
@@ -91,7 +90,6 @@ class GLMToolParser(ToolParser):
 
 @ToolParserManager.register_module(["qwen2_5"])
 class Qwen2d5ToolParser(ToolParser):
-
     def __init__(self, tokenizer: object):
         super().__init__(tokenizer)
         self.position = 0
@@ -325,21 +323,26 @@ class Qwen2d5ToolParser(ToolParser):
 
 
 def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
-    tool_call_info = tool_parser.extract_tool_calls(full_text, tools)
-    tools_called = tool_call_info.tools_called
-    text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
-    tool_calls = [i.model_dump() for i in tool_calls]
-    # -----------------------------------
-    ret["text"] = ""
-    ret["tool_calls"] = tool_calls
-    ret["finish_reason"] = (
-        "tool_calls" if tools and tools_called else ret.get("finish_reason", "stop")
-    )
-    if tools:
-        logger.info(
-            f" 工具解析{'成功' if tools_called else '失败'}, tool_calls: {tool_calls}"
+    try:
+        tool_call_info = tool_parser.extract_tool_calls(full_text, tools)
+        tools_called = tool_call_info.tools_called
+        text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
+        tool_calls = [i.model_dump() for i in tool_calls]
+        # -----------------------------------
+        ret["text"] = ""
+        ret["tool_calls"] = tool_calls
+        ret["finish_reason"] = (
+            "tool_calls" if tools and tools_called else ret.get("finish_reason", "stop")
         )
-    return json.dumps(ret).encode() + b"\0"
+        if tools:
+            logger.info(
+                f" 工具解析{'成功' if tools_called else '失败'}, tool_calls: {tool_calls}"
+            )
+        return json.dumps(ret).encode() + b"\0"
+    except Exception as e:
+        logger.error(f"Error in tool_parser: {e}")
+        ret["text"] = ""
+        return json.dumps(ret).encode() + b"\0"
 
 
 if __name__ == "__main__":
