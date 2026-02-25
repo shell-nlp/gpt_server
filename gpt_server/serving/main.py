@@ -21,11 +21,10 @@ original_pythonpath = os.environ.get("PYTHONPATH", "")
 os.environ["PYTHONPATH"] = original_pythonpath + ":" + root_dir
 sys.path.append(root_dir)
 os.environ["LOGDIR"] = os.path.join(root_dir, "logs")
-from gpt_server import utils
-from gpt_server.utils import (
+from gpt_server import utils  # noqa: E402
+from gpt_server.utils import (  # noqa: E402
     start_api_server,
     start_model_worker,
-    delete_log,
     pre_processing,
 )
 
@@ -41,10 +40,25 @@ with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 
 
+def get_enabled_models(config):
+    """
+    只返回启用的模型列表
+    """
+    enabled_models = []
+    for model_item in config["models"]:
+        for model_name, model_config in model_item.items():
+            if model_config.get("enable") == True:
+                enabled_models.append({model_name: model_config})
+
+    return enabled_models
+
+
 # print(config)
 def main():
     # ----------------------------启动 Controller 和 Openai API 服务----------------------------------------
-    logger.info(f"config:\n{json.dumps(config,ensure_ascii=False,indent=2)}")
+    true_model_config = config.copy()
+    true_model_config["models"] = get_enabled_models(config)
+    logger.info(f"config:\n{json.dumps(true_model_config,ensure_ascii=False,indent=2)}")
     start_api_server(config=config)
     # ----------------------------启动 Model Worker 服务----------------------------------------------------
     start_model_worker(config=config)
