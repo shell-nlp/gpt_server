@@ -51,6 +51,7 @@ override-dependencies = [
     "xgrammar==0.1.29",               # vllm 和 sglang 冲突
     "numpy==2.2",
     "opencv-python-headless>=4.13.0", # vllm 和 sglang 冲突
+    "openai-whisper==20250625"
 
 ]
 default-groups = [] # 默认只安装dependencies中的库
