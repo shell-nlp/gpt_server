@@ -67,6 +67,23 @@ async def load_base64_or_url(base64_or_url) -> io.BytesIO:
     return bytes_io
 
 
+def guess_tool_parser_by_model(model_path: str) -> str:
+    """根据模型路径猜测工具解析器"""
+    model_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+    architectures = getattr(model_config, "architectures", [])
+    architecture: str = architectures[0]
+    architecture_lower = architecture.lower()
+
+    for i in ["qwen3_5", "qwen3next"]:
+        if i in architecture_lower:
+            return "qwen3_coder"
+
+    if "qwen" in architecture_lower:
+        return "qwen2_5"
+
+    return "qwen2_5"
+
+
 class PoolingModel:
     def __init__(self, model_path: str):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -238,7 +255,6 @@ def get_embedding_mode(model_path: str):
 
 
 if __name__ == "__main__":
-
     # 示例用法
     r = get_embedding_mode("/home/dev/model/jinaai/jina-reranker-v3/")
     print(r)
