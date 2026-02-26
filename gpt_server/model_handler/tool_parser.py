@@ -1,5 +1,4 @@
 import json
-import uuid
 from loguru import logger
 import re
 from typing import Dict, List, Literal, Sequence, Union, Optional
@@ -17,9 +16,14 @@ from lmdeploy.serve.openai.protocol import (
     FunctionCall,
 )
 
-from lmdeploy.serve.openai.tool_parser import ToolParser, ToolParserManager
 from lmdeploy.serve.openai.tool_parser.utils import extract_intermediate_diff
-from lmdeploy.serve.openai.tool_parser import ToolParser
+
+from vllm.tool_parsers import ToolParserManager, ToolParser
+
+# ChatCompletionRequest
+from vllm.entrypoints.openai.chat_completion.protocol import (
+    ChatCompletionRequest,
+)
 
 
 class ToolCall(BaseModel):
@@ -40,52 +44,6 @@ class ExtractedToolCallInformation(BaseModel):
     # content - per OpenAI spec, content AND tool calls can be returned rarely
     # But some models will do this intentionally
     content: Optional[str] = None
-
-
-@ToolParserManager.register_module(["glm"])
-class GLMToolParser(ToolParser):
-    def __init__(self, tokenizer: object = None):
-        super().__init__(tokenizer)
-        self.position = 0
-
-    def get_argments(self, obj):
-        if "parameters" in obj:
-            return obj.get("parameters")
-        elif "arguments" in obj:
-            return obj.get("arguments")
-        return None
-
-    def extract_tool_calls(
-        self,
-        model_output: str,
-        tools,
-    ) -> ExtractedToolCallInformation:
-        text = model_output
-        try:
-            if "Action:" not in text:
-                raise Exception
-            i = text.rfind("Action:")
-            j = text.rfind("Action Input:")
-            name = text[i + len("Action:") : j].strip().strip(".")
-            if "Observation" in model_output:
-                k = text.rfind("Observation")
-                arguments = text[j + len("Action Input:") : k].strip()
-            else:
-                arguments = text[j + len("Action Input:") :].strip()
-            tool_calls = []
-            tool_calls.append(
-                ToolCall(function=FunctionCall(name=name, arguments=arguments))
-            )
-        except Exception:
-            return ExtractedToolCallInformation(
-                tools_called=False, tool_calls=[], content=text
-            )
-
-        return ExtractedToolCallInformation(
-            tools_called=True,
-            tool_calls=tool_calls,
-            content=text if len(text) > 0 else "",
-        )
 
 
 @ToolParserManager.register_module(["qwen2_5"])
@@ -248,7 +206,7 @@ class Qwen2d5ToolParser(ToolParser):
     def extract_tool_calls(
         self,
         model_output: str,
-        tools,
+        request: ChatCompletionRequest,
     ) -> ExtractedToolCallInformation:
         text = model_output
         if self.tool_start_token in text and self.tool_end_token in text:
@@ -322,9 +280,12 @@ class Qwen2d5ToolParser(ToolParser):
         )
 
 
-def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
+def tool_parser(full_text: str, tool_parser_: ToolParser, tools, ret):
     try:
-        tool_call_info = tool_parser.extract_tool_calls(full_text, tools)
+        request = ChatCompletionRequest(
+            messages=[{"role": "user", "content": full_text}], tools=tools
+        )
+        tool_call_info = tool_parser_.extract_tool_calls(full_text, request)
         tools_called = tool_call_info.tools_called
         text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
         tool_calls = [i.model_dump() for i in tool_calls]
@@ -348,11 +309,43 @@ def tool_parser(full_text: str, tool_parser: ToolParser, tools, ret):
 if __name__ == "__main__":
     from transformers import AutoTokenizer
 
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_weather",
+                "description": "Get the current weather in a given location",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": "City and state, e.g., 'San Francisco, CA'",
+                        },
+                        "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                    },
+                    "required": ["location"],
+                },
+            },
+        }
+    ]
     glm_full_text = """Action: get_weather
 Action Input: {"location": "Nanjing", "unit": "celsius"}"""
     qwen_full_text = """<tool_call>{"name": "get_weather", "arguments": {"location": "Nanjing", "unit": "celsius"}}</tool_call>"""
-    tokenizer = AutoTokenizer.from_pretrained(
-        "/home/dev/model/Qwen/Qwen3-30B-A3B-Instruct-2507/"
+    qwen3coder_text = """
+<tool_call>
+<function=get_weather>
+<parameter=location>
+南京
+</parameter>
+<parameter=unit>
+celsius
+</parameter>
+</function>
+</tool_call>
+"""
+    tokenizer = AutoTokenizer.from_pretrained("/home/dev/model/Qwen/Qwen3___5-35B-A3B/")
+    tool_parser_ = ToolParserManager.get_tool_parser("qwen2_5")(tokenizer)
+    tool_parser(
+        full_text=qwen_full_text, tool_parser_=tool_parser_, tools=tools, ret={}
     )
-    tool_parser2 = ToolParserManager.module_dict["qwen2_5"](tokenizer=tokenizer)
-    tool_parser(full_text=qwen_full_text, tool_parser=tool_parser2, tools=True, ret={})

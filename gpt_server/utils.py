@@ -239,7 +239,9 @@ def start_model_worker(config: dict):
                     task_type = engine_config.get("task_type", "auto")
                     hf_overrides = engine_config.get("hf_overrides", "")
                     reasoning_parser = engine_config.get("reasoning_parser", "")
-                    speculative_algorithm = engine_config.get("speculative_algorithm", "")
+                    speculative_algorithm = engine_config.get(
+                        "speculative_algorithm", ""
+                    )
                     speculative_num_steps = engine_config.get(
                         "speculative_num_steps", ""
                     )
@@ -269,10 +271,10 @@ def start_model_worker(config: dict):
                 model_type = model_config.get("model_type", "auto")
                 # 对model type 进行校验
                 if model_type not in model_types:
-                    logger.error(
-                        f"不支持model_type: {model_type},仅支持{model_types}模型之一！"
+                    model_type = "auto"
+                    logger.warning(
+                        f"不支持设置 model_type: {model_type},仅支持{model_types}模型之一！已将 model_type 设置为 auto"
                     )
-                    sys.exit()
 
                 model_names = model_name
                 if model_config["alias"]:
