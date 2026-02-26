@@ -239,6 +239,10 @@ def start_model_worker(config: dict):
                     task_type = engine_config.get("task_type", "auto")
                     hf_overrides = engine_config.get("hf_overrides", "")
                     reasoning_parser = engine_config.get("reasoning_parser", "")
+                    speculative_algorithm = engine_config.get("speculative_algorithm", "")
+                    speculative_num_steps = engine_config.get(
+                        "speculative_num_steps", ""
+                    )
 
                 else:
                     logger.error(
@@ -348,6 +352,10 @@ def start_model_worker(config: dict):
                         cmd += f" --hf_overrides '{json.dumps(hf_overrides)}'"
                     if reasoning_parser:
                         cmd += f" --reasoning_parser {reasoning_parser}"
+                    if speculative_algorithm:
+                        cmd += f" --speculative_algorithm {speculative_algorithm}"
+                    if speculative_num_steps:
+                        cmd += f" --speculative_num_steps {speculative_num_steps}"
 
                     proc = run_cmd(cmd, group="worker")
 

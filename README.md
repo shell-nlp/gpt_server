@@ -203,7 +203,7 @@ python gpt_server/serving/main.py
 ```bash
 docker pull 506610466/gpt_server:latest # 如果拉取失败可尝试下面的方式
 # 如果国内无法拉取docker镜像，可以尝试下面的国内镜像拉取的方式（不保证国内镜像源一直可用）
-docker pull docker.1ms.run/506610466/gpt_server:latest
+docker pull docker.xuanyuan.me/506610466/gpt_server:latest
 ```
 ##### 3.2.1 直接使用Docker命令直接启动
 ```bash
@@ -211,11 +211,11 @@ docker run -d \
   --name gpt_server \
   --restart always \
   --shm-size 32g \
-  --network host
+  --network host \
   -v your_model_path/:your_model_path/ \
   -v your_config_path/config.yaml:/gpt_server/gpt_server/script/config.yaml \
   --gpus all \
-  docker.1ms.run/506610466/gpt_server:latest  \
+  docker.xuanyuan.me/506610466/gpt_server:latest  \
   python gpt_server/serving/main.py  
 ```
 

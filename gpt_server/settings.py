@@ -17,6 +17,10 @@ class ModelConfig(BaseSettings):
     """HuggingFace 配置覆盖参数"""
     reasoning_parser: str | None = None
 
+    speculative_algorithm: str | None = None
+    """投机解码算法"""
+    speculative_num_steps: int | None = None
+
 
 def get_model_config() -> ModelConfig:
     """获取模型配置"""

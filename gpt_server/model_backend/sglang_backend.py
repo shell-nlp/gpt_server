@@ -49,9 +49,10 @@ class SGLangBackend(ModelBackend):
             "grammar_backend": "xgrammar",
             "disable_radix_cache": not model_config.enable_prefix_caching,
             # https://docs.sglang.io/advanced_features/separate_reasoning.html
-            "reasoning_parser": model_config.reasoning_parser
-            if model_config.reasoning_parser
-            else None,
+            "reasoning_parser": model_config.reasoning_parser,
+            "speculative_algorithm": model_config.speculative_algorithm,
+            "speculative_num_steps": model_config.speculative_num_steps,
+            "speculative_eagle_topk": 1 if model_config.speculative_algorithm else None,
         }
         server_args = ServerArgs(**kwargs)
 
