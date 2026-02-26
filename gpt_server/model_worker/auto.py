@@ -40,7 +40,7 @@ class AutoWorker(ModelWorkerBase):
         logger.warning(f"{model_names[0]} 停用词: {self.stop}")
 
         # from https://github.com/xorbitsai/inference/blob/c70ea74fa820a613f8d577047ef1818da20a96b3/xinference/model/llm/llm_family_modelscope.json
-        self.tool_parser = ToolParserManager.get_tool_parser("qwen2_5")
+        self.tool_parser = ToolParserManager.get_tool_parser("qwen2_5")(self.tokenizer)
 
     async def generate_stream_gate(self, params):
         self.call_ct += 1

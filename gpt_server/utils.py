@@ -271,10 +271,10 @@ def start_model_worker(config: dict):
                 model_type = model_config.get("model_type", "auto")
                 # 对model type 进行校验
                 if model_type not in model_types:
-                    model_type = "auto"
                     logger.warning(
                         f"不支持设置 model_type: {model_type},仅支持{model_types}模型之一！已将 model_type 设置为 auto"
                     )
+                    model_type = "auto"
 
                 model_names = model_name
                 if model_config["alias"]:

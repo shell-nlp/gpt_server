@@ -285,9 +285,11 @@ def tool_parser(full_text: str, tool_parser_: ToolParser, tools, ret):
         request = ChatCompletionRequest(
             messages=[{"role": "user", "content": full_text}], tools=tools
         )
-        tool_call_info = tool_parser_.extract_tool_calls(full_text, request)
+        tool_call_info = tool_parser_.extract_tool_calls(
+            model_output=full_text, request=request
+        )
         tools_called = tool_call_info.tools_called
-        text, tool_calls = tool_call_info.content, tool_call_info.tool_calls
+        _, tool_calls = tool_call_info.content, tool_call_info.tool_calls
         tool_calls = [i.model_dump() for i in tool_calls]
         # -----------------------------------
         ret["text"] = ""
@@ -301,7 +303,10 @@ def tool_parser(full_text: str, tool_parser_: ToolParser, tools, ret):
             )
         return json.dumps(ret).encode() + b"\0"
     except Exception as e:
-        logger.error(f"Error in tool_parser: {e}")
+        logger.warning(f"Error in tool_parser: {e}")
+        import traceback
+
+        traceback.print_exc()
         ret["text"] = ""
         return json.dumps(ret).encode() + b"\0"
 
@@ -344,7 +349,9 @@ celsius
 </function>
 </tool_call>
 """
-    tokenizer = AutoTokenizer.from_pretrained("/home/dev/model/Qwen/Qwen3___5-35B-A3B/")
+    tokenizer = AutoTokenizer.from_pretrained(
+        "/home/dev/model/Qwen/Qwen3-30B-A3B-Instruct-2507/"
+    )
     tool_parser_ = ToolParserManager.get_tool_parser("qwen2_5")(tokenizer)
     tool_parser(
         full_text=qwen_full_text, tool_parser_=tool_parser_, tools=tools, ret={}
