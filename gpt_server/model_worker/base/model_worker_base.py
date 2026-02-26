@@ -145,7 +145,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             params["multimodal"] = True
             params["chat_template"] = self.vl_chat_template
         # ---------- 如果传入的是 str 则修改为messages ----------
-        messages = params["messages"]
+        messages = params.get("messages", [])
         if isinstance(messages, str):
             messages = [{"role": "user", "content": messages}]
             params["messages"] = messages
@@ -428,7 +428,6 @@ async def api_generate_stream(request: Request):
     request_id = gen_request_id()
     params["request_id"] = request_id
     params["request"] = request
-    params.pop("prompt")
     logger.debug(f"params {params}")
     # 对 params 进行预处理
     params = worker.preprocess_params(params)

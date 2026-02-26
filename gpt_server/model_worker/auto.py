@@ -51,20 +51,24 @@ class AutoWorker(ModelWorkerBase):
         self.call_ct += 1
         try:
             tools = params.get("tools", None)
-            # ---------------添加额外的参数------------------------
-            params["stop"].extend(self.stop)
-            params["stop_words_ids"] = self.stop_words_ids
-            # ---------------添加额外的参数------------------------
+            api_type = params.get("api_type", "chat")
             full_text = ""
             ret = {}
-            async for ret in self.backend.stream_chat(params=params):
-                full_text += ret.get("text", "")
-                yield json.dumps(ret).encode() + b"\0"
-            # ------ add tool_calls ------
-            yield tool_parser(
-                full_text=full_text, tool_parser_=self.tool_parser, tools=tools, ret=ret
-            )
-            # ------ add tool_calls ------
+            if api_type == "chat":
+                async for ret in self.backend.stream_chat(params=params):
+                    full_text += ret.get("text", "")
+                    yield json.dumps(ret).encode() + b"\0"
+                # ------ add tool_calls ------
+                yield tool_parser(
+                    full_text=full_text,
+                    tool_parser_=self.tool_parser,
+                    tools=tools,
+                    ret=ret,
+                )
+                # ------ add tool_calls ------
+            else:
+                async for ret in self.backend.stream_chat(params=params):
+                    yield ret.encode() + b"\0"
         except torch.cuda.OutOfMemoryError as e:
             ret = {
                 "text": f"{SERVER_ERROR_MSG}\n\n({e})",

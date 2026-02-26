@@ -301,7 +301,6 @@ def get_gen_params(
 
 class AddressManager:
     def __init__(self):
-
         self.lock = threading.Lock()
         self.last_index = -1  # 轮询索引
 
@@ -508,95 +507,35 @@ def responses_input_to_chat_messages(input_data):
     response_class=responses.ORJSONResponse,
 )
 async def create_responses(request: ResponsesRequest):
-    request.store = False  # 暂时关闭
-    global response_store, msg_store
-    error_check_ret = check_model(request.model)
-    if error_check_ret is not None:
-        return error_check_ret
+    request_dict = request.model_dump()
     worker_addr = get_worker_address(request.model)
-    max_tokens = 1024 * 8
-    if request.max_output_tokens:
-        max_tokens = request.max_output_tokens
-    # ----------- 需要进行转化映射 -----------
-    # Handle the previous response ID.
-    previous_response_id = request.previous_response_id
-    if previous_response_id is not None:
-        async with response_store_lock:
-            prev_response = response_store.get(previous_response_id)
-        if prev_response is None:
-            return ErrorResponseV2(
-                error=ErrorInfo(
-                    message=f"Response with id '{previous_response_id}' not found.",
-                    type="invalid_request_error",
-                    code=HTTPStatus.NOT_FOUND,
-                )
-            )
-    else:
-        prev_response = None
-
-    if request.store:
-        messages = _construct_input_messages(
-            request=request, prev_response=prev_response
-        )
-        request.input = messages
-        if previous_response_id:
-            msg_store[previous_response_id] = messages
-        else:
-            msg_store[request.request_id] = messages
-        # msg_store[previous_response_id] = messages
-    if isinstance(request.input, list) and isinstance(request.input[0], dict):
-        new_input = responses_input_to_chat_messages_v0(request.input)
-
-        request.input = new_input
-    elif isinstance(request.input, str):
-        # if request.instructions:
-        #     messages = [{"role": "system", "content": request.instructions}]
-        # messages = [{"role": "user", "content": request.input}]
-        pass
-
-    messages = request.input
-    logger.warning(f"messages: {messages}")
-    response_format = None
-    if request.text:
-        response_format = {}
-        response_format["type"] = request.text.format.type
-        if "json_schema" == request.text.format.type:
-            response_format["json_schema"] = {"schema": request.text.format.schema_}
-
-    reasoning_parser = None
-    enable_thinking = True
-    ## 转化工具
-    tools = []
-    for tool in request.tools:
-        tool_dict = tool.model_dump()
-        type_ = tool_dict.pop("type")
-        tools.append({"type": type_, "function": tool_dict})
-    # ----------- 需要进行转化映射 -----------
-    gen_params = get_gen_params(
-        request.model,
-        "",
-        messages=messages,
-        temperature=request.temperature,
-        top_p=request.top_p,
-        top_k=request.top_k,
-        presence_penalty=request.presence_penalty,
-        frequency_penalty=request.frequency_penalty,
-        max_tokens=max_tokens,
-        echo=False,
-        stop=request.stop,
-        tools=tools,
-        tool_choice=request.tool_choice,
-        response_format=response_format,
-        reasoning_parser=reasoning_parser,
-        enable_thinking=enable_thinking,
-    )
-    if gen_params["max_new_tokens"] is None:
-        gen_params["max_new_tokens"] = 1024 * 16
-
+    gen_params = {"responses_request": request_dict, "api_type": "responses"}
     if request.stream:
-        generator = responses_stream_generator(request, gen_params, worker_addr)
-        content = _convert_stream_to_sse_events(generator=generator)
-        return StreamingResponse(content, media_type="text/event-stream")
+
+        async def stream_content():
+            async with httpx.AsyncClient() as client:
+                delimiter = b"\0"
+                async with client.stream(
+                    "POST",
+                    worker_addr + "/worker_generate_stream",
+                    headers=headers,
+                    json=gen_params,
+                    timeout=60,
+                ) as response:
+                    # content = await response.aread()
+                    buffer = b""
+                    async for raw_chunk in response.aiter_raw():
+                        buffer += raw_chunk
+                        while (chunk_end := buffer.find(delimiter)) >= 0:
+                            chunk, buffer = buffer[:chunk_end], buffer[chunk_end + 1 :]
+                            if not chunk:
+                                continue
+                            yield chunk.decode()
+            # async for content in generate_completion_stream(gen_params, worker_addr):
+            #     # yield f"data: {json.dumps(content, ensure_ascii=False)}\n\n"
+            #     yield content
+
+        return StreamingResponse(stream_content(), media_type="text/event-stream")
 
     content = await generate_completion(gen_params, worker_addr)
     if isinstance(content, str):
