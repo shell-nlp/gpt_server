@@ -215,7 +215,7 @@ docker run -d \
   -v your_model_path/:your_model_path/ \
   -v your_config_path/config.yaml:/gpt_server/gpt_server/script/config.yaml \
   --gpus all \
-  docker.xuanyuan.me/506610466/gpt_server:latest  \
+  docker.1ms.run/506610466/gpt_server:latest  \
   python gpt_server/serving/main.py  
 ```
 
