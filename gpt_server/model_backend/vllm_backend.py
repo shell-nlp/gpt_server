@@ -71,6 +71,7 @@ class VllmBackend(ModelBackend):
             # ),
             prefix_caching_hash_algo="xxhash",
             structured_outputs_config=StructuredOutputsConfig(backend="xgrammar"),
+            enforce_eager=False,
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         models = OpenAIServingModels(
@@ -241,10 +242,15 @@ class VllmBackend(ModelBackend):
             request_dict = params.get("responses_request", None)
             request = ResponsesRequest.model_validate(request_dict)
             request.model = self.model_path
-            response = await self.serving_responses.create_responses(request)
-            async for chunk in response:
-                data = chunk.model_dump_json(exclude_unset=True)
-                yield f"data: {data}\n\n"
+            if request.stream:
+                response = await self.serving_responses.create_responses(request)
+                async for chunk in response:
+                    data = chunk.model_dump_json(exclude_unset=True)
+                    yield f"data: {data}\n\n"
+            else:
+                response = await self.serving_responses.create_responses(request)
+                data = response.model_dump_json(exclude_unset=True)
+                yield data
 
 
 if __name__ == "__main__":

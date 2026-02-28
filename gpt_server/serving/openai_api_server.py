@@ -410,97 +410,6 @@ def get_model_address_map():
     return model_address_map
 
 
-response_store_lock = asyncio.Lock()
-response_store: dict[str, ResponsesResponse] = {}
-msg_store = {}
-
-
-def responses_input_to_chat_messages_v0(input_data):
-    """
-    将 /v1/responses 的 input 转换为 /v1/chat/completions 的 messages
-    {
-      "input": [
-        {
-          "role": "user",
-          "content": [
-            { "type": "text", "text": "分析这张图并返回 JSON" },
-            {
-              "type": "input_image",
-              "image_url": "https://example.com/dog.png"
-            }
-          ]
-        }
-      ]
-    }
-    """
-    tool_name_cache_dict = {}
-    new_input = []
-    for idx, item in enumerate(input_data):
-        new_item = copy.deepcopy(item)  # dict
-        content = new_item.get("content")
-        if content:
-            if isinstance(content, list):
-                for i in new_item["content"]:
-                    # if i["type"] == "text":
-                    #     i["type"] = "input_text"
-                    # if i["type"] == "image_url":
-                    #     i["type"] = "input_image"
-                    #     i["image_url"] = i["image_url"]["url"]
-                    if i["type"] == "output_text" and new_item["type"] == "message":
-                        new_item = {
-                            "role": "assistant",
-                            "content": i["text"],
-                        }
-                    if i["type"] == "input_image":
-                        i["type"] = "image_url"
-                        i["image_url"] = {"url": i["image_url"]}
-                    if i["type"] == "input_text":
-                        i["type"] = "text"
-
-                    else:
-                        pass
-            new_input.append(new_item)
-        else:
-            type_ = item["type"]
-            if type_ == "function_call":
-                tool_name_cache_dict[item["call_id"]] = item["name"]
-                arguments = item["arguments"]
-                if isinstance(arguments, str):
-                    arguments = json.loads(arguments)
-                new_item = {
-                    "role": "assistant",
-                    "content": None,
-                    "tool_calls": [
-                        {
-                            "id": item["call_id"],
-                            "type": "function",
-                            "function": {
-                                "name": item["name"],
-                                "arguments": arguments,
-                            },
-                        }
-                    ],
-                }
-                new_input.append(new_item)
-            elif type_ == "function_call_output":
-                tool_name = tool_name_cache_dict[item["call_id"]]
-                new_item = {
-                    "role": "tool",
-                    "name": tool_name,
-                    "content": item["output"],
-                }
-                new_input.append(new_item)
-            else:
-                new_input.append(item)
-        return new_input
-
-
-def responses_input_to_chat_messages(input_data):
-    """
-    将 /v1/responses 的 input 转换为 /v1/chat/completions 的 messages
-    """
-
-
 @app.post(
     "/v1/responses",
     dependencies=[Depends(check_api_key)],
@@ -510,125 +419,37 @@ async def create_responses(request: ResponsesRequest):
     request_dict = request.model_dump()
     worker_addr = get_worker_address(request.model)
     gen_params = {"responses_request": request_dict, "api_type": "responses"}
+
+    async def stream_content(params, worker_addr):
+        async with httpx.AsyncClient() as client:
+            delimiter = b"\0"
+            async with client.stream(
+                "POST",
+                worker_addr + "/worker_generate_stream",
+                headers=headers,
+                json=params,
+                timeout=60,
+            ) as response:
+                # content = await response.aread()
+                buffer = b""
+                async for raw_chunk in response.aiter_raw():
+                    buffer += raw_chunk
+                    while (chunk_end := buffer.find(delimiter)) >= 0:
+                        chunk, buffer = buffer[:chunk_end], buffer[chunk_end + 1 :]
+                        if not chunk:
+                            continue
+                        yield chunk.decode()
+
     if request.stream:
-
-        async def stream_content():
-            async with httpx.AsyncClient() as client:
-                delimiter = b"\0"
-                async with client.stream(
-                    "POST",
-                    worker_addr + "/worker_generate_stream",
-                    headers=headers,
-                    json=gen_params,
-                    timeout=60,
-                ) as response:
-                    # content = await response.aread()
-                    buffer = b""
-                    async for raw_chunk in response.aiter_raw():
-                        buffer += raw_chunk
-                        while (chunk_end := buffer.find(delimiter)) >= 0:
-                            chunk, buffer = buffer[:chunk_end], buffer[chunk_end + 1 :]
-                            if not chunk:
-                                continue
-                            yield chunk.decode()
-            # async for content in generate_completion_stream(gen_params, worker_addr):
-            #     # yield f"data: {json.dumps(content, ensure_ascii=False)}\n\n"
-            #     yield content
-
-        return StreamingResponse(stream_content(), media_type="text/event-stream")
-
-    content = await generate_completion(gen_params, worker_addr)
-    if isinstance(content, str):
-        content = json.loads(content)
-    if content["error_code"] != 0:
-        return create_error_response(content["error_code"], content["text"])
-    output = []
-    output_text = ResponseOutputText(
-        text=content["text"],
-        annotations=[],  # TODO
-        type="output_text",
-        logprobs=None,
-    )
-    message = ResponseOutputMessage(
-        id=f"msg_{random_uuid()}",
-        content=[output_text],
-        role="assistant",
-        status="completed",
-        type="message",
-    )
-
-    tool_calls = content.get("tool_calls", None)
-    if tool_calls:
-        responses_tools = tool_calls2responses_tools(tool_calls)
-        output.extend(responses_tools)
-    else:
-        output.append(message)
-    created_time = int(time.time())
-    response = ResponsesResponse.from_request(
-        request,
-        created_time=created_time,
-        output=output,
-        status="completed",
-        usage=None,  # TODO
-    )
-    if request.store:
-        async with response_store_lock:
-            stored_response = response_store.get(response.id)
-            # If the response is already cancelled, don't update it.
-            if stored_response is None or stored_response.status != "cancelled":
-                response_store[response.id] = response
-    return response
-
-
-def _construct_input_messages(
-    request: ResponsesRequest,
-    prev_response: ResponsesResponse | None = None,
-) -> list:
-    global response_store, msg_store
-    messages = []
-    if request.instructions:
-        messages.append(
-            {
-                "role": "system",
-                "content": request.instructions,
-            }
+        return StreamingResponse(
+            stream_content(gen_params, worker_addr), media_type="text/event-stream"
         )
-    # Prepend the conversation history.
-    if prev_response is not None:
-        prev_msg = msg_store.get(prev_response.id)
-        if prev_msg:
-            messages.extend(prev_msg)
-        # Add the previous output.
-        for output_item in prev_response.output:
-            # NOTE: We skip the reasoning output.
-            if isinstance(output_item, ResponseOutputMessage):
-                for content in output_item.content:
-                    messages.append(
-                        {
-                            "role": "assistant",
-                            "content": content.text,
-                        }
-                    )
-    # Append the new input.
-    # Responses API supports simple text inputs without chat format.
-    if isinstance(request.input, str):
-        messages.append({"role": "user", "content": request.input})
     else:
-        messages.extend(request.input)  # type: ignore
-    return messages
-
-
-async def _convert_stream_to_sse_events(
-    generator: AsyncGenerator["StreamingResponsesResponse", None],
-) -> AsyncGenerator[str, None]:
-    """Convert the generator to a stream of events in SSE format"""
-    async for event in generator:
-        event_type = getattr(event, "type", "unknown")
-        # https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format
-        event_data = (
-            f"event: {event_type}\ndata: {event.model_dump_json(indent=None)}\n\n"
-        )
-        yield event_data
+        final_response = None
+        async for chunk in stream_content(gen_params, worker_addr):
+            final_response = chunk
+        responses_response = ResponsesResponse.model_validate_json(final_response)
+        return responses_response
 
 
 @app.post(
@@ -718,249 +539,8 @@ from gpt_server.openai_api_protocol.custom_api_protocol import (
     CustomChatCompletionResponseStreamChoice,
     CustomDeltaMessage,
     StreamingResponsesResponse,
-    ResponseCreatedEvent,
-    ResponseInProgressEvent,
-    ResponseOutputItemAddedEvent,
     ResponseOutputMessage,
-    ResponseContentPartAddedEvent,
-    ResponseTextDeltaEvent,
-    ResponseTextDoneEvent,
-    ResponseContentPartDoneEvent,
-    ResponseOutputItemDoneEvent,
-    ResponseCompletedEvent,
-    ResponseFunctionToolCall,
 )
-from contextlib import AsyncExitStack
-
-
-async def _process_simple_streaming_events(
-    request: ResponsesRequest,
-    _increment_sequence_number_and_return: Callable[
-        [StreamingResponsesResponse], StreamingResponsesResponse
-    ],
-    gen_params,
-    worker_addr,
-):
-    global response_store, msg_store
-    current_output_index = 0
-    current_content_index = 0
-    current_item_id = ""
-    first_delta_sent = False
-    if not first_delta_sent:
-        current_item_id = str(uuid.uuid4())
-    # TODO 这里暂时不考虑 reasoning_content
-    yield _increment_sequence_number_and_return(
-        ResponseOutputItemAddedEvent(
-            type="response.output_item.added",
-            sequence_number=-1,
-            output_index=current_output_index,
-            item=ResponseOutputMessage(
-                id=current_item_id,
-                type="message",
-                role="assistant",
-                content=[],
-                status="in_progress",
-            ),
-        )
-    )
-    yield _increment_sequence_number_and_return(
-        ResponseContentPartAddedEvent(
-            type="response.content_part.added",
-            sequence_number=-1,
-            output_index=current_output_index,
-            item_id=current_item_id,
-            content_index=current_content_index,
-            part=ResponseOutputText(
-                type="output_text",
-                text="",
-                annotations=[],
-                logprobs=[],
-            ),
-        )
-    )
-    current_content_index += 1
-    first_delta_sent = True
-    final_content = ""
-    tool_calls = None
-    async for content in generate_completion_stream(gen_params, worker_addr):
-        try:
-            error_code = content["error_code"]
-        except Exception as e:
-            logger.exception(f"发生异常 content：{content}")
-            content["error_code"] = ErrorCode.INTERNAL_ERROR
-        if content["error_code"] != 0:
-            yield f"data: {json.dumps(content, ensure_ascii=False)}\n\n"
-            yield "data: [DONE]\n\n"
-            return
-        delta_text = content.get("text", "")
-        tool_calls = content.get("tool_calls", None)
-        final_content += delta_text
-        yield _increment_sequence_number_and_return(
-            ResponseTextDeltaEvent(
-                type="response.output_text.delta",
-                sequence_number=-1,
-                content_index=current_content_index,
-                output_index=current_output_index,
-                item_id=current_item_id,
-                delta=delta_text,
-                logprobs=[],
-            )
-        )
-        current_content_index += 1
-    yield _increment_sequence_number_and_return(
-        ResponseTextDoneEvent(
-            type="response.output_text.done",
-            sequence_number=-1,
-            output_index=current_output_index,
-            content_index=current_content_index,
-            text=final_content,
-            logprobs=[],
-            item_id=current_item_id,
-        )
-    )
-    part = ResponseOutputText(
-        text=final_content,
-        type="output_text",
-        annotations=[],
-    )
-    yield _increment_sequence_number_and_return(
-        ResponseContentPartDoneEvent(
-            type="response.content_part.done",
-            sequence_number=-1,
-            item_id=current_item_id,
-            output_index=current_output_index,
-            content_index=current_content_index,
-            part=part,
-        )
-    )
-    item = ResponseOutputMessage(
-        type="message",
-        role="assistant",
-        content=[
-            part,
-        ],
-        status="completed",
-        id=current_item_id,
-        summary=[],
-    )
-    yield _increment_sequence_number_and_return(
-        ResponseOutputItemDoneEvent(
-            type="response.output_item.done",
-            sequence_number=-1,
-            output_index=current_output_index,
-            item=item,
-        )
-    )
-
-    output = []
-    output_text = ResponseOutputText(
-        text=final_content,
-        annotations=[],  # TODO
-        type="output_text",
-        logprobs=None,
-    )
-    message = ResponseOutputMessage(
-        id=f"msg_{random_uuid()}",
-        content=[output_text],
-        role="assistant",
-        status="completed",
-        type="message",
-    )
-    output.append(message)
-    # tool_calls=[ChatCompletionMessageToolCall(id='chatcmpl-BeBhvTW4bjGu6JWJQz6s8k', function=Function(arguments='{"location": "南京", "unit": "celsius"}', name='get_weather'), type='function', index=None)]
-    if tool_calls:
-        responses_tools = tool_calls2responses_tools(tool_calls=tool_calls)
-        output.extend(responses_tools)
-    else:
-        output.append(message)
-    created_time = int(time.time())
-    response = ResponsesResponse.from_request(
-        request,
-        created_time=created_time,
-        output=output,
-        status="completed",
-        usage=None,  # TODO
-    )
-    if request.store:
-        async with response_store_lock:
-            stored_response = response_store.get(response.id)
-            # If the response is already cancelled, don't update it.
-            if stored_response is None or stored_response.status != "cancelled":
-                response_store[response.id] = response
-    yield _increment_sequence_number_and_return(
-        ResponseCompletedEvent(
-            type="response.completed",
-            sequence_number=-1,
-            response=response.model_dump(),
-        )
-    )
-
-
-def tool_calls2responses_tools(tool_calls: list) -> list:
-    responses_tools = []
-    for tool in tool_calls:
-        responses_tools.append(
-            ResponseFunctionToolCall(
-                type="function_call",
-                arguments=tool["function"]["arguments"],
-                call_id=tool["id"],
-                name=tool["function"]["name"],
-                id=tool["id"],
-                status="completed",
-            )
-        )
-    return responses_tools
-
-
-async def responses_stream_generator(
-    request: ResponsesRequest, gen_params: Dict[str, Any], worker_addr: str
-) -> Generator[str, Any, None]:  # type: ignore
-    # --------------------
-    created_time = int(time.time())
-    sequence_number = 0
-
-    def _increment_sequence_number_and_return(
-        event: StreamingResponsesResponse,
-    ) -> StreamingResponsesResponse:
-        nonlocal sequence_number
-        # Set sequence_number if the event has this attribute
-        if hasattr(event, "sequence_number"):
-            event.sequence_number = sequence_number
-        sequence_number += 1
-        return event
-
-    async with AsyncExitStack() as exit_stack:
-        processer = None
-        # TODO 没有考虑 use_harmony:
-        processer = _process_simple_streaming_events
-        initial_response = ResponsesResponse.from_request(
-            request=request,
-            created_time=created_time,
-            output=[],
-            status="in_progress",
-            usage=None,
-        ).model_dump()
-        yield _increment_sequence_number_and_return(
-            ResponseCreatedEvent(
-                type="response.created",
-                sequence_number=-1,
-                response=initial_response,
-            )
-        )
-        yield _increment_sequence_number_and_return(
-            ResponseInProgressEvent(
-                type="response.in_progress",
-                sequence_number=-1,
-                response=initial_response,
-            )
-        )
-        async for event_data in processer(
-            request=request,
-            _increment_sequence_number_and_return=_increment_sequence_number_and_return,
-            gen_params=gen_params,
-            worker_addr=worker_addr,
-        ):
-            yield event_data
 
 
 async def chat_completion_stream_generator(

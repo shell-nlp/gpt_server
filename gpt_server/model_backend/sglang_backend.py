@@ -55,6 +55,7 @@ class SGLangBackend(ModelBackend):
             "speculative_algorithm": model_config.speculative_algorithm,
             "speculative_num_steps": model_config.speculative_num_steps,
             "speculative_eagle_topk": 1 if model_config.speculative_algorithm else None,
+            "disable_cuda_graph": False,
         }
         server_args = ServerArgs(**kwargs)
 
@@ -187,11 +188,18 @@ class SGLangBackend(ModelBackend):
                 request_dict = params.get("responses_request", None)
                 request = ResponsesRequest.model_validate(request_dict)
                 request.model = self.model_path
-                response = await self.serving_responses.create_responses(
-                    request, raw_request=None
-                )
-                async for chunk in response:
-                    yield chunk
+                if request.stream:
+                    response = await self.serving_responses.create_responses(
+                        request, raw_request=None
+                    )
+                    async for chunk in response:
+                        yield chunk
+                else:
+                    response = await self.serving_responses.create_responses(
+                        request, raw_request=None
+                    )
+                    data = response.model_dump_json(exclude_unset=True)
+                    yield data
         except asyncio.CancelledError as e:
             self.tokenizer_manager.abort_request(request_id)
             logger.warning(f"request_id : {request_id} 已中断！")
