@@ -1,14 +1,16 @@
 import json
+import traceback
 from typing import List
+
 from fastchat.constants import ErrorCode, SERVER_ERROR_MSG
 from loguru import logger
 import torch
-import traceback
-from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
-from gpt_server.model_handler.tool_parser import tool_parser
-from gpt_server.model_worker.utils import guess_tool_parser_by_model
-
 from vllm.tool_parsers import ToolParserManager
+
+from gpt_server.model_handler.tool_parser import tool_parser
+from gpt_server.model_worker.base.model_worker_base import ModelWorkerBase
+from gpt_server.model_worker.utils import guess_tool_parser_by_model
+from gpt_server.settings import get_model_config
 
 
 class AutoWorker(ModelWorkerBase):
@@ -38,13 +40,15 @@ class AutoWorker(ModelWorkerBase):
         self.stop = [
             self.tokenizer.decode(skip_word) for skip_word in self.stop_words_ids
         ]
-        logger.warning(f"{model_names[0]} 停用词: {self.stop}")
-
         tool_parser_name = guess_tool_parser_by_model(model_path)
-        logger.warning(f"{model_names[0]} 工具解析器: {tool_parser_name}")
+        model_config = get_model_config()
+
         # from https://github.com/xorbitsai/inference/blob/c70ea74fa820a613f8d577047ef1818da20a96b3/xinference/model/llm/llm_family_modelscope.json
         self.tool_parser = ToolParserManager.get_tool_parser(tool_parser_name)(
             self.tokenizer
+        )
+        logger.warning(
+            f"已启动模型: {model_names[0]} |  工具解析器: {tool_parser_name} | 推理解析器: {model_config.reasoning_parser}"
         )
 
     async def generate_stream_gate(self, params):

@@ -169,7 +169,9 @@ class SGLangBackend(ModelBackend):
                             usage = pre_usage
                         pre_usage = usage
                         try:
-                            reasoning_content = choices[0]["delta"]["reasoning_content"]
+                            reasoning_content = choices[0]["delta"].get(
+                                "reasoning_content", None
+                            )
                             text = choices[0]["delta"]["content"]
                             if text is None:
                                 text = ""

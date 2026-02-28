@@ -84,7 +84,7 @@ class VllmBackend(ModelBackend):
             # ),
             prefix_caching_hash_algo="xxhash",
             structured_outputs_config=StructuredOutputsConfig(backend="xgrammar"),
-            enforce_eager=True,
+            enforce_eager=False,
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         models = OpenAIServingModels(
@@ -231,7 +231,9 @@ class VllmBackend(ModelBackend):
                 reasoning_content = None
                 try:
                     text = choices[0]["delta"]["content"]
-                    reasoning_content = choices[0]["delta"]["reasoning_content"]
+                    reasoning_content = choices[0]["delta"].get(
+                        "reasoning_content", None
+                    )
                 except Exception:
                     logger.error(
                         f"Error in processing chunk: {chunk_dict}",
