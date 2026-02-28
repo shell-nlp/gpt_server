@@ -1,6 +1,6 @@
 [project]
 name = "gpt_server"
-version = "0.7.1"
+version = "0.7.2"
 description = "gpt_server是一个用于生产级部署LLMs、Embedding、Reranker、ASR和TTS的开源框架。"
 readme = "README.md"
 license = { text = "Apache 2.0" }
@@ -19,7 +19,7 @@ dependencies = [
     "torchvision==0.24.0",
     "infinity-emb[all]==0.0.77",
     "lmdeploy==0.12.1",
-    "vllm==0.15.1",
+    "vllm==0.16.0",
     "sglang[all]>=0.5.9",
     "qwen_vl_utils",
     "evalscope[perf,rag]>=1.1.1",

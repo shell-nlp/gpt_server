@@ -1795,7 +1795,7 @@ wheels = [
 
 [[package]]
 name = "gpt-server"
-version = "0.7.1"
+version = "0.7.2"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
@@ -1851,7 +1851,7 @@ requires-dist = [
     { name = "streamlit", specifier = ">=1.50.0" },
     { name = "torch", specifier = "==2.9.0" },
     { name = "torchvision", specifier = "==0.24.0" },
-    { name = "vllm", specifier = "==0.15.1" },
+    { name = "vllm", specifier = "==0.16.0" },
 ]
 
 [[package]]
@@ -3280,7 +3280,7 @@ wheels = [
 
 [[package]]
 name = "mistral-common"
-version = "1.8.8"
+version = "1.9.1"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "jsonschema" },
@@ -3292,9 +3292,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/0a/bb/6fc2e46d9920c80f0d053d58be5b0546c18010ff3a5f9b9d91299226e989/mistral_common-1.8.8.tar.gz", hash = "sha256:8ae28b3f88bce1b9396f5d1107e5ea87e4130486b9f6d811df6d5ac07bff2186", size = 6337014, upload-time = "2025-12-22T10:51:47.245Z" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/db/ce/685b8127a326478e05501cb4c9ca23d1cd9f37e16c465a1e832c75aea709/mistral_common-1.9.1.tar.gz", hash = "sha256:550583d70a395c3586cfb748ffab53bd1d7c3409507f0efc0118bff30ffb26e9", size = 6338922, upload-time = "2026-02-12T10:53:41.639Z" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/73/02/c1866598c8e94a4d0593b73e6dec0afea722227b9b3223bf6bb8ab269fa7/mistral_common-1.8.8-py3-none-any.whl", hash = "sha256:f63ce79b1867b3fc7c8b66fcaedab3b07966185567558038dc02321c17e4f39f", size = 6518005, upload-time = "2025-12-22T10:51:44.88Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ac/72/a38bb1fd9fd4d4ef990341c9dd1a7c8061f1951e10efa6d50c0a3f04eced/mistral_common-1.9.1-py3-none-any.whl", hash = "sha256:9e2b2520b6f67bac2e2bb06fcf985b7a1277b01938da2b7cda8cf0fdbfa92e91", size = 6518623, upload-time = "2026-02-12T10:53:39.457Z" },
 ]
 
 [package.optional-dependencies]
@@ -7098,7 +7098,7 @@ wheels = [
 
 [[package]]
 name = "vllm"
-version = "0.15.1"
+version = "0.16.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -7162,9 +7162,10 @@ dependencies = [
     { name = "watchfiles" },
     { name = "xgrammar" },
 ]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e6/fa/ab31c88afd21b69a46c3cc80d4017a2d5045a30cc4862dba6eae6eca7865/vllm-0.16.0.tar.gz", hash = "sha256:1f684bb31fbef59d862e2fe666e23a41f1d39d93f86215ce1ce1db89a8f5665b", size = 29197396, upload-time = "2026-02-26T03:09:45.533Z" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e7/62/17dd4b80508b26c1a85db4fd9789d4726d3f36c95856a89419a178dda461/vllm-0.15.1-cp38-abi3-manylinux_2_31_aarch64.whl", hash = "sha256:97bfc79b0c29d242c57b0d395e48d2949a868957587b853deb813a985a41ed6e", size = 461362624, upload-time = "2026-02-05T00:18:12.38Z" },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/19/2a/a8fdb1d71dfb5b67485b1755a2cc2e069e72fccfa1787cc6dadb6b4176e8/vllm-0.15.1-cp38-abi3-manylinux_2_31_x86_64.whl", hash = "sha256:d3810299d331fc1031c8a2a9886f1f0e0cc2f14ddad284d337174324b1c83e92", size = 509219874, upload-time = "2026-02-05T00:18:30.377Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/d6/ed/9fafb939bf8326e4a45e62041bf5d1eb73b4f76aff8ef75ae1169df7f3cb/vllm-0.16.0-cp38-abi3-manylinux_2_31_aarch64.whl", hash = "sha256:dfaa14846608fd229dda9d372e2ad3f13854fd09147c2ba36b40579cf3c03804", size = 460494130, upload-time = "2026-02-26T03:02:38.495Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/84/ce/44a5a999eb7116516a8d4a08ab9fe14df773f0da4b243ceffe76b0afe54a/vllm-0.16.0-cp38-abi3-manylinux_2_31_x86_64.whl", hash = "sha256:f066b2a2f8597a4a3ada8fbbfd122b59086864b2260ca42dc81bf9fb57af0c42", size = 508337437, upload-time = "2026-02-26T03:02:55.258Z" },
 ]
 
 [[package]]

@@ -1,27 +1,24 @@
-import json
-from typing import Any, Dict, AsyncGenerator
-from vllm import AsyncLLMEngine, AsyncEngineArgs
-from vllm.sampling_params import StructuredOutputsParams
-from gpt_server.model_backend.base import ModelBackend
-from loguru import logger
-from vllm.lora.request import LoRARequest
-from transformers import PreTrainedTokenizer
-
-from vllm.config.structured_outputs import StructuredOutputsConfig
-from gpt_server.settings import get_model_config
-from vllm.entrypoints.openai.models.serving import BaseModelPath, OpenAIServingModels
-from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
-from vllm.entrypoints.openai.responses.serving import OpenAIServingResponses
-from vllm.entrypoints.openai.chat_completion.protocol import (
-    ChatCompletionRequest,
-)
-from vllm.entrypoints.openai.responses.protocol import ResponsesRequest
-from vllm.entrypoints.openai.engine.protocol import StreamOptions
 from dataclasses import asdict
-from vllm.entrypoints.chat_utils import (
-    ConversationMessage,
-)
+import json
+from typing import Any, AsyncGenerator, Dict
+
+from loguru import logger
+from transformers import PreTrainedTokenizer
+from vllm import AsyncEngineArgs, AsyncLLMEngine
+from vllm.config.structured_outputs import StructuredOutputsConfig
+from vllm.entrypoints.chat_utils import ConversationMessage
+from vllm.entrypoints.openai.chat_completion.protocol import ChatCompletionRequest
+from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
+from vllm.entrypoints.openai.engine.protocol import StreamOptions
+from vllm.entrypoints.openai.models.serving import BaseModelPath, OpenAIServingModels
+from vllm.entrypoints.openai.responses.protocol import ResponsesRequest
+from vllm.entrypoints.openai.responses.serving import OpenAIServingResponses
 from vllm.inputs.data import TokensPrompt
+from vllm.lora.request import LoRARequest
+from vllm.sampling_params import StructuredOutputsParams
+
+from gpt_server.model_backend.base import ModelBackend
+from gpt_server.settings import get_model_config
 
 
 class CustomOpenAIServingResponses(OpenAIServingResponses):
@@ -87,7 +84,7 @@ class VllmBackend(ModelBackend):
             # ),
             prefix_caching_hash_algo="xxhash",
             structured_outputs_config=StructuredOutputsConfig(backend="xgrammar"),
-            enforce_eager=False,
+            enforce_eager=True,
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         models = OpenAIServingModels(
@@ -231,6 +228,7 @@ class VllmBackend(ModelBackend):
                 if not choices:
                     continue
                 usage = chunk_dict["usage"]
+                reasoning_content = None
                 try:
                     text = choices[0]["delta"]["content"]
                     reasoning_content = choices[0]["delta"]["reasoning_content"]
