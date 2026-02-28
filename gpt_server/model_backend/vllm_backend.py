@@ -18,6 +18,22 @@ from vllm.entrypoints.openai.chat_completion.protocol import (
 from vllm.entrypoints.openai.responses.protocol import ResponsesRequest
 from vllm.entrypoints.openai.engine.protocol import StreamOptions
 from dataclasses import asdict
+from vllm.entrypoints.chat_utils import (
+    ConversationMessage,
+)
+from vllm.inputs.data import TokensPrompt
+
+
+class CustomOpenAIServingResponses(OpenAIServingResponses):
+    async def _preprocess_chat(self, *args, **kwargs):
+        value: tuple[list[ConversationMessage], list[TokensPrompt]] = (
+            await super()._preprocess_chat(*args, **kwargs)
+        )
+        prompts: TokensPrompt = value[1][0]
+        prompt = prompts.get("prompt", None)
+        if prompt:
+            logger.info("prompt:\n" + prompt)
+        return value
 
 
 class CustomOpenAIServingChat(OpenAIServingChat):
@@ -96,7 +112,7 @@ class VllmBackend(ModelBackend):
                 model_config.reasoning_parser if model_config.reasoning_parser else ""
             ),
         )
-        self.serving_responses = OpenAIServingResponses(
+        self.serving_responses = CustomOpenAIServingResponses(
             engine_client=self.engine,
             models=models,
             chat_template=None,

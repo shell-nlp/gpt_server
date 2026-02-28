@@ -25,6 +25,16 @@ from sglang.srt.server_args import ServerArgs
 from starlette.responses import StreamingResponse
 
 
+class CustomOpenAIServingResponses(OpenAIServingResponses):
+    def _process_messages(self, request, is_multimodal):
+        value: MessageProcessingResult = super()._process_messages(
+            request, is_multimodal
+        )
+        prompt = value.prompt
+        logger.info("prompt:\n" + prompt)
+        return value
+
+
 class CustomOpenAIServingChat(OpenAIServingChat):
     def _process_messages(self, request, is_multimodal):
         value: MessageProcessingResult = super()._process_messages(
@@ -72,7 +82,7 @@ class SGLangBackend(ModelBackend):
             tokenizer_manager=tokenizer_manager, template_manager=template_manager
         )
         # ---
-        self.serving_responses = OpenAIServingResponses(
+        self.serving_responses = CustomOpenAIServingResponses(
             tokenizer_manager=tokenizer_manager, template_manager=template_manager
         )
 
