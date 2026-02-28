@@ -79,64 +79,65 @@ class SGLangBackend(ModelBackend):
         logger.info("sglang后端退出")
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        # params 已不需要传入 prompt
-        messages = params.get("messages", [])
-        tools = params.get("tools", None)
-        chat_template = params.get("chat_template", None)
-        enable_thinking = bool(params.get("enable_thinking", True))
-        request_id = params.get("request_id", "0")
-        temperature = float(params.get("temperature", 0.8))
-        top_p = float(params.get("top_p", 0.8))
-        top_k = params.get("top_k", -1)
-        max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
-        stop_str = params.get("stop", None)
-        stop_token_ids = params.get("stop_words_ids", None) or []
-        presence_penalty = float(params.get("presence_penalty", 0.0))
-        frequency_penalty = float(params.get("frequency_penalty", 0.0))
-        request = params.get("request", None)
+
         api_type = params.get("api_type", "chat")
-        # Handle stop_str
-        stop = set()
-        if isinstance(stop_str, str) and stop_str != "":
-            stop.add(stop_str)
-        elif isinstance(stop_str, list) and stop_str != []:
-            stop.update(stop_str)
+        try:
+            if api_type == "chat":
+                # params 已不需要传入 prompt
+                messages = params.get("messages", [])
+                tools = params.get("tools", None)
+                chat_template = params.get("chat_template", None)
+                enable_thinking = bool(params.get("enable_thinking", True))
+                request_id = params.get("request_id", "0")
+                temperature = float(params.get("temperature", 0.8))
+                top_p = float(params.get("top_p", 0.8))
+                top_k = params.get("top_k", -1)
+                max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
+                stop_str = params.get("stop", None)
+                stop_token_ids = params.get("stop_words_ids", None) or []
+                presence_penalty = float(params.get("presence_penalty", 0.0))
+                frequency_penalty = float(params.get("frequency_penalty", 0.0))
+                request = params.get("request", None)
+                # ---- 支持 response_format ----
+                response_format = params.get("response_format", None)
+                # ------
+                # Handle stop_str
+                stop = set()
+                if isinstance(stop_str, str) and stop_str != "":
+                    stop.add(stop_str)
+                elif isinstance(stop_str, list) and stop_str != []:
+                    stop.update(stop_str)
+                if tools:
+                    for t in tools:
+                        if t["function"].get("strict", None) is None:
+                            t["function"]["strict"] = False
+                request = ChatCompletionRequest(
+                    messages=messages,
+                    model=self.model_path,
+                    max_tokens=max_new_tokens,
+                    temperature=temperature,
+                    seed=33,
+                    stream=True,
+                    stream_options=StreamOptions(
+                        include_usage=True, continuous_usage_stats=True
+                    ),
+                    tools=tools,
+                    response_format=response_format,
+                    stop_token_ids=stop_token_ids,
+                    stop=stop,
+                    presence_penalty=presence_penalty,
+                    frequency_penalty=frequency_penalty,
+                    top_k=top_k,
+                    top_p=top_p if top_p != 0 else 0.01,
+                    rid=request_id,
+                    # tool_choice=params.get("tool_choice", "auto"),
+                    chat_template_kwargs={"enable_thinking": enable_thinking},
+                )
 
-        # ---- 支持 response_format ----
-        response_format = params.get("response_format", None)
-        # ------
-        if api_type == "chat":
-            if tools:
-                for t in tools:
-                    if t["function"].get("strict", None) is None:
-                        t["function"]["strict"] = False
-            request = ChatCompletionRequest(
-                messages=messages,
-                model=self.model_path,
-                max_tokens=max_new_tokens,
-                temperature=temperature,
-                seed=33,
-                stream=True,
-                stream_options=StreamOptions(
-                    include_usage=True, continuous_usage_stats=True
-                ),
-                tools=tools,
-                response_format=response_format,
-                stop_token_ids=stop_token_ids,
-                stop=stop,
-                presence_penalty=presence_penalty,
-                frequency_penalty=frequency_penalty,
-                top_k=top_k,
-                top_p=top_p if top_p != 0 else 0.01,
-                rid=request_id,
-                # tool_choice=params.get("tool_choice", "auto"),
-                chat_template_kwargs={"enable_thinking": enable_thinking},
-            )
+                response = await self.serving_chat.handle_request(
+                    request=request, raw_request=None
+                )
 
-            response = await self.serving_chat.handle_request(
-                request=request, raw_request=None
-            )
-            try:
                 if isinstance(response, StreamingResponse):
                     output_text = ""
                     reasoning_content_text = ""
@@ -182,14 +183,15 @@ class SGLangBackend(ModelBackend):
                 elif isinstance(response, ErrorResponse):
                     pass
 
-            except asyncio.CancelledError as e:
-                self.tokenizer_manager.abort_request(request_id)
-                logger.warning(f"request_id : {request_id} 已中断！")
-        else:
-            request_dict = params.get("responses_request", None)
-            request = ResponsesRequest.model_validate(request_dict)
-            response = await self.serving_responses.create_responses(
-                request, raw_request=None
-            )
-            async for chunk in response:
-                yield chunk
+            else:
+                request_dict = params.get("responses_request", None)
+                request = ResponsesRequest.model_validate(request_dict)
+                request.model = self.model_path
+                response = await self.serving_responses.create_responses(
+                    request, raw_request=None
+                )
+                async for chunk in response:
+                    yield chunk
+        except asyncio.CancelledError as e:
+            self.tokenizer_manager.abort_request(request_id)
+            logger.warning(f"request_id : {request_id} 已中断！")

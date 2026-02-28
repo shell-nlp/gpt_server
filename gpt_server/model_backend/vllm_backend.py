@@ -11,9 +11,11 @@ from vllm.config.structured_outputs import StructuredOutputsConfig
 from gpt_server.settings import get_model_config
 from vllm.entrypoints.openai.models.serving import BaseModelPath, OpenAIServingModels
 from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
+from vllm.entrypoints.openai.responses.serving import OpenAIServingResponses
 from vllm.entrypoints.openai.chat_completion.protocol import (
     ChatCompletionRequest,
 )
+from vllm.entrypoints.openai.responses.protocol import ResponsesRequest
 from vllm.entrypoints.openai.engine.protocol import StreamOptions
 from dataclasses import asdict
 
@@ -89,9 +91,22 @@ class VllmBackend(ModelBackend):
             enable_auto_tools=True,
             tool_parser=None,
             # https://docs.vllm.ai/en/latest/features/reasoning_outputs/
-            reasoning_parser=model_config.reasoning_parser
-            if model_config.reasoning_parser
-            else "",
+            reasoning_parser=(
+                model_config.reasoning_parser if model_config.reasoning_parser else ""
+            ),
+        )
+        self.serving_responses = OpenAIServingResponses(
+            engine_client=self.engine,
+            models=models,
+            chat_template=None,
+            chat_template_content_format="auto",
+            request_logger=None,
+            enable_auto_tools=True,
+            tool_parser=None,
+            # https://docs.vllm.ai/en/latest/features/reasoning_outputs/
+            reasoning_parser=(
+                model_config.reasoning_parser if model_config.reasoning_parser else ""
+            ),
         )
 
     def shutdown(self):
@@ -99,126 +114,137 @@ class VllmBackend(ModelBackend):
         logger.info("vllm后端退出")
 
     async def stream_chat(self, params: Dict[str, Any]) -> AsyncGenerator:
-        # params 已不需要传入 prompt
-        messages = params["messages"]
-        request_id = params.get("request_id", "0")
-        temperature = float(params.get("temperature", 0.8))
-        top_p = float(params.get("top_p", 0.8))
-        top_k = int(params.get("top_k", 0))
-        max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
-        stop_str = params.get("stop", None)
-        stop_token_ids = params.get("stop_words_ids", None) or []
-        presence_penalty = float(params.get("presence_penalty", 0.0))
-        frequency_penalty = float(params.get("frequency_penalty", 0.0))
-        repetition_penalty = float(params.get("repetition_penalty", 1.0))
-        enable_thinking = bool(params.get("enable_thinking", True))
-        request = params.get("request", None)
-        tools = params.get("tools", None)
-        chat_template = params.get("chat_template", None)
-        # Handle stop_str
-        stop = set()
-        if isinstance(stop_str, str) and stop_str != "":
-            stop.add(stop_str)
-        elif isinstance(stop_str, list) and stop_str != []:
-            stop.update(stop_str)
 
-        # ----------------------------------------------------------------
-        # make sampling params in vllm
-        top_p = max(top_p, 1e-5)
-        if temperature <= 1e-5:
-            top_p = 1.0
-            temperature = 0.01
-        response_format = params["response_format"]
-        guided_json_object = None
-        guided_decoding = None
-        guided_json = None
-        if response_format is not None:
-            if response_format["type"] == "json_object":
-                guided_json_object = True
-            if response_format["type"] == "json_schema":
-                json_schema = response_format["json_schema"]
-                assert json_schema is not None
-                guided_json = json_schema["schema"]
-            guided_decoding = StructuredOutputsParams(
-                json=guided_json,
-                regex=None,
-                choice=None,
-                grammar=None,
-                json_object=guided_json_object,
-                whitespace_pattern=None,
-            )
-            if response_format["type"] == "text":
-                guided_decoding = None
+        api_type = params.get("api_type", "chat")
+        if api_type == "chat":
+            # params 已不需要传入 prompt
+            messages = params["messages"]
+            request_id = params.get("request_id", "0")
+            temperature = float(params.get("temperature", 0.8))
+            top_p = float(params.get("top_p", 0.8))
+            top_k = int(params.get("top_k", 0))
+            max_new_tokens = int(params.get("max_new_tokens", 1024 * 8))
+            stop_str = params.get("stop", None)
+            stop_token_ids = params.get("stop_words_ids", None) or []
+            presence_penalty = float(params.get("presence_penalty", 0.0))
+            frequency_penalty = float(params.get("frequency_penalty", 0.0))
+            repetition_penalty = float(params.get("repetition_penalty", 1.0))
+            enable_thinking = bool(params.get("enable_thinking", True))
+            request = params.get("request", None)
+            tools = params.get("tools", None)
+            chat_template = params.get("chat_template", None)
+            # Handle stop_str
+            stop = set()
+            if isinstance(stop_str, str) and stop_str != "":
+                stop.add(stop_str)
+            elif isinstance(stop_str, list) and stop_str != []:
+                stop.update(stop_str)
 
-        lora_request = None
-        for lora in self.lora_requests:
-            if params["model"] == lora.lora_name:
-                lora_request = lora
-                break
-
-        request = ChatCompletionRequest(
-            model=self.model_path,
-            messages=messages,
-            seed=33,
-            stream=True,
-            stream_options=StreamOptions(
-                include_usage=True, continuous_usage_stats=True
-            ),
-            max_tokens=max_new_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
-            repetition_penalty=repetition_penalty,
-            stop=stop,
-            stop_token_ids=stop_token_ids,
-            structured_outputs=asdict(guided_decoding) if guided_decoding else None,
-            request_id=request_id,
-            tools=tools,
-            # tool_choice=params.get("tool_choice", None),
-            chat_template_kwargs={"enable_thinking": enable_thinking},
-        )
-        response = await self.serving_chat.create_chat_completion(
-            request=request,
-            raw_request=None,
-        )
-        output_text = ""
-        reasoning_content_text = ""
-        async for chunk in response:
-            # data: {"id":"chatcmpl-bf6de7d56c9bfecc","object":"chat.completion.chunk","created":1769947499,"model":"qwem3vl","choices":[{"index":0,"delta":{"content":"你好","reasoning_content":null},"logprobs":null,"finish_reason":null,"token_ids":null}],"usage":{"prompt_tokens":10,"total_tokens":11,"completion_tokens":1}}
-            # data: [DONE]
-            chunk = chunk.strip("data: ").strip()
-            if chunk == "[DONE]":
-                break
-            chunk_dict = json.loads(chunk)
-            choices = chunk_dict["choices"]
-            if not choices:
-                continue
-            usage = chunk_dict["usage"]
-            try:
-                text = choices[0]["delta"]["content"]
-                reasoning_content = choices[0]["delta"]["reasoning_content"]
-            except Exception:
-                logger.error(
-                    f"Error in processing chunk: {chunk_dict}",
+            # ----------------------------------------------------------------
+            # make sampling params in vllm
+            top_p = max(top_p, 1e-5)
+            if temperature <= 1e-5:
+                top_p = 1.0
+                temperature = 0.01
+            response_format = params["response_format"]
+            guided_json_object = None
+            guided_decoding = None
+            guided_json = None
+            if response_format is not None:
+                if response_format["type"] == "json_object":
+                    guided_json_object = True
+                if response_format["type"] == "json_schema":
+                    json_schema = response_format["json_schema"]
+                    assert json_schema is not None
+                    guided_json = json_schema["schema"]
+                guided_decoding = StructuredOutputsParams(
+                    json=guided_json,
+                    regex=None,
+                    choice=None,
+                    grammar=None,
+                    json_object=guided_json_object,
+                    whitespace_pattern=None,
                 )
-            output_text += text
-            if reasoning_content:
-                reasoning_content_text += reasoning_content
-            ret = {
-                "text": text,
-                "usage": usage,
-                "error_code": 0,
-                "finish_reason": choices[0]["finish_reason"],
-                "reasoning_content": reasoning_content,
-            }
-            yield ret
+                if response_format["type"] == "text":
+                    guided_decoding = None
 
-        # logger.info(f"Lora: {request_output.lora_request}")
-        logger.info(f"reasoning_content: \n{reasoning_content_text}")
-        logger.info(f"output_text: \n{output_text}")
-        logger.info(f"usage: {usage}")
+            lora_request = None
+            for lora in self.lora_requests:
+                if params["model"] == lora.lora_name:
+                    lora_request = lora
+                    break
+
+            request = ChatCompletionRequest(
+                model=self.model_path,
+                messages=messages,
+                seed=33,
+                stream=True,
+                stream_options=StreamOptions(
+                    include_usage=True, continuous_usage_stats=True
+                ),
+                max_tokens=max_new_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                presence_penalty=presence_penalty,
+                frequency_penalty=frequency_penalty,
+                repetition_penalty=repetition_penalty,
+                stop=stop,
+                stop_token_ids=stop_token_ids,
+                structured_outputs=asdict(guided_decoding) if guided_decoding else None,
+                request_id=request_id,
+                tools=tools,
+                # tool_choice=params.get("tool_choice", None),
+                chat_template_kwargs={"enable_thinking": enable_thinking},
+            )
+            response = await self.serving_chat.create_chat_completion(
+                request=request,
+                raw_request=None,
+            )
+            output_text = ""
+            reasoning_content_text = ""
+            async for chunk in response:
+                # data: {"id":"chatcmpl-bf6de7d56c9bfecc","object":"chat.completion.chunk","created":1769947499,"model":"qwem3vl","choices":[{"index":0,"delta":{"content":"你好","reasoning_content":null},"logprobs":null,"finish_reason":null,"token_ids":null}],"usage":{"prompt_tokens":10,"total_tokens":11,"completion_tokens":1}}
+                # data: [DONE]
+                chunk = chunk.strip("data: ").strip()
+                if chunk == "[DONE]":
+                    break
+                chunk_dict = json.loads(chunk)
+                choices = chunk_dict["choices"]
+                if not choices:
+                    continue
+                usage = chunk_dict["usage"]
+                try:
+                    text = choices[0]["delta"]["content"]
+                    reasoning_content = choices[0]["delta"]["reasoning_content"]
+                except Exception:
+                    logger.error(
+                        f"Error in processing chunk: {chunk_dict}",
+                    )
+                output_text += text
+                if reasoning_content:
+                    reasoning_content_text += reasoning_content
+                ret = {
+                    "text": text,
+                    "usage": usage,
+                    "error_code": 0,
+                    "finish_reason": choices[0]["finish_reason"],
+                    "reasoning_content": reasoning_content,
+                }
+                yield ret
+
+            # logger.info(f"Lora: {request_output.lora_request}")
+            logger.info(f"reasoning_content: \n{reasoning_content_text}")
+            logger.info(f"output_text: \n{output_text}")
+            logger.info(f"usage: {usage}")
+        else:
+            request_dict = params.get("responses_request", None)
+            request = ResponsesRequest.model_validate(request_dict)
+            request.model = self.model_path
+            response = await self.serving_responses.create_responses(request)
+            async for chunk in response:
+                data = chunk.model_dump_json(exclude_unset=True)
+                yield f"data: {data}\n\n"
 
 
 if __name__ == "__main__":
