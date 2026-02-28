@@ -289,8 +289,14 @@ def tool_parser(full_text: str, tool_parser_: ToolParser, tools, ret):
             model_output=full_text, request=request
         )
         tools_called = tool_call_info.tools_called
-        _, tool_calls = tool_call_info.content, tool_call_info.tool_calls
-        tool_calls = [i.model_dump() for i in tool_calls]
+        _, tool_calls_ = tool_call_info.content, tool_call_info.tool_calls
+        tool_calls = []
+        for index, i in enumerate(tool_calls_):
+            tool_call = i.model_dump()
+            if "index" not in tool_call:
+                tool_call["index"] = index
+            tool_calls.append(tool_call)
+
         # -----------------------------------
         ret["text"] = ""
         ret["tool_calls"] = tool_calls
@@ -349,9 +355,7 @@ celsius
 </function>
 </tool_call>
 """
-    tokenizer = AutoTokenizer.from_pretrained(
-        "/home/dev/model/Qwen/Qwen3-30B-A3B-Instruct-2507/"
-    )
+    tokenizer = AutoTokenizer.from_pretrained("/home/dev/model/Qwen/Qwen3___5-35B-A3B/")
     tool_parser_ = ToolParserManager.get_tool_parser("qwen2_5")(tokenizer)
     tool_parser(
         full_text=qwen_full_text, tool_parser_=tool_parser_, tools=tools, ret={}
