@@ -23,6 +23,7 @@ from transformers import (
 import uuid
 from gpt_server.utils import get_free_tcp_port, STATIC_DIR, local_ip
 from gpt_server.model_worker.base.base_model_worker import BaseModelWorker
+from gpt_server.model_handler.tool_parser import ToolCallStreamProcessor
 
 worker = None
 app = FastAPI()
@@ -247,9 +248,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         full_text = ""
         full_tool_calls = None
         full_reasoning_content = ""
-        old_tool_calls_len = 0
         tool_calls = None
         reasoning_content = ""
+        processor = ToolCallStreamProcessor()
         async for ret in self.generate_stream_gate(params):
             full_text += json.loads(ret[:-1].decode()).get("text", "")
             tool_calls = json.loads(ret[:-1].decode()).get("tool_calls", None)
@@ -259,10 +260,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             if reasoning_content:
                 full_reasoning_content += reasoning_content
             if tool_calls:
-                current_tool_calls_len = len(str(tool_calls))
-                if current_tool_calls_len > old_tool_calls_len:
-                    old_tool_calls_len = current_tool_calls_len
-                    full_tool_calls = tool_calls
+                processor.process_chunk(tool_calls)
+        full_tool_calls = processor.get_completed_tool_calls()
         ret = json.loads(ret[:-1].decode())
         ret["text"] = full_text
         ret["tool_calls"] = full_tool_calls

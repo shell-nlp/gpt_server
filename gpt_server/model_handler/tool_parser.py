@@ -157,6 +157,96 @@ def tool_parser(full_text: str, tool_parser_: ToolParser, tools, ret):
         return None
 
 
+import json
+import logging
+from typing import Dict, List, Any, Optional
+
+
+class ToolCallStreamProcessor:
+    """
+    处理流式tool_calls，只接收tool_calls部分数据
+    """
+
+    def __init__(self):
+        # 存储所有工具调用的累积数据，按index索引
+        self.tool_calls: Dict[int, Dict[str, Any]] = {}
+
+    def process_chunk(self, tool_calls_data: List[Dict]) -> Optional[List[Dict]]:
+        """
+        处理tool_calls数据
+        参数: tool_calls_data - 从delta中提取的tool_calls列表
+        返回: 如果检测到完成则返回完整的工具调用，否则返回None
+        """
+        if not tool_calls_data:
+            return None
+
+        for tool_call in tool_calls_data:
+            index = tool_call.get("index", 0)
+
+            # 初始化新工具调用
+            if index not in self.tool_calls:
+                self.tool_calls[index] = {
+                    "id": None,
+                    "type": "function",
+                    "function": {"name": None, "arguments": ""},
+                }
+
+            current = self.tool_calls[index]
+
+            # 更新ID（只在第一个chunk中出现）
+            if tool_call.get("id"):
+                current["id"] = tool_call["id"]
+
+            # 更新函数名（只在第一个chunk中出现）
+            function_data = tool_call.get("function", {})
+            if function_data.get("name"):
+                current["function"]["name"] = function_data["name"]
+
+            # 累积参数字符串
+            if function_data.get("arguments"):
+                current["function"]["arguments"] += function_data["arguments"]
+
+        return None
+
+    def get_completed_tool_calls(self) -> Optional[List[Dict]]:
+        """
+        获取所有完整的工具调用，并解析arguments JSON
+        通常在收到finish_reason='tool_calls'后调用
+        """
+        if not self.tool_calls:
+            return None
+
+        completed_calls = []
+
+        for index in sorted(self.tool_calls.keys()):
+            call_data = self.tool_calls[index]
+
+            # 检查是否完整
+            if not call_data["id"] or not call_data["function"]["name"]:
+                logging.warning(f"工具调用 {index} 不完整，跳过")
+                continue
+
+            # 解析arguments JSON
+            args_str = call_data["function"]["arguments"]
+
+            completed_calls.append(
+                {
+                    "id": call_data["id"],
+                    "type": call_data["type"],
+                    "function": {
+                        "name": call_data["function"]["name"],
+                        "arguments": args_str,
+                    },
+                }
+            )
+
+        return completed_calls if completed_calls else None
+
+    def reset(self):
+        """重置处理器"""
+        self.tool_calls = {}
+
+
 if __name__ == "__main__":
     from transformers import AutoTokenizer
 
