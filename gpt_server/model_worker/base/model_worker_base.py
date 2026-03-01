@@ -5,6 +5,7 @@ import json
 import sys
 import shutil
 from abc import ABC
+from contextlib import asynccontextmanager
 from fastapi import BackgroundTasks, Request, FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -163,7 +164,9 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             elif isinstance(tool_choice, dict):
                 tools = pop_matching_tool(tools=tools, tool_choice=tool_choice)
                 tool_name = tool_choice["function"]["name"]
-                params["extra_prompt"] = f"""<tool_call>
+                params[
+                    "extra_prompt"
+                ] = f"""<tool_call>
 {{"name": "{tool_name}", "arguments": 
     """
         params["tools"] = tools
@@ -373,24 +376,25 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         model_names = args.model_names
         logger.info(f"{model_names[0]} args: \n{args}")
 
-        @app.on_event("startup")
-        async def startup():
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            # Startup
             global worker
             asyncio.create_task(run_scheduler())
             worker = cls.get_worker(
                 worker_addr=worker_addr,
                 model_path=args.model_name_or_path,
                 model_names=model_names,
-                conv_template="chatglm3",  # TODO 默认是chatglm3用于统一处理
+                conv_template="chatglm3",
                 controller_addr=controller_address,
                 limit_worker_concurrency=limit_worker_concurrency,
             )
-
-        @app.on_event("shutdown")
-        async def shutdown():
-            global worker
-            # 优雅推出
+            yield
+            # Shutdown
+            # 优雅退出
             worker.backend.shutdown()
+
+        app.router.lifespan_context = lifespan
 
         uvicorn.run(app, host=host, port=port)
 
