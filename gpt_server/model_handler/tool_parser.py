@@ -146,14 +146,15 @@ def tool_parser(full_text: str, tool_parser_: ToolParser, tools, ret):
             logger.info(
                 f" 工具解析{'成功' if tools_called else '失败'}, tool_calls: {tool_calls}"
             )
+        if not tools_called:
+            return None
         return json.dumps(ret).encode() + b"\0"
     except Exception as e:
         logger.warning(f"Error in tool_parser: {e}")
         import traceback
 
         traceback.print_exc()
-        ret["text"] = ""
-        return json.dumps(ret).encode() + b"\0"
+        return None
 
 
 if __name__ == "__main__":

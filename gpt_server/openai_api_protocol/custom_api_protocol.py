@@ -427,6 +427,7 @@ class ChatMessage(BaseModel):
 
 class CustomChatMessage(ChatMessage):
     tool_calls: Optional[list] = None
+    reasoning_content: Optional[str] = None
 
 
 class CustomChatCompletionResponseChoice(BaseModel):

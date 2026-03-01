@@ -245,10 +245,28 @@ class ModelWorkerBase(BaseModelWorker, ABC):
 
     async def generate_gate(self, params):
         full_text = ""
+        full_tool_calls = None
+        full_reasoning_content = ""
+        old_tool_calls_len = 0
+        tool_calls = None
+        reasoning_content = ""
         async for ret in self.generate_stream_gate(params):
             full_text += json.loads(ret[:-1].decode()).get("text", "")
+            tool_calls = json.loads(ret[:-1].decode()).get("tool_calls", None)
+            reasoning_content = json.loads(ret[:-1].decode()).get(
+                "reasoning_content", ""
+            )
+            if reasoning_content:
+                full_reasoning_content += reasoning_content
+            if tool_calls:
+                current_tool_calls_len = len(str(tool_calls))
+                if current_tool_calls_len > old_tool_calls_len:
+                    old_tool_calls_len = current_tool_calls_len
+                    full_tool_calls = tool_calls
         ret = json.loads(ret[:-1].decode())
         ret["text"] = full_text
+        ret["tool_calls"] = full_tool_calls
+        ret["reasoning_content"] = full_reasoning_content
         return ret
 
     @classmethod
@@ -320,6 +338,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--reasoning_parser", type=str, default="")
         parser.add_argument("--speculative_algorithm", type=str, default="")
         parser.add_argument("--speculative_num_steps", type=str, default="")
+        # tool_call_parser
+        parser.add_argument("--tool_call_parser", type=str, default="")
 
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
@@ -350,6 +370,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
             os.environ["speculative_algorithm"] = args.speculative_algorithm
         if args.speculative_num_steps:
             os.environ["speculative_num_steps"] = args.speculative_num_steps
+        if args.tool_call_parser:
+            os.environ["tool_call_parser"] = args.tool_call_parser
 
         os.environ["model_type"] = args.model_type
         os.environ["enable_prefix_caching"] = args.enable_prefix_caching

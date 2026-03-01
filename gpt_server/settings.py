@@ -16,6 +16,7 @@ class ModelConfig(BaseSettings):
     hf_overrides: dict | None = None
     """HuggingFace 配置覆盖参数"""
     reasoning_parser: str | None = None
+    tool_call_parser: str | None = None
 
     speculative_algorithm: str | None = None
     """投机解码算法"""

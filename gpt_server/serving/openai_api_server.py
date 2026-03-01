@@ -516,8 +516,9 @@ async def create_chat_completion(request: CustomChatCompletionRequest):
                 index=i,
                 message=CustomChatMessage(
                     role="assistant",
-                    content=content["text"],
+                    content=content.get("text", None),
                     tool_calls=content.get("tool_calls", None),
+                    reasoning_content=content.get("reasoning_content", None),
                 ),
                 finish_reason=content.get("finish_reason", "stop"),
             )

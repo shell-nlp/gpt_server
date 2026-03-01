@@ -63,12 +63,14 @@ class AutoWorker(ModelWorkerBase):
                     full_text += ret.get("text", "")
                     yield json.dumps(ret).encode() + b"\0"
                 # ------ add tool_calls ------
-                yield tool_parser(
+                tool_parser_result = tool_parser(
                     full_text=full_text,
                     tool_parser_=self.tool_parser,
                     tools=tools,
                     ret=ret,
                 )
+                if tool_parser_result:
+                    yield tool_parser_result
                 # ------ add tool_calls ------
             else:
                 async for ret in self.backend.stream_chat(params=params):

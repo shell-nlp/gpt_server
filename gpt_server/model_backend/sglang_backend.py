@@ -63,6 +63,7 @@ class SGLangBackend(ModelBackend):
             "disable_radix_cache": not model_config.enable_prefix_caching,
             # https://docs.sglang.io/advanced_features/separate_reasoning.html
             "reasoning_parser": model_config.reasoning_parser,
+            "tool_call_parser": model_config.tool_call_parser,
             "speculative_algorithm": model_config.speculative_algorithm,
             "speculative_num_steps": model_config.speculative_num_steps,
             "speculative_eagle_topk": 1 if model_config.speculative_algorithm else None,
@@ -168,11 +169,14 @@ class SGLangBackend(ModelBackend):
                         if usage is None and pre_usage is not None:
                             usage = pre_usage
                         pre_usage = usage
+                        tool_calls = None
                         try:
                             reasoning_content = choices[0]["delta"].get(
                                 "reasoning_content", None
                             )
                             text = choices[0]["delta"]["content"]
+                            # 提取 tool_calls
+                            tool_calls = choices[0]["delta"].get("tool_calls", None)
                             if text is None:
                                 text = ""
                         except Exception:
@@ -188,6 +192,7 @@ class SGLangBackend(ModelBackend):
                             "error_code": 0,
                             "finish_reason": choices[0]["finish_reason"],
                             "reasoning_content": reasoning_content,
+                            "tool_calls": tool_calls,
                         }
                         yield ret
                     logger.info(f"reasoning_content: \n{reasoning_content_text}")

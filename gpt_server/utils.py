@@ -239,6 +239,7 @@ def start_model_worker(config: dict):
                     task_type = engine_config.get("task_type", "auto")
                     hf_overrides = engine_config.get("hf_overrides", "")
                     reasoning_parser = engine_config.get("reasoning_parser", "")
+                    tool_call_parser = engine_config.get("tool_call_parser", "")
                     speculative_algorithm = engine_config.get(
                         "speculative_algorithm", ""
                     )
@@ -354,6 +355,8 @@ def start_model_worker(config: dict):
                         cmd += f" --hf_overrides '{json.dumps(hf_overrides)}'"
                     if reasoning_parser:
                         cmd += f" --reasoning_parser {reasoning_parser}"
+                    if tool_call_parser:
+                        cmd += f" --tool_call_parser {tool_call_parser}"
                     if speculative_algorithm:
                         cmd += f" --speculative_algorithm {speculative_algorithm}"
                     if speculative_num_steps:
