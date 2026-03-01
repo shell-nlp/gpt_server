@@ -5,6 +5,7 @@ class ModelConfig(BaseSettings):
     model_name_or_path: str | None = None
     """模型名称或者路径"""
     backend: str = "vllm"
+    enforce_eager: bool = False
     enable_prefix_caching: bool = False
     enable_chunked_prefill: bool | None = None
     max_model_len: int | None = None

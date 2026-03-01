@@ -84,7 +84,7 @@ class VllmBackend(ModelBackend):
             # ),
             prefix_caching_hash_algo="xxhash",
             structured_outputs_config=StructuredOutputsConfig(backend="xgrammar"),
-            enforce_eager=False,
+            enforce_eager=model_config.enforce_eager,
         )
         self.engine = AsyncLLMEngine.from_engine_args(self.engine_args)
         models = OpenAIServingModels(
@@ -103,7 +103,7 @@ class VllmBackend(ModelBackend):
             request_logger=None,
             trust_request_chat_template=True,
             enable_auto_tools=True,
-            tool_parser=None,
+            tool_parser=model_config.tool_call_parser,
             # https://docs.vllm.ai/en/latest/features/reasoning_outputs/
             reasoning_parser=(
                 model_config.reasoning_parser if model_config.reasoning_parser else ""
@@ -229,11 +229,13 @@ class VllmBackend(ModelBackend):
                     continue
                 usage = chunk_dict["usage"]
                 reasoning_content = None
+                tool_calls = None
                 try:
                     text = choices[0]["delta"]["content"]
                     reasoning_content = choices[0]["delta"].get(
                         "reasoning_content", None
                     )
+                    tool_calls = choices[0]["delta"].get("tool_calls", None)
                 except Exception:
                     logger.error(
                         f"Error in processing chunk: {chunk_dict}",
@@ -247,6 +249,7 @@ class VllmBackend(ModelBackend):
                     "error_code": 0,
                     "finish_reason": choices[0]["finish_reason"],
                     "reasoning_content": reasoning_content,
+                    "tool_calls": tool_calls,
                 }
                 yield ret
 

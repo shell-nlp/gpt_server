@@ -67,7 +67,7 @@ class SGLangBackend(ModelBackend):
             "speculative_algorithm": model_config.speculative_algorithm,
             "speculative_num_steps": model_config.speculative_num_steps,
             "speculative_eagle_topk": 1 if model_config.speculative_algorithm else None,
-            "disable_cuda_graph": False,
+            "disable_cuda_graph": model_config.enforce_eager,
         }
         server_args = ServerArgs(**kwargs)
 

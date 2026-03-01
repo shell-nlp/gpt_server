@@ -339,6 +339,8 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         parser.add_argument("--speculative_num_steps", type=str, default="")
         # tool_call_parser
         parser.add_argument("--tool_call_parser", type=str, default="")
+        # enforce_eager
+        parser.add_argument("--enforce_eager", type=str, default="False")
 
         args = parser.parse_args()
         os.environ["num_gpus"] = str(args.num_gpus)
@@ -380,6 +382,7 @@ class ModelWorkerBase(BaseModelWorker, ABC):
         os.environ["dtype"] = args.dtype
         os.environ["log_level"] = args.log_level
         os.environ["task_type"] = args.task_type
+        os.environ["enforce_eager"] = args.enforce_eager
         limit_worker_concurrency = int(args.limit_worker_concurrency)
         logger.remove(0)
         log_level = os.getenv("log_level", "WARNING")

@@ -246,6 +246,7 @@ def start_model_worker(config: dict):
                     speculative_num_steps = engine_config.get(
                         "speculative_num_steps", ""
                     )
+                    enforce_eager = engine_config.get("enforce_eager", "False")
 
                 else:
                     logger.error(
@@ -339,6 +340,7 @@ def start_model_worker(config: dict):
                         + f" --task_type {task_type}"  # 日志水平
                         + f" --limit_worker_concurrency {limit_worker_concurrency}"  # 限制worker并发数
                         + f" --model_type {model_type}"  # 默认类型
+                        + f" --enforce_eager {enforce_eager}"  # 是否开启 eager 模式
                     )
                     # 处理为 None的情况
                     if port:
