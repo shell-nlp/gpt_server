@@ -80,7 +80,8 @@ def guess_tool_parser_by_model(model_path: str) -> str:
 
     if "qwen" in architecture_lower:
         return "qwen2_5"
-
+    if "minimaxm2" in architecture_lower:
+        return "minimax_m2 "
     return "qwen2_5"
 
 
