@@ -155,6 +155,7 @@ class SGLangBackend(ModelBackend):
                     output_text = ""
                     reasoning_content_text = ""
                     pre_usage = None
+                    usage = None
                     async for chunk in response.body_iterator:
                         # data: {"id":"chatcmpl-bf6de7d56c9bfecc","object":"chat.completion.chunk","created":1769947499,"model":"qwem3vl","choices":[{"index":0,"delta":{"content":"你好","reasoning_content":null},"logprobs":null,"finish_reason":null,"token_ids":null}],"usage":{"prompt_tokens":10,"total_tokens":11,"completion_tokens":1}}
                         # data: [DONE]
@@ -162,7 +163,7 @@ class SGLangBackend(ModelBackend):
                         if chunk == "[DONE]":
                             break
                         chunk_dict = json.loads(chunk)
-                        choices = chunk_dict["choices"]
+                        choices = chunk_dict.get("choices", None)
                         if not choices:
                             continue
                         usage = chunk_dict["usage"]
