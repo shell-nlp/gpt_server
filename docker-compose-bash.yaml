@@ -7,7 +7,7 @@ services:
     #   context: .
     #   dockerfile: Dockerfile.copy
     # image: gpt_server:bash
-    image: docker.1ms.run/506610466/gpt_server:latest
+    image: docker.1ms.run/506610466/gpt_server:0.7.2
     container_name: bash
     # ------ 从项目构建最新代码镜像 ------
     # image: docker.1ms.run/506610466/gpt_server:latest # 如果只是用docker hub发布的镜像,则去掉这个注释,将上面从项目构建最新代码镜像的注释掉

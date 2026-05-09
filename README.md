@@ -48,6 +48,20 @@
 - 支持了`OpenAI`库的SD,文生图模型接口（sd, /v1/images/edits）,基于diffusers后端(代码样例见gpt_server/tests/test_image_edit.py)
 
 
+## ⚠️ 注意
+**⚠️ 注意：本仓库2026年5月9日开始已不再维护（No Longer Maintained）**
+
+因vllm/sglang/lmdeploy环境依赖发生重大冲突，导致环境很难兼容，且老版本的cuda vllm/sglang官方也不再构建，因此维护成本较高，因此本项目停止更新和维护，不再提供新功能开发、Bug修复和安全更新。建议用户迁移到其他替代方案。
+本项目起步于2023年10月，为本人亲自维护，当初为解决fastchat更新过慢、早期的vllm bug较多，更新较慢以及不支持 工具调用等诸多问题。现如今 vllm/sglang生态已成，各种问题早已解决，因此此项目存在的意义以及不大。
+下面将介绍迁移方案。
+1. 对于 LLM/VLM/Embedding/Reranker,建议使用官方的vllm/sglang 镜像直接部署。
+ 参考部署的docker compose 见 [docker-compose.yml](https://github.com/shell-nlp/gpt_server/blob/dev/tests/migrate/docker-compose-vllm.yml)，每个模型会占用不同的端口，但可以通过openai router进行 反向代理。
+2. 对于 ASR/TTS/SD 等模型,建议使用vllm-omni 项目直接部署。
+3. 对于 通过一个 ip:port 路由到不同模型，下面给出两种迁移方案。
+ 使用 [SGLang Model Gateway](https://docs.sglang.io/docs/advanced_features/sgl_model_gateway),支持缓存感知的路由，缺点是 不支持对一个模型设置多个别名。
+ 使用 [openai router](https://github.com/shell-nlp/openai_router),支持对一个模型设置多个别名，带UI界面，方便管理。（本人的另一个项目，将长期维护）
+
+
 ## 📘 配置文档 
 
 

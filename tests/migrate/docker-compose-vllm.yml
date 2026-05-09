@@ -1,7 +1,7 @@
 version: "3.8"
 
 x-vllm-base: &vllm-base
-  image: llmhub.archermind.com/vllm/vllm-openai:v0.20.1
+  image: vllm/vllm-openai:v0.20.1
   restart: unless-stopped
   volumes:
     - /home/dev/model/:/home/dev/model/
