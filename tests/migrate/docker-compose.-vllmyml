@@ -1,0 +1,103 @@
+version: "3.8"
+
+x-vllm-base: &vllm-base
+  image: llmhub.archermind.com/vllm/vllm-openai:v0.20.1
+  restart: unless-stopped
+  volumes:
+    - /home/dev/model/:/home/dev/model/
+  shm_size: 64g
+  ipc: host
+  environment:
+    - VLLM_LOGGING_LEVEL=DEBUG
+services:
+  qwen3.5:
+      <<: *vllm-base
+      container_name: qwen3.5
+      ports:
+        - "40000:30000"
+      deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                device_ids: ["0"]
+                capabilities: [gpu]
+      command: >
+        /home/dev/model/Qwen/Qwen3___6-35B-A3B/
+        --served-model-name qwen3.5 qwq qwen32b qwen3 qwen
+        --host 0.0.0.0
+        --port 30000
+        --data-parallel-size 1
+        --tensor-parallel-size 1
+        --max-model-len 64000
+        --gpu-memory-utilization 0.95
+        --enable-prefix-caching
+        --max-num-seqs 150
+        --reasoning-parser qwen3
+        --tool-call-parser qwen3_coder
+        --enable-auto-tool-choice
+        --enable-force-include-usage
+        --default-chat-template-kwargs '{"enable_thinking": false}'
+
+        --enable-log-requests
+        --enable_log_outputs
+        --no-enable-log-deltas
+
+  # ----------------- embedding/reranker ---------------
+  qwen3-embedding:
+      <<: *vllm-base
+      container_name: qwen3-embedding
+      ports:
+        - "40001:30000"
+      deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                device_ids: ["3"]
+                capabilities: [gpu]
+      command: >
+        /home/dev/model/Qwen/Qwen3-Embedding-0___6B/
+        --runner pooling
+        --served-model-name qwen3-embedding text-embedding-ada-003
+        --host 0.0.0.0
+        --port 30000
+        --gpu-memory-utilization 0.5
+
+  Conan-embedding-v1:
+      <<: *vllm-base
+      container_name: Conan-embedding-v1
+      ports:
+        - "40004:30000"
+      deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                device_ids: ["3"]
+                capabilities: [gpu]
+      command: >
+        /home/dev/model/TencentBAC/Conan-embedding-v1/
+        --served-model-name Conan-embedding-v1 text-embedding-ada-002
+        --host 0.0.0.0
+        --port 30000
+        --runner pooling
+
+  bge-reranker-base:
+      <<: *vllm-base
+      container_name: bge-reranker-base
+      ports:
+        - "40003:30000"
+      deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                device_ids: ["3"]
+                capabilities: [gpu]
+      command: >
+        /home/dev/model/Xorbits/bge-reranker-base/
+        --served-model-name bge-reranker-base
+        --host 0.0.0.0
+        --port 30000
+        --gpu-memory-utilization 0.2
